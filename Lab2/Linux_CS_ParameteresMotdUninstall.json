@@ -14,7 +14,7 @@
             ]
         },
         "commandToExecute": {
-            "value": "./custom_script_linux_v1.sh" 
+            "value": "./custom_script_linux_v1_uninstall.sh" 
         }
     }
 }
