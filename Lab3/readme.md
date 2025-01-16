@@ -15,13 +15,19 @@ O repositório abaixo pode ser utilizado como referência para a criação de ou
 [Github PSDscResources] (https://github.com/PowerShell/PSDscResources/blob/dev/Examples/Sample_MsiPackage_InstallPackageFromHttp.ps1)
 
 ### **7-zip**
+Com base no documento oficial da Microsoft **Como criar um pacote personalizado** vou utilizar como base e usar o exemplo [sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab3/sample7zip.ps1). Com isso executaremos o script para criar o arquivo **localhost.mof**.
 
+Esse arquivo será processado pelo comando abaixo:
 
+```bash
 New-GuestConfigurationPackage `
 -Name 'Install7zip_MsiPackageFromHttp' `
 -Configuration ".\Install7zip_MsiPackageFromHttp/localhost.mof" `
 -Type AuditAndSet `
--Path $OutputPath `
+-Path .\ `
 -Force
+```
 
+O comando gerará o pacote necessário para aplicar e auditar a configuração desejada. Para realizar testes, podemos copiar o arquivo Install7zip_MsiPackageFromHttp.zip para um servidor e validá-lo utilizando o seguinte comando:
+```bash
 Start-GuestConfigurationPackageRemediation -Path .\Install7zip_MsiPackageFromHttp.zip
