@@ -1,4 +1,4 @@
-# Usaremos o Azure Arc JumpStart para criar o ambiente de demonstração.
+# Usaremos o Azure Arc JumpStart para criar o ambiente de demonstração
 [Azure Arc JumpStart ITPro] (https://azurearcjumpstart.com/azure_jumpstart_arcbox/ITPro)
 
 # Alteramos o arquivo em azure_arc\azure_jumpstart_arcbox\bicep com os parâmetros abaixo, que são apenas exemplos.
