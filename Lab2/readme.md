@@ -1,3 +1,5 @@
+# Distribuição de Software
+
 # Requisitos do Laboratório (Importante ressaltar que, para este cenário, não foram adotadas as boas práticas de segurança.)
 
 1. Criar uma conta de armazenamento (Storage Account).
