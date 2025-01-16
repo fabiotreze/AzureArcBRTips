@@ -6,7 +6,7 @@
 
 ```bicep
 using 'main.bicep'
-param tenantId = 'd4dc091b-7813-4238-bd15-a0cff81d508d'
+param tenantId = '0d994b7c-f5b1-5b99-bffc-82f61f963c54'
 param windowsAdminUsername = 'arcdemo'
 param windowsAdminPassword = 'ArcPassword123!!'
 param logAnalyticsWorkspaceName = 'log-AzureArcBankDemo'
