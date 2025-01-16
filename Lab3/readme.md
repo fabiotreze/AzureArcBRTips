@@ -31,3 +31,6 @@ New-GuestConfigurationPackage `
 O comando gerará o pacote necessário para aplicar e auditar a configuração desejada. Para realizar testes, podemos copiar o arquivo Install7zip_MsiPackageFromHttp.zip para um servidor e validá-lo utilizando o seguinte comando:
 ```bash
 Start-GuestConfigurationPackageRemediation -Path .\Install7zip_MsiPackageFromHttp.zip
+```
+
+Como próximo passo, podemos avançar no laboratório [Como publicar artefatos de pacote de configuração de máquina personalizados](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/how-to/develop-custom-package/4-publish-package)
