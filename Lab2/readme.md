@@ -57,6 +57,7 @@ az deployment group create --resource-group rg-azurearc-itpro-br --template-file
 - **Desinstalação**
 ```bash
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Linux_CS_Template.json --parameters .\Linux_CS_ParameteresMotdUninstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
+```
 
 # Para o futuro
 https://learn.microsoft.com/en-us/azure/azure-arc/servers/run-command
