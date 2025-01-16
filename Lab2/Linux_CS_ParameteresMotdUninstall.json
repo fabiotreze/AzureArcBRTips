@@ -3,17 +3,18 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vmName": {
-            "value": "vmName"
+            "value": "<arc_vm_name>" 
         },
         "location": {
             "value": "brazilsouth"
         },
         "fileUris": {
-            "value": 
-                "https://arcboxapps.blob.core.windows.net/apps/7z2408-x64.exe"
+            "value": [
+                "https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab2/custom_script_linux_v1.sh" 
+            ]
         },
         "commandToExecute": {
-            "value": "start cmd.exe /c \"C:\\Program Files\\7-Zip\\Uninstall.exe\" /S"
+            "value": "./custom_script_linux_v1.sh" 
         }
     }
 }
