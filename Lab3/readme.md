@@ -28,7 +28,8 @@ New-GuestConfigurationPackage `
 -Force
 ```
 
-O comando gerará o pacote necessário para aplicar e auditar a configuração desejada. Para realizar testes, podemos copiar o arquivo Install7zip_MsiPackageFromHttp.zip para um servidor e validá-lo utilizando o seguinte comando:
+O comando gerará o pacote necessário para aplicar e auditar a configuração desejada. Para realizar testes, podemos copiar o arquivo **Install7zip_MsiPackageFromHttp.zip** para um servidor e validá-lo utilizando o seguinte comando:
+
 ```bash
 Start-GuestConfigurationPackageRemediation -Path .\Install7zip_MsiPackageFromHttp.zip
 ```
