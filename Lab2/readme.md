@@ -10,11 +10,11 @@
 
 ### **Windows**
 - [7z2409-x64.exe](https://www.7-zip.org/a/7z2409-x64.exe), utilizando o repositório do fornecedor
-- [7z2408-x64.exe](https://arcboxapps.blob.core.windows.net/apps/7z2408-x64.exe), utilizando o meu storage account
+- [7z2408-x64.exe](https://arcboxapps.blob.core.windows.net/apps/7z2408-x64.exe), utilizando o meu storage account. **O acesso pode não estar disponível aqui; este é apenas um exemplo ilustrativo. :-)**
 
 ### **Linux**
 - [custom_script_linux_v1.sh](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab2/custom_script_linux_v1.sh), utilizando o repositório do fornecedor
-- [custom_script_linux_v1.sh](https://arcboxapps.blob.core.windows.net/apps/custom_script_linux_v1.sh), utilizando o meu storage account
+- [custom_script_linux_v1.sh](https://arcboxapps.blob.core.windows.net/apps/custom_script_linux_v1.sh), utilizando o meu storage account **O acesso pode não estar disponível aqui; este é apenas um exemplo ilustrativo. :-)**
 
 Podemos utilizar também **Private Endpoints**, o que requer configurações adicionais no ambiente on-premise e engarços relacionados. Mais detalhes podem ser encontrados [aqui](https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints).
 
