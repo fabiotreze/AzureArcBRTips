@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "fileUris": {
+      "type": "string",
+      "metadata": {
+        "description": "URI do arquivo script a ser executado."
+      }
+    },
+    "commandToExecute": {
+      "type": "string",
+      "metadata": {
+        "description": "Comando para executar o script customizado na VM."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.HybridCompute/machines/extensions",
+      "apiVersion": "2022-11-10",
+      "name": "[concat(parameters('vmName'), '/CustomScriptExtension')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.10",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('fileUris')]"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "[parameters('commandToExecute')]"
+        }
+      }
+    }
+  ]
+}

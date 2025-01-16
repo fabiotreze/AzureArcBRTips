@@ -1,0 +1,20 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "<arc_vm_name>" 
+        },
+        "location": {
+            "value": "brazilsouth"
+        },
+        "fileUris": {
+            "value": [
+                "https://arcboxapps.blob.core.windows.net/apps/custom_script_linux_v1.sh" 
+            ]
+        },
+        "commandToExecute": {
+            "value": "./custom_script_linux_v1.sh" 
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "vmName"
+        },
+        "location": {
+            "value": "brazilsouth"
+        },
+        "fileUris": {
+            "value": 
+                "https://arcboxapps.blob.core.windows.net/apps/7z2408-x64.exe"
+        },
+        "commandToExecute": {
+            "value": "start cmd.exe /c 7z2408-x64.exe /S"
+        }
+    }
+}
