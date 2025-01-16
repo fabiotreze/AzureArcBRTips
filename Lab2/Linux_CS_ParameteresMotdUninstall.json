@@ -10,7 +10,7 @@
         },
         "fileUris": {
             "value": [
-                "https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab2/custom_script_linux_v1.sh" 
+                "https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab2/custom_script_linux_v1_uninstall.sh" 
             ]
         },
         "commandToExecute": {
