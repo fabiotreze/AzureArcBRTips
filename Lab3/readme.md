@@ -16,6 +16,8 @@ Importante se atentar aos requerimentos técnicos de módulos para a máquina qu
 O repositório abaixo pode ser utilizado como referência para a criação de novos recursos, possibilitando uma ampla variedade de ações com o Guest Configuration e o Azure Arc. Ele contém diversos exemplos de DSC que servem como base e inspiração, simplificando o processo e evitando a necessidade de começar do zero.
 [Github PSDscResources] (https://github.com/PowerShell/PSDscResources/tree/dev)
 
+Recomendo o oficial também [Azure Policy built-in packages for guest configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-packages)
+
 ### **7-zip**
 Com base no documento oficial da Microsoft **Como criar um pacote personalizado** vou utilizar como base e usar o exemplo [sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab3/sample7zip.ps1). Com isso executaremos o script para criar o arquivo **localhost.mof**.
 
@@ -60,8 +62,10 @@ New-GuestConfigurationPolicy @PolicyConfig -verbose
 ```
 Na sua pasta de execução será criada a estrutura de pasta **\policies\auditIfNotExists.json** com pelo menos 2 arquivos
 
-**.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json**
-**.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json**
+```plaintext
+.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json
+.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json
+```
 
 Utilize o comando abaixo Powershell para a criação dos Azure Policy
 ```powershell
