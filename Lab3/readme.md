@@ -1,8 +1,13 @@
 # Gerenciamento de Conformidade
 
+Importante se atentar aos requerimentos técnicos de módulos para a máquina que será utilizada para criar o pacote personalizado.
+
 - [Software Installation Using Machine Configuration and Azure Policy](https://techcommunity.microsoft.com/blog/coreinfrastructureandsecurityblog/software-installation-using-machine-configuration-and-azure-policy/3695636)
 - [Azure Arc JumpStart: Machine Configuration Custom Windows](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_windows)
 - [Visão Geral do Machine Configuration no Azure](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/overview)
+
+**Repositório bem bacana com alguns exemplos DSC**
+[PSDscResources](https://github.com/PowerShell/PSDscResources/tree/dev/Examples)
 
 **Informações importantes sobre o agent**
 [Correção](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/whats-new/agent)
