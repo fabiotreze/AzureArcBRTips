@@ -1,13 +1,10 @@
 # Gerenciamento de Conformidade
 
-Importante se atentar aos requerimentos técnicos de módulos para a máquina que será utilizada para criar o pacote personalizado.
+Importante se atentar aos requerimentos técnicos de módulos para a máquina que será utilizada para criar o pacote personalizado e uso do Azure Policy.
 
 - [Software Installation Using Machine Configuration and Azure Policy](https://techcommunity.microsoft.com/blog/coreinfrastructureandsecurityblog/software-installation-using-machine-configuration-and-azure-policy/3695636)
 - [Azure Arc JumpStart: Machine Configuration Custom Windows](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_windows)
 - [Visão Geral do Machine Configuration no Azure](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/overview)
-
-**Repositório bem bacana com alguns exemplos DSC**
-[PSDscResources](https://github.com/PowerShell/PSDscResources/tree/dev/Examples)
 
 **Informações importantes sobre o agent**
 [Correção](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/whats-new/agent)
@@ -16,7 +13,7 @@ Importante se atentar aos requerimentos técnicos de módulos para a máquina qu
 [Como configurar um ambiente de criação de configuração de máquina](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/develop-custom-package/1-set-up-authoring-environment)
 
 # Exemplos de utilização do DSC
-O repositório abaixo pode ser utilizado como referência para a criação de outros recursos, permitindo a execução de uma variedade infinita de ações com o Guest Configuration e o Azure Arc.
+O repositório abaixo pode ser utilizado como referência para a criação de novos recursos, possibilitando uma ampla variedade de ações com o Guest Configuration e o Azure Arc. Ele contém diversos exemplos de DSC que servem como base e inspiração, simplificando o processo e evitando a necessidade de começar do zero.
 [Github PSDscResources] (https://github.com/PowerShell/PSDscResources/blob/dev/Examples/Sample_MsiPackage_InstallPackageFromHttp.ps1)
 
 ### **7-zip**
@@ -24,7 +21,7 @@ Com base no documento oficial da Microsoft **Como criar um pacote personalizado*
 
 Esse arquivo será processado pelo comando abaixo:
 
-```bash
+```powershell
 New-GuestConfigurationPackage `
 -Name 'Install7zip_MsiPackageFromHttp' `
 -Configuration ".\Install7zip_MsiPackageFromHttp/localhost.mof" `
@@ -35,8 +32,41 @@ New-GuestConfigurationPackage `
 
 O comando gerará o pacote necessário para aplicar e auditar a configuração desejada. Para realizar testes, podemos copiar o arquivo **Install7zip_MsiPackageFromHttp.zip** para um servidor e validá-lo utilizando o seguinte comando:
 
-```bash
+```powershell
 Start-GuestConfigurationPackageRemediation -Path .\Install7zip_MsiPackageFromHttp.zip
 ```
 
-Como próximo passo, podemos avançar no laboratório [Como publicar artefatos de pacote de configuração de máquina personalizados](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/how-to/develop-custom-package/4-publish-package)
+# Como próximo passo, podemos avançar na utilização deste arquivo para a criação de uma definição de política no Azure.
+[Como criar definições de políticas de configuração de computador personalizadas](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/create-policy-definition)
+
+Podemos seguir as orientações do artigo, de armazenar em uma **Storage Account**, com isso pegar o **URI** para utilização no comando mais abaixo:
+
+```powershell
+$contentUri = "https://arcboxmachineconfigyqvkt.blob.core.windows.net/machineconfiguration/Install7zip_MsiPackageFromHttp.zip" #O acesso pode não estar disponível aqui; este é apenas um exemplo ilustrativo. :-)**
+$contentUri
+
+$PolicyConfig      = @{
+  PolicyId      = '704dccbb-132a-4eb8-b6a4-409608b5b2ee' #Utilize new-guid no powershell para gerar um novo GUID
+  ContentUri    = $contentUri
+  DisplayName   = '(ArcBox - Custom) My policy Apply_and_Autocorrect - Install7zip_MsiPackageFromHttp'
+  Description   = '(ArcBox - Custom) My policy Apply_and_Autocorrect - Install7zip_MsiPackageFromHttp'
+  Path          = './policies/auditIfNotExists.json'
+  Platform      = 'Windows'
+  PolicyVersion = '1.0.0'
+  Mode          = 'ApplyAndAutoCorrect'
+}
+
+New-GuestConfigurationPolicy @PolicyConfig -verbose
+```
+Na sua pasta de execução será criada a estrutura de pasta **\policies\auditIfNotExists.json** com pelo menos 2 arquivos
+
+**.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json**
+**.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json**
+
+Utilize o comando abaixo Powershell para a criação dos Azure Policy
+```powershell
+New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpAuditIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json' -verbose
+New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpDeployIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json' -verbose
+```
+
+Após espero que esteja disponível a Definition no Azure Policy para avaliação e assignments.
