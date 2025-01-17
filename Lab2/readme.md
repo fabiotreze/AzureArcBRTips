@@ -31,33 +31,38 @@ Referências adicionais estão disponíveis [aqui](https://github.com/microsoft/
 Caso precise desinstalar a extensão, um dos métodos é via linha de comando, como nos exemplos abaixo:
 [Como Gerenciar Extensões via CLI](https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-vm-extensions-cli)
 
-```bash
+```azurecli
 az connectedmachine extension delete --name CustomScript --resource-group rg-azurearc-itpro-br --machine-name Arcbox-Ubuntu-01 --verbose
 az connectedmachine extension delete --name CustomScriptExtension --resource-group rg-azurearc-itpro-br --machine-name ArcBox-Win2k25 --verbose
+```
 
 # Exemplos de Comandos para Windows e Linux
 
 ### Windows
 
 - **Instalação do 7-Zip 24.08**
-```bash
+```azurecli
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresInstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
+```
 
 - **Desinstalação do 7-Zip 24.08**
-```bash
+```azurecli
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresUninstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
+```
 
 - **Atualização de versão do 7-Zip 24.09 para 7-Zip 24.09**
-```bash
+```azurecli
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresInstall7zip09.json --parameters vmName=ArcBox-Win2k25 --verbose
+```
 
 ### Linux
 - **Instalação**
-```bash
+```azurecli
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Linux_CS_Template.json --parameters .\Linux_CS_ParameteresMotdInstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
+```
 
 - **Desinstalação**
-```bash
+```azurecli
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Linux_CS_Template.json --parameters .\Linux_CS_ParameteresMotdUninstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
 ```
 
