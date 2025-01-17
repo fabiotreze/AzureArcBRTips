@@ -14,7 +14,7 @@ Importante se atentar aos requerimentos técnicos de módulos para a máquina qu
 
 # Exemplos de utilização do DSC
 O repositório abaixo pode ser utilizado como referência para a criação de novos recursos, possibilitando uma ampla variedade de ações com o Guest Configuration e o Azure Arc. Ele contém diversos exemplos de DSC que servem como base e inspiração, simplificando o processo e evitando a necessidade de começar do zero.
-[Github PSDscResources] (https://github.com/PowerShell/PSDscResources/blob/dev/Examples/Sample_MsiPackage_InstallPackageFromHttp.ps1)
+[Github PSDscResources] (https://github.com/PowerShell/PSDscResources/tree/dev)
 
 ### **7-zip**
 Com base no documento oficial da Microsoft **Como criar um pacote personalizado** vou utilizar como base e usar o exemplo [sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab3/sample7zip.ps1). Com isso executaremos o script para criar o arquivo **localhost.mof**.
