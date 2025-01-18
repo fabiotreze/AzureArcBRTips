@@ -91,6 +91,8 @@ Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura seg
 ```
 Podemos fazer o uso para a criação do **Guest Assignments** e utilizar com a funcionalidade do **Machine Configuration** juntamente do Azure Arc.
 
+[Atribuir uma configuração](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/assign-configuration/overview)
+
 Talvez surja a dúvida: quando devo utilizar o **Guest Configuration** e quando utilizar o **Azure Policy**?
 
 Lembre-se de que as informações apresentadas abaixo são apenas exemplos e não se limitam ao que está mostrado na tabela, podendo ser aplicadas de forma mais ampla conforme o cenário.
