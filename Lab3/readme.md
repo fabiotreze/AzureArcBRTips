@@ -72,5 +72,34 @@ Utilize o comando abaixo Powershell para a criação dos Azure Policy
 New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpAuditIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json' -verbose
 New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpDeployIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json' -verbose
 ```
-
 Após espero que esteja disponível a Definition no Azure Policy para avaliação e assignments.
+
+# DICA EXTRA
+
+Nos passos mencionados anteriormente, foram criados arquivos JSON que serão utilizados no **Azure Policy**, especificamente para a criação das **Definitions**.
+
+Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura segue um formato semelhante ao exemplo apresentado. Temos 2 campos importantes **contentUri** e **contentHash**.
+
+```json
+"guestConfiguration": {
+                "name": "Install7zip_MsiPackageFromHttp",
+                "version": "1.0.0",
+                "contentType": "Custom",
+                "contentUri": "https://arcboxmachineconfigyqvkt.blob.core.windows.net/machineconfiguration/Install7zip_MsiPackageFromHttp.zip",
+                "contentHash": "XE5268417B0246DB936CB5C249C8CADF18590F214D399825950A39E381A30491DD"
+            }
+```
+Podemos fazer o uso para a criação do **Guest Assignments** e utilizar com a funcionalidade do **Machine Configuration** juntamente do Azure Arc.
+
+Talvez surja a dúvida: quando devo utilizar o **Guest Configuration** e quando utilizar o **Azure Policy**?
+
+Lembre-se de que as informações apresentadas abaixo são apenas exemplos e não se limitam ao que está mostrado na tabela, podendo ser aplicadas de forma mais ampla conforme o cenário.
+
+| **Aspecto**               | **Azure Policy**                              | **Guest Configuration (Machine Configuration)** |
+|----------------------------|-----------------------------------------------|-------------------------------------------------|
+| **Escopo**                | Infraestrutura e recursos                    | Sistema Operacional (Guest OS)                 |
+| **Habilitação**           | Regras para recursos gerenciados             | Extensão de VM ou Azure Arc                    |
+| **Granularidade**         | Macro (recursos, regiões, tags)              | Micro (SO, serviços, arquivos)                 |
+| **Exemplos de Uso**       | Restrições de local, SKUs, tags               | Configurações de SSH, serviços, arquivos       |
+| **Compatibilidade com Azure Arc** | Sim                                   | Sim                                             |
+| **Correção Automática**   | Limitada (aplica-se à infraestrutura)        | Sim (aplica-se à configuração no SO)           |
