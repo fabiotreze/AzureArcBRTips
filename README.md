@@ -10,4 +10,6 @@ O uso de qualquer material deste repositório é feito por sua própria conta e 
 
 O repositório está dividido em laboratórios, cada um com cenários práticos para guiar a implementação das funcionalidades do Azure Arc. Recomendamos que leiam sempre o arquivo `readme.md` de cada laboratório para obter orientações adicionais e informações sobre o uso de cada cenário.
 
+[Labs](https://github.com/fabiotreze/AzureArcDemo/tree/main)
+
 **Atenção**: Lembre-se de que o uso de todos os artefatos e scripts é feito por sua própria responsabilidade.
