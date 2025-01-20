@@ -10,7 +10,8 @@ Este repositório contém conteúdos e laboratórios destinados exclusivamente p
 
 O repositório está organizado em laboratórios, cada um com cenários práticos para guiar a implementação das funcionalidades do **Azure Arc**. Recomendamos que leia sempre o arquivo `readme.md` de cada laboratório para obter orientações adicionais e informações sobre o uso de cada cenário.
 
-- [Labs](https://github.com/fabiotreze/AzureArcDemo/tree/main)
+### Links para os Laboratórios
+- Acesse todos os **Labs** disponíveis no repositório: [Labs do AzureArcDemo](https://github.com/fabiotreze/AzureArcDemo/tree/main)
 
 ### Atenção
 Lembre-se de que o uso de todos os artefatos e scripts é feito por sua própria responsabilidade.
