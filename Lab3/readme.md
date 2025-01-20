@@ -1,6 +1,5 @@
 # Gerenciamento de Conformidade
 
----
 ## Requerimentos Técnicos
 Importante se atentar aos requerimentos técnicos de módulos para a máquina que será utilizada para criar o pacote personalizado e uso do Azure Policy.
 
@@ -101,8 +100,6 @@ Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura seg
                 "contentHash": "XE5268417B0246DB936CB5C249C8CADF18590F214D399825950A39E381A30491DD"
             }
 ```
-
----
 
 Podemos fazer o uso para a criação do **Guest Assignments** e utilizar com a funcionalidade do **Machine Configuration** juntamente do Azure Arc.
 
