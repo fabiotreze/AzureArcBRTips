@@ -21,6 +21,8 @@
 
 > **Nota:** Podemos utilizar também **Private Endpoints**, o que requer configurações adicionais no ambiente on-premise e ajustes relacionados. Mais detalhes podem ser encontrados [aqui](https://learn.microsoft.com/en-us/azure/storage/common/storage-private-endpoints).
 
+---
+
 # Distribuição de Software
 
 Utilizaremos a **Custom Script Extension** para Windows e Linux. Mais informações podem ser encontradas [aqui](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-windows).
@@ -35,8 +37,9 @@ Referências adicionais estão disponíveis [aqui](https://github.com/microsoft/
 ```azurecli
 az connectedmachine extension delete --name CustomScript --resource-group rg-azurearc-itpro-br --machine-name Arcbox-Ubuntu-01 --verbose
 az connectedmachine extension delete --name CustomScriptExtension --resource-group rg-azurearc-itpro-br --machine-name ArcBox-Win2k25 --verbose
-
 ```
+
+---
 
 # Exemplos de Comandos para Windows e Linux
 
