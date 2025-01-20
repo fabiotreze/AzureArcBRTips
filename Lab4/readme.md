@@ -29,6 +29,6 @@ Já para o **Destination**, utilizaremos o **Log Analytics Workspace**, que ser�
 ```bash
 Security!*[System[(EventID=4624) or (EventID=4625) or (EventID=4634) or (EventID=4647) or (EventID=4648) or (EventID=4779)]]
 ```
-Após é ir até o **Resources** e adicionar os computadores do **Azure Arc** que deverão receber a configuração relacionada a este Data Collection Rule. Com isso, deverá ser instalada a extensão do Azure Monitoring Agent e aplicada a configuração.
+Após é ir até o **Resources** e adicionar os computadores do **Azure Arc** que deverão receber a configuração relacionada a este **Data Collection Rule**. Com isso, deverá ser instalada a extensão do **Azure Monitoring Agent** e aplicada a configuração.
 
-Link para Workbook [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab4/AzureArc-AuditLogonEvents.workbook)
+**Link para Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab4/AzureArc-AuditLogonEvents.workbook)
