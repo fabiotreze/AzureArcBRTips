@@ -13,8 +13,8 @@ Importante se atentar aos requerimentos técnicos de módulos para a máquina qu
 [Como configurar um ambiente de criação de configuração de máquina](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/develop-custom-package/1-set-up-authoring-environment)
 
 # Exemplos de utilização do DSC
-O repositório abaixo pode ser utilizado como referência para a criação de novos recursos, possibilitando uma ampla variedade de ações com o Guest Configuration e o Azure Arc. Ele contém diversos exemplos de DSC que servem como base e inspiração, simplificando o processo e evitando a necessidade de começar do zero.
-[Github PSDscResources] (https://github.com/PowerShell/PSDscResources/tree/dev)
+O repositório abaixo pode ser utilizado como referência para a criação de novos recursos, possibilitando uma ampla variedade de ações com o **Guest Configuration** e o Azure Arc. Ele contém diversos exemplos de DSC que servem como base e inspiração, simplificando o processo e evitando a necessidade de começar do zero.
+**[Github PSDscResources]** (https://github.com/PowerShell/PSDscResources/tree/dev)
 
 Recomendo o oficial também [Azure Policy built-in packages for guest configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-packages)
 

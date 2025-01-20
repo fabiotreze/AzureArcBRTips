@@ -13,6 +13,7 @@ param logAnalyticsWorkspaceName = 'log-AzureArcBankDemo'
 param flavor = 'ITPro'
 param deployBastion = false
 param vmAutologon = true
+```
 
 # Comando de exemplo para implementar a solução:
 az deployment group create -g "rg-azurearc-itpro-br" -f "main.bicep" -p "main.bicepparam" --verbose
