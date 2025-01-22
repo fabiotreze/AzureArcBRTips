@@ -55,7 +55,7 @@ az deployment group create --resource-group rg-azurearc-itpro-br --template-file
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresUninstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
 ```
 
-- **Atualização de versão do 7-Zip 24.09 para 7-Zip 24.09**
+- **Atualização de versão do 7-Zip 24.08 para 7-Zip 24.09**
 ```azurecli
 az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresInstall7zip09.json --parameters vmName=ArcBox-Win2k25 --verbose
 ```
