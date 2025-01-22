@@ -1,0 +1,1237 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 21,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<td style=\"background-color:#2D2D2D; color:#FFFFFF; padding:20px; border-radius:10px;\">\r\n  <div style=\"line-height:1.5; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position:relative;\">\r\n    <a href=\"/html/classic/index.shtm\" tabindex=\"-1\" style=\"position:absolute; top:10px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; background-color:#8B0000; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab5/seulogoaqui.png\" style=\"width:100%; height:auto; display:block;\" alt=\"SeuLogoAqui\">\r\n      </div>\r\n    </a>\r\n    <span style=\"font-size:32px; font-weight:bold; color:#000000; display:block; margin-bottom:10px;\">Azure Arc Demo</span>\r\n    <span style=\"font-size:14px; font-weight:normal; color:#000000; display:block;\">Dashboard with information and status of installed Azure Arc agents.</span>\r\n    <br>\r\n    <span style=\"font-size:14px; color:#000000; font-weight:bold;\">&#x1F517;</span>\r\n    <a href=\"http://aka.ms/azurearc\" style=\"color:#1E90FF; text-decoration:none; font-weight:bold;\">Azure Arc Documentation</a>\r\n    <br><br>\r\n    <a href=\"https://www.microsoft.com\" tabindex=\"-1\" style=\"position:absolute; top:50px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/UHFbanner-MSlogo?fmt=png-alpha&bfc=off&qlt=100,1\" alt=\"Microsoft logo\" style=\"width:100%; height:auto; display:block;\">\r\n      </div>\r\n    </a>\r\n    <div style=\"position:absolute; bottom:10px; right:10px; font-size:14px; color:#000000; font-weight:normal; direction:rtl;\">\r\n      <span>Provided by</span> <span style=\"font-weight:bold;\">fabiotreze</span>\r\n    </div>\r\n  </div>\r\n</td>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": "https://banco.bradesco/assets/classic/home/images/logo-mobile.png"
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 2,
+              "colSpan": 21,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Overview</span>\n<span> - Overview of the Arc agents installed and current status.</span>\n</div>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": {}
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 3,
+              "colSpan": 3,
+              "rowSpan": 12
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='display:flex; justify-content:flex-start; align-items:flex-start; height:100px;'>\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Azure Arc Overview</span>\n</div>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": {}
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 3,
+              "colSpan": 18,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Run query to see results.\r\nresources\r\n| where type in~ (\r\n    \"Microsoft.HybridCompute/machines\",\r\n    \"Microsoft.Kubernetes/connectedclusters\",\r\n    \"Microsoft.HybridContainerService/provisionedClusters\",\r\n    \"Microsoft.AzureArcData/sqlServerInstances\",\r\n    \"Microsoft.AzureArcData/dataControllers\",\r\n    \"Microsoft.AzureStackHCI/clusters\"\r\n)\r\n// inicio do bloco adicionado\r\n| extend agentversion = properties.agentVersion\r\n| extend state = properties.status\r\n| extend status = case(\r\n    state =~ 'Connected', 'Connected',\r\n    state =~ 'Disconnected', 'Offline',\r\n    state =~ 'Error', 'Error',\r\n    state =~ 'Expired', 'Expired',\r\n    '')\r\n    | extend osSku = properties.osSku\r\n| extend os = properties.osName\r\n| extend osName = case(\r\n    os =~ 'windows', 'Windows',\r\n    os =~ 'linux', 'Linux',\r\n    '')\r\n| extend operatingSystem = iif(isnotnull(osSku), osSku, osName)\r\n// fim do bloco\r\n| project name, agentversion, status, type, operatingSystem, resourceGroup, location, subscriptionId, kind, id, tags\r\n| extend locationDisplayName=case(location =~ 'eastus','East US',location =~ 'southcentralus','South Central US',location =~ 'westus2','West US 2',location =~ 'westus3','West US 3',location =~ 'australiaeast','Australia East',location =~ 'southeastasia','Southeast Asia',location =~ 'northeurope','North Europe',location =~ 'swedencentral','Sweden Central',location =~ 'uksouth','UK South',location =~ 'westeurope','West Europe',location =~ 'centralus','Central US',location =~ 'southafricanorth','South Africa North',location =~ 'centralindia','Central India',location =~ 'eastasia','East Asia',location =~ 'japaneast','Japan East',location =~ 'koreacentral','Korea Central',location =~ 'newzealandnorth','New Zealand North',location =~ 'canadacentral','Canada Central',location =~ 'francecentral','France Central',location =~ 'germanywestcentral','Germany West Central',location =~ 'italynorth','Italy North',location =~ 'norwayeast','Norway East',location =~ 'polandcentral','Poland Central',location =~ 'spaincentral','Spain Central',location =~ 'switzerlandnorth','Switzerland North',location =~ 'mexicocentral','Mexico Central',location =~ 'uaenorth','UAE North',location =~ 'brazilsouth','Brazil South',location =~ 'israelcentral','Israel Central',location =~ 'qatarcentral','Qatar Central',location =~ 'centralusstage','Central US (Stage)',location =~ 'eastusstage','East US (Stage)',location =~ 'eastus2stage','East US 2 (Stage)',location =~ 'northcentralusstage','North Central US (Stage)',location =~ 'southcentralusstage','South Central US (Stage)',location =~ 'westusstage','West US (Stage)',location =~ 'westus2stage','West US 2 (Stage)',location =~ 'asia','Asia',location =~ 'asiapacific','Asia Pacific',location =~ 'australia','Australia',location =~ 'brazil','Brazil',location =~ 'canada','Canada',location =~ 'europe','Europe',location =~ 'france','France',location =~ 'germany','Germany',location =~ 'global','Global',location =~ 'india','India',location =~ 'israel','Israel',location =~ 'italy','Italy',location =~ 'japan','Japan',location =~ 'korea','Korea',location =~ 'newzealand','New Zealand',location =~ 'norway','Norway',location =~ 'poland','Poland',location =~ 'qatar','Qatar',location =~ 'singapore','Singapore',location =~ 'southafrica','South Africa',location =~ 'sweden','Sweden',location =~ 'switzerland','Switzerland',location =~ 'uae','United Arab Emirates',location =~ 'uk','United Kingdom',location =~ 'unitedstates','United States',location =~ 'unitedstateseuap','United States EUAP',location =~ 'eastasiastage','East Asia (Stage)',location =~ 'southeastasiastage','Southeast Asia (Stage)',location =~ 'brazilus','Brazil US',location =~ 'eastus2','East US 2',location =~ 'northcentralus','North Central US',location =~ 'westus','West US',location =~ 'japanwest','Japan West',location =~ 'jioindiawest','Jio India West',location =~ 'westcentralus','West Central US',location =~ 'southafricawest','South Africa West',location =~ 'australiacentral','Australia Central',location =~ 'australiacentral2','Australia Central 2',location =~ 'australiasoutheast','Australia Southeast',location =~ 'jioindiacentral','Jio India Central',location =~ 'koreasouth','Korea South',location =~ 'southindia','South India',location =~ 'westindia','West India',location =~ 'canadaeast','Canada East',location =~ 'francesouth','France South',location =~ 'germanynorth','Germany North',location =~ 'norwaywest','Norway West',location =~ 'switzerlandwest','Switzerland West',location =~ 'ukwest','UK West',location =~ 'uaecentral','UAE Central',location =~ 'brazilsoutheast','Brazil Southeast',location)\r\n| extend typeDisplayName=case(type =~ 'microsoft.azurestackhci/clusters','Azure Local',type =~ 'microsoft.arc/all','Azure Arc enabled resource',(type =~ 'microsoft.kubernetes/connectedclusters') and (kind =~ 'provisionedcluster'),'Kubernetes - Azure Arc',type =~ 'microsoft.kubernetes/connectedclusters','Kubernetes - Azure Arc',type =~ 'microsoft.hybridcontainerservice/provisionedclusters','Kubernetes hybrid - Azure Arc',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'avs'),'Machine - Azure Arc (AVS)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'vmware'),'Machine - Azure Arc (VMware)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'scvmm'),'Machine - Azure Arc (SCVMM)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'hci'),'Machine - Azure Arc (Azure Local)',type =~ 'microsoft.hybridcompute/machines','Machine - Azure Arc',type =~ 'microsoft.azurearcdata/datacontrollers','Azure Arc data controller',type =~ 'microsoft.azurearcdata/sqlserverinstances','SQL Server - Azure Arc',type)\r\n| where (type !~ ('dell.storage/filesystems'))\r\n| where (type !~ ('arizeai.observabilityeval/organizations'))\r\n| where (type !~ ('lambdatest.hyperexecute/organizations'))\r\n| where (type !~ ('pinecone.vectordb/organizations'))\r\n| where (type !~ ('microsoft.weightsandbiases/instances'))\r\n| where (type !~ ('paloaltonetworks.cloudngfw/globalrulestacks'))\r\n| where (type !~ ('purestorage.block/storagepools/avsstoragecontainers'))\r\n| where (type !~ ('purestorage.block/reservations'))\r\n| where (type !~ ('purestorage.block/storagepools'))\r\n| where (type !~ ('solarwinds.observability/organizations'))\r\n| where (type !~ ('splitio.experimentation/experimentationworkspaces'))\r\n| where (type !~ ('microsoft.agfoodplatform/farmbeats'))\r\n| where (type !~ ('microsoft.agricultureplatform/agriservices'))\r\n| where (type !~ ('microsoft.appsecurity/policies'))\r\n| where (type !~ ('microsoft.arc/allfairfax'))\r\n| where (type !~ ('microsoft.cdn/profiles/customdomains'))\r\n| where (type !~ ('microsoft.cdn/profiles/afdendpoints'))\r\n| where (type !~ ('microsoft.cdn/profiles/origingroups/origins'))\r\n| where (type !~ ('microsoft.cdn/profiles/origingroups'))\r\n| where (type !~ ('microsoft.cdn/profiles/afdendpoints/routes'))\r\n| where (type !~ ('microsoft.cdn/profiles/rulesets/rules'))\r\n| where (type !~ ('microsoft.cdn/profiles/rulesets'))\r\n| where (type !~ ('microsoft.cdn/profiles/secrets'))\r\n| where (type !~ ('microsoft.cdn/profiles/securitypolicies'))\r\n| where (type !~ ('microsoft.chaos/privateaccesses'))\r\n| where (type !~ ('microsoft.sovereign/transparencylogs'))\r\n| where (type !~ ('microsoft.sovereign/landingzoneconfigurations'))\r\n| where (type !~ ('microsoft.hardwaresecuritymodules/cloudhsmclusters'))\r\n| where (type !~ ('microsoft.cloudtest/accounts'))\r\n| where (type !~ ('microsoft.cloudtest/hostedpools'))\r\n| where (type !~ ('microsoft.cloudtest/images'))\r\n| where (type !~ ('microsoft.cloudtest/pools'))\r\n| where (type !~ ('microsoft.compute/computefleetinstances'))\r\n| where (type !~ ('microsoft.compute/standbypoolinstance'))\r\n| where (type !~ ('microsoft.compute/virtualmachineflexinstances'))\r\n| where (type !~ ('microsoft.kubernetesconfiguration/extensions'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/extensions'))\r\n| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/namespaces'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/namespaces'))\r\n| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))\r\n| where (type !~ ('microsoft.portalservices/extensions/deployments'))\r\n| where (type !~ ('microsoft.portalservices/extensions'))\r\n| where (type !~ ('microsoft.portalservices/extensions/slots'))\r\n| where (type !~ ('microsoft.portalservices/extensions/versions'))\r\n| where (type !~ ('microsoft.datacollaboration/workspaces'))\r\n| where (type !~ ('microsoft.deviceregistry/devices'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/activedeployments'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/agents'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/deployments'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/deviceclasses'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/updates'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts'))\r\n| where (type !~ ('private.easm/workspaces'))\r\n| where (type !~ ('microsoft.impact/connectors'))\r\n| where (type !~ ('microsoft.edgeorder/virtual_orderitems'))\r\n| where (type !~ ('microsoft.workloads/epicvirtualinstances'))\r\n| where (type !~ ('microsoft.fairfieldgardens/provisioningresources/provisioningpolicies'))\r\n| where (type !~ ('microsoft.fairfieldgardens/provisioningresources'))\r\n| where (type !~ ('microsoft.healthmodel/healthmodels'))\r\n| where (type !~ ('microsoft.hybridcompute/arcserverwithwac'))\r\n| where (type !~ ('microsoft.hybridcompute/machinessovereign'))\r\n| where (type !~ ('microsoft.hybridcompute/machinesesu'))\r\n| where (type !~ ('microsoft.hybridcompute/machinespaygo'))\r\n| where (type !~ ('microsoft.hybridcompute/machinessoftwareassurance'))\r\n| where (type !~ ('microsoft.network/virtualhubs')) or ((kind =~ ('routeserver')))\r\n| where (type !~ ('microsoft.network/networkvirtualappliances'))\r\n| where (type !~ ('microsoft.devhub/iacprofiles'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/files'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/filerequests'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/licenses'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/connectors'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/sharedstorages'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/storages'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/workloads'))\r\n| where (type !~ ('microsoft.insights/diagnosticsettings'))\r\n| where not((type =~ ('microsoft.network/serviceendpointpolicies')) and ((kind =~ ('internal'))))\r\n| where (type !~ ('microsoft.resources/resourcegraphvisualizer'))\r\n| where (type !~ ('microsoft.orbital/cloudaccessrouters'))\r\n| where (type !~ ('microsoft.orbital/terminals'))\r\n| where (type !~ ('microsoft.orbital/sdwancontrollers'))\r\n| where (type !~ ('microsoft.orbital/spacecrafts/contacts'))\r\n| where (type !~ ('microsoft.orbital/contactprofiles'))\r\n| where (type !~ ('microsoft.orbital/edgesites'))\r\n| where (type !~ ('microsoft.orbital/geocatalogs'))\r\n| where (type !~ ('microsoft.orbital/groundstations'))\r\n| where (type !~ ('microsoft.orbital/l2connections'))\r\n| where (type !~ ('microsoft.orbital/spacecrafts'))\r\n| where (type !~ ('microsoft.recommendationsservice/accounts/modeling'))\r\n| where (type !~ ('microsoft.recommendationsservice/accounts/serviceendpoints'))\r\n| where (type !~ ('microsoft.recoveryservicesbvtd/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesbvtd2/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesintd/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesintd2/vaults'))\r\n| where (type !~ ('microsoft.relationships/servicegroupmember'))\r\n| where (type !~ ('microsoft.relationships/dependencyof'))\r\n| where (type !~ ('microsoft.resources/deletedresources'))\r\n| where (type !~ ('microsoft.deploymentmanager/rollouts'))\r\n| where (type !~ ('microsoft.features/featureprovidernamespaces/featureconfigurations'))\r\n| where (type !~ ('microsoft.saashub/cloudservices/hidden'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations/customrollouts'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations/defaultrollouts'))\r\n| where (type !~ ('microsoft.edge/configurations'))\r\n| where not((type =~ ('microsoft.synapse/workspaces/sqlpools')) and ((kind =~ ('v3'))))\r\n| where (type !~ ('microsoft.mission/virtualenclaves/workloads'))\r\n| where (type !~ ('microsoft.mission/virtualenclaves'))\r\n| where (type !~ ('microsoft.mission/communities/transithubs'))\r\n| where (type !~ ('microsoft.mission/virtualenclaves/enclaveendpoints'))\r\n| where (type !~ ('microsoft.mission/enclaveconnections'))\r\n| where (type !~ ('microsoft.mission/communities/communityendpoints'))\r\n| where (type !~ ('microsoft.mission/communities'))\r\n| where (type !~ ('microsoft.mission/catalogs'))\r\n| where (type !~ ('microsoft.mission/approvals'))\r\n| where (type !~ ('microsoft.workloads/insights'))\r\n| where (type !~ ('microsoft.hanaonazure/sapmonitors'))\r\n| where (type !~ ('microsoft.cloudhealth/healthmodels'))\r\n| where (type !~ ('microsoft.connectedcache/enterprisemcccustomers/enterprisemcccachenodes'))\r\n| where not((type =~ ('microsoft.sql/servers/databases')) and ((kind in~ ('system','v2.0,system','v12.0,system','v12.0,system,serverless','v12.0,user,datawarehouse,gen2,analytics'))))\r\n| where not((type =~ ('microsoft.sql/servers')) and ((kind =~ ('v12.0,analytics'))))\r\n//| where (type in~ ('Microsoft.Arc/all','Microsoft.HybridCompute/machines','Microsoft.Kubernetes/connectedclusters','Microsoft.HybridContainerService/provisionedClusters','Microsoft.AzureArcData/sqlServerInstances','Microsoft.AzureArcData/dataControllers','Microsoft.AzureStackHCI/clusters'))\r\n| where (type in~ ('Microsoft.HybridCompute/machines'))\r\n| project name, agentversion, status,operatingSystem,locationDisplayName,typeDisplayName,type,kind,id,tags,subscriptionId//location,subscriptionId,tags\r\n| sort by (tolower(tostring(name))) asc",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Azure Arc Overview",
+                "subtitle": "Simple view displaying agent information, version, location, and status."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 9,
+              "colSpan": 12,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 2",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Run query to see results.\r\nresources\r\n| where type in~ (\r\n    \"Microsoft.HybridCompute/machines\",\r\n    \"Microsoft.Kubernetes/connectedclusters\",\r\n    \"Microsoft.HybridContainerService/provisionedClusters\",\r\n    \"Microsoft.AzureArcData/sqlServerInstances\",\r\n    \"Microsoft.AzureArcData/dataControllers\",\r\n    \"Microsoft.AzureStackHCI/clusters\"\r\n)\r\n// inicio do bloco adicionado\r\n| extend agentversion = properties.agentVersion\r\n| extend state = properties.status\r\n| extend status = case(\r\n    state =~ 'Connected', 'Connected',\r\n    state =~ 'Disconnected', 'Offline',\r\n    state =~ 'Error', 'Error',\r\n    state =~ 'Expired', 'Expired',\r\n    '')\r\n    | extend osSku = properties.osSku\r\n| extend os = properties.osName\r\n| extend osName = case(\r\n    os =~ 'windows', 'Windows',\r\n    os =~ 'linux', 'Linux',\r\n    '')\r\n| extend operatingSystem = iif(isnotnull(osSku), osSku, osName)\r\n// fim do bloco\r\n| project name, agentversion, status, type, operatingSystem, resourceGroup, location, subscriptionId, kind, id, tags\r\n| extend locationDisplayName=case(location =~ 'eastus','East US',location =~ 'southcentralus','South Central US',location =~ 'westus2','West US 2',location =~ 'westus3','West US 3',location =~ 'australiaeast','Australia East',location =~ 'southeastasia','Southeast Asia',location =~ 'northeurope','North Europe',location =~ 'swedencentral','Sweden Central',location =~ 'uksouth','UK South',location =~ 'westeurope','West Europe',location =~ 'centralus','Central US',location =~ 'southafricanorth','South Africa North',location =~ 'centralindia','Central India',location =~ 'eastasia','East Asia',location =~ 'japaneast','Japan East',location =~ 'koreacentral','Korea Central',location =~ 'newzealandnorth','New Zealand North',location =~ 'canadacentral','Canada Central',location =~ 'francecentral','France Central',location =~ 'germanywestcentral','Germany West Central',location =~ 'italynorth','Italy North',location =~ 'norwayeast','Norway East',location =~ 'polandcentral','Poland Central',location =~ 'spaincentral','Spain Central',location =~ 'switzerlandnorth','Switzerland North',location =~ 'mexicocentral','Mexico Central',location =~ 'uaenorth','UAE North',location =~ 'brazilsouth','Brazil South',location =~ 'israelcentral','Israel Central',location =~ 'qatarcentral','Qatar Central',location =~ 'centralusstage','Central US (Stage)',location =~ 'eastusstage','East US (Stage)',location =~ 'eastus2stage','East US 2 (Stage)',location =~ 'northcentralusstage','North Central US (Stage)',location =~ 'southcentralusstage','South Central US (Stage)',location =~ 'westusstage','West US (Stage)',location =~ 'westus2stage','West US 2 (Stage)',location =~ 'asia','Asia',location =~ 'asiapacific','Asia Pacific',location =~ 'australia','Australia',location =~ 'brazil','Brazil',location =~ 'canada','Canada',location =~ 'europe','Europe',location =~ 'france','France',location =~ 'germany','Germany',location =~ 'global','Global',location =~ 'india','India',location =~ 'israel','Israel',location =~ 'italy','Italy',location =~ 'japan','Japan',location =~ 'korea','Korea',location =~ 'newzealand','New Zealand',location =~ 'norway','Norway',location =~ 'poland','Poland',location =~ 'qatar','Qatar',location =~ 'singapore','Singapore',location =~ 'southafrica','South Africa',location =~ 'sweden','Sweden',location =~ 'switzerland','Switzerland',location =~ 'uae','United Arab Emirates',location =~ 'uk','United Kingdom',location =~ 'unitedstates','United States',location =~ 'unitedstateseuap','United States EUAP',location =~ 'eastasiastage','East Asia (Stage)',location =~ 'southeastasiastage','Southeast Asia (Stage)',location =~ 'brazilus','Brazil US',location =~ 'eastus2','East US 2',location =~ 'northcentralus','North Central US',location =~ 'westus','West US',location =~ 'japanwest','Japan West',location =~ 'jioindiawest','Jio India West',location =~ 'westcentralus','West Central US',location =~ 'southafricawest','South Africa West',location =~ 'australiacentral','Australia Central',location =~ 'australiacentral2','Australia Central 2',location =~ 'australiasoutheast','Australia Southeast',location =~ 'jioindiacentral','Jio India Central',location =~ 'koreasouth','Korea South',location =~ 'southindia','South India',location =~ 'westindia','West India',location =~ 'canadaeast','Canada East',location =~ 'francesouth','France South',location =~ 'germanynorth','Germany North',location =~ 'norwaywest','Norway West',location =~ 'switzerlandwest','Switzerland West',location =~ 'ukwest','UK West',location =~ 'uaecentral','UAE Central',location =~ 'brazilsoutheast','Brazil Southeast',location)\r\n| extend typeDisplayName=case(type =~ 'microsoft.azurestackhci/clusters','Azure Local',type =~ 'microsoft.arc/all','Azure Arc enabled resource',(type =~ 'microsoft.kubernetes/connectedclusters') and (kind =~ 'provisionedcluster'),'Kubernetes - Azure Arc',type =~ 'microsoft.kubernetes/connectedclusters','Kubernetes - Azure Arc',type =~ 'microsoft.hybridcontainerservice/provisionedclusters','Kubernetes hybrid - Azure Arc',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'avs'),'Machine - Azure Arc (AVS)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'vmware'),'Machine - Azure Arc (VMware)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'scvmm'),'Machine - Azure Arc (SCVMM)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'hci'),'Machine - Azure Arc (Azure Local)',type =~ 'microsoft.hybridcompute/machines','Machine - Azure Arc',type =~ 'microsoft.azurearcdata/datacontrollers','Azure Arc data controller',type =~ 'microsoft.azurearcdata/sqlserverinstances','SQL Server - Azure Arc',type)\r\n| where (type !~ ('dell.storage/filesystems'))\r\n| where (type !~ ('arizeai.observabilityeval/organizations'))\r\n| where (type !~ ('lambdatest.hyperexecute/organizations'))\r\n| where (type !~ ('pinecone.vectordb/organizations'))\r\n| where (type !~ ('microsoft.weightsandbiases/instances'))\r\n| where (type !~ ('paloaltonetworks.cloudngfw/globalrulestacks'))\r\n| where (type !~ ('purestorage.block/storagepools/avsstoragecontainers'))\r\n| where (type !~ ('purestorage.block/reservations'))\r\n| where (type !~ ('purestorage.block/storagepools'))\r\n| where (type !~ ('solarwinds.observability/organizations'))\r\n| where (type !~ ('splitio.experimentation/experimentationworkspaces'))\r\n| where (type !~ ('microsoft.agfoodplatform/farmbeats'))\r\n| where (type !~ ('microsoft.agricultureplatform/agriservices'))\r\n| where (type !~ ('microsoft.appsecurity/policies'))\r\n| where (type !~ ('microsoft.arc/allfairfax'))\r\n| where (type !~ ('microsoft.cdn/profiles/customdomains'))\r\n| where (type !~ ('microsoft.cdn/profiles/afdendpoints'))\r\n| where (type !~ ('microsoft.cdn/profiles/origingroups/origins'))\r\n| where (type !~ ('microsoft.cdn/profiles/origingroups'))\r\n| where (type !~ ('microsoft.cdn/profiles/afdendpoints/routes'))\r\n| where (type !~ ('microsoft.cdn/profiles/rulesets/rules'))\r\n| where (type !~ ('microsoft.cdn/profiles/rulesets'))\r\n| where (type !~ ('microsoft.cdn/profiles/secrets'))\r\n| where (type !~ ('microsoft.cdn/profiles/securitypolicies'))\r\n| where (type !~ ('microsoft.chaos/privateaccesses'))\r\n| where (type !~ ('microsoft.sovereign/transparencylogs'))\r\n| where (type !~ ('microsoft.sovereign/landingzoneconfigurations'))\r\n| where (type !~ ('microsoft.hardwaresecuritymodules/cloudhsmclusters'))\r\n| where (type !~ ('microsoft.cloudtest/accounts'))\r\n| where (type !~ ('microsoft.cloudtest/hostedpools'))\r\n| where (type !~ ('microsoft.cloudtest/images'))\r\n| where (type !~ ('microsoft.cloudtest/pools'))\r\n| where (type !~ ('microsoft.compute/computefleetinstances'))\r\n| where (type !~ ('microsoft.compute/standbypoolinstance'))\r\n| where (type !~ ('microsoft.compute/virtualmachineflexinstances'))\r\n| where (type !~ ('microsoft.kubernetesconfiguration/extensions'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/extensions'))\r\n| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/namespaces'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/namespaces'))\r\n| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))\r\n| where (type !~ ('microsoft.portalservices/extensions/deployments'))\r\n| where (type !~ ('microsoft.portalservices/extensions'))\r\n| where (type !~ ('microsoft.portalservices/extensions/slots'))\r\n| where (type !~ ('microsoft.portalservices/extensions/versions'))\r\n| where (type !~ ('microsoft.datacollaboration/workspaces'))\r\n| where (type !~ ('microsoft.deviceregistry/devices'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/activedeployments'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/agents'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/deployments'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/deviceclasses'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/updates'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts'))\r\n| where (type !~ ('private.easm/workspaces'))\r\n| where (type !~ ('microsoft.impact/connectors'))\r\n| where (type !~ ('microsoft.edgeorder/virtual_orderitems'))\r\n| where (type !~ ('microsoft.workloads/epicvirtualinstances'))\r\n| where (type !~ ('microsoft.fairfieldgardens/provisioningresources/provisioningpolicies'))\r\n| where (type !~ ('microsoft.fairfieldgardens/provisioningresources'))\r\n| where (type !~ ('microsoft.healthmodel/healthmodels'))\r\n| where (type !~ ('microsoft.hybridcompute/arcserverwithwac'))\r\n| where (type !~ ('microsoft.hybridcompute/machinessovereign'))\r\n| where (type !~ ('microsoft.hybridcompute/machinesesu'))\r\n| where (type !~ ('microsoft.hybridcompute/machinespaygo'))\r\n| where (type !~ ('microsoft.hybridcompute/machinessoftwareassurance'))\r\n| where (type !~ ('microsoft.network/virtualhubs')) or ((kind =~ ('routeserver')))\r\n| where (type !~ ('microsoft.network/networkvirtualappliances'))\r\n| where (type !~ ('microsoft.devhub/iacprofiles'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/files'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/filerequests'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/licenses'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/connectors'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/sharedstorages'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/storages'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/workloads'))\r\n| where (type !~ ('microsoft.insights/diagnosticsettings'))\r\n| where not((type =~ ('microsoft.network/serviceendpointpolicies')) and ((kind =~ ('internal'))))\r\n| where (type !~ ('microsoft.resources/resourcegraphvisualizer'))\r\n| where (type !~ ('microsoft.orbital/cloudaccessrouters'))\r\n| where (type !~ ('microsoft.orbital/terminals'))\r\n| where (type !~ ('microsoft.orbital/sdwancontrollers'))\r\n| where (type !~ ('microsoft.orbital/spacecrafts/contacts'))\r\n| where (type !~ ('microsoft.orbital/contactprofiles'))\r\n| where (type !~ ('microsoft.orbital/edgesites'))\r\n| where (type !~ ('microsoft.orbital/geocatalogs'))\r\n| where (type !~ ('microsoft.orbital/groundstations'))\r\n| where (type !~ ('microsoft.orbital/l2connections'))\r\n| where (type !~ ('microsoft.orbital/spacecrafts'))\r\n| where (type !~ ('microsoft.recommendationsservice/accounts/modeling'))\r\n| where (type !~ ('microsoft.recommendationsservice/accounts/serviceendpoints'))\r\n| where (type !~ ('microsoft.recoveryservicesbvtd/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesbvtd2/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesintd/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesintd2/vaults'))\r\n| where (type !~ ('microsoft.relationships/servicegroupmember'))\r\n| where (type !~ ('microsoft.relationships/dependencyof'))\r\n| where (type !~ ('microsoft.resources/deletedresources'))\r\n| where (type !~ ('microsoft.deploymentmanager/rollouts'))\r\n| where (type !~ ('microsoft.features/featureprovidernamespaces/featureconfigurations'))\r\n| where (type !~ ('microsoft.saashub/cloudservices/hidden'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations/customrollouts'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations/defaultrollouts'))\r\n| where (type !~ ('microsoft.edge/configurations'))\r\n| where not((type =~ ('microsoft.synapse/workspaces/sqlpools')) and ((kind =~ ('v3'))))\r\n| where (type !~ ('microsoft.mission/virtualenclaves/workloads'))\r\n| where (type !~ ('microsoft.mission/virtualenclaves'))\r\n| where (type !~ ('microsoft.mission/communities/transithubs'))\r\n| where (type !~ ('microsoft.mission/virtualenclaves/enclaveendpoints'))\r\n| where (type !~ ('microsoft.mission/enclaveconnections'))\r\n| where (type !~ ('microsoft.mission/communities/communityendpoints'))\r\n| where (type !~ ('microsoft.mission/communities'))\r\n| where (type !~ ('microsoft.mission/catalogs'))\r\n| where (type !~ ('microsoft.mission/approvals'))\r\n| where (type !~ ('microsoft.workloads/insights'))\r\n| where (type !~ ('microsoft.hanaonazure/sapmonitors'))\r\n| where (type !~ ('microsoft.cloudhealth/healthmodels'))\r\n| where (type !~ ('microsoft.connectedcache/enterprisemcccustomers/enterprisemcccachenodes'))\r\n| where not((type =~ ('microsoft.sql/servers/databases')) and ((kind in~ ('system','v2.0,system','v12.0,system','v12.0,system,serverless','v12.0,user,datawarehouse,gen2,analytics'))))\r\n| where not((type =~ ('microsoft.sql/servers')) and ((kind =~ ('v12.0,analytics'))))\r\n//| where (type in~ ('Microsoft.Arc/all','Microsoft.HybridCompute/machines','Microsoft.Kubernetes/connectedclusters','Microsoft.HybridContainerService/provisionedClusters','Microsoft.AzureArcData/sqlServerInstances','Microsoft.AzureArcData/dataControllers','Microsoft.AzureStackHCI/clusters'))\r\n| where (type in~ ('Microsoft.HybridCompute/machines'))\r\n| project operatingSystem\r\n| summarize Count = count() by operatingSystem\r\n| order by operatingSystem asc ",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Operating System Distribution",
+                "subtitle": "Count of resources by OS type"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 9,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 2",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Run query to see results.\r\nresources\r\n| where type in~ (\r\n    \"Microsoft.HybridCompute/machines\",\r\n    \"Microsoft.Kubernetes/connectedclusters\",\r\n    \"Microsoft.HybridContainerService/provisionedClusters\",\r\n    \"Microsoft.AzureArcData/sqlServerInstances\",\r\n    \"Microsoft.AzureArcData/dataControllers\",\r\n    \"Microsoft.AzureStackHCI/clusters\"\r\n)\r\n// inicio do bloco adicionado\r\n| extend agentversion = properties.agentVersion\r\n| extend state = properties.status\r\n| extend status = case(\r\n    state =~ 'Connected', 'Connected',\r\n    state =~ 'Disconnected', 'Offline',\r\n    state =~ 'Error', 'Error',\r\n    state =~ 'Expired', 'Expired',\r\n    '')\r\n    | extend osSku = properties.osSku\r\n| extend os = properties.osName\r\n| extend osName = case(\r\n    os =~ 'windows', 'Windows',\r\n    os =~ 'linux', 'Linux',\r\n    '')\r\n| extend operatingSystem = iif(isnotnull(osSku), osSku, osName)\r\n// fim do bloco\r\n| project name, agentversion, status, type, operatingSystem,domain = tostring(properties.domainName), resourceGroup, location, subscriptionId, kind, id, tags\r\n| extend locationDisplayName=case(location =~ 'eastus','East US',location =~ 'southcentralus','South Central US',location =~ 'westus2','West US 2',location =~ 'westus3','West US 3',location =~ 'australiaeast','Australia East',location =~ 'southeastasia','Southeast Asia',location =~ 'northeurope','North Europe',location =~ 'swedencentral','Sweden Central',location =~ 'uksouth','UK South',location =~ 'westeurope','West Europe',location =~ 'centralus','Central US',location =~ 'southafricanorth','South Africa North',location =~ 'centralindia','Central India',location =~ 'eastasia','East Asia',location =~ 'japaneast','Japan East',location =~ 'koreacentral','Korea Central',location =~ 'newzealandnorth','New Zealand North',location =~ 'canadacentral','Canada Central',location =~ 'francecentral','France Central',location =~ 'germanywestcentral','Germany West Central',location =~ 'italynorth','Italy North',location =~ 'norwayeast','Norway East',location =~ 'polandcentral','Poland Central',location =~ 'spaincentral','Spain Central',location =~ 'switzerlandnorth','Switzerland North',location =~ 'mexicocentral','Mexico Central',location =~ 'uaenorth','UAE North',location =~ 'brazilsouth','Brazil South',location =~ 'israelcentral','Israel Central',location =~ 'qatarcentral','Qatar Central',location =~ 'centralusstage','Central US (Stage)',location =~ 'eastusstage','East US (Stage)',location =~ 'eastus2stage','East US 2 (Stage)',location =~ 'northcentralusstage','North Central US (Stage)',location =~ 'southcentralusstage','South Central US (Stage)',location =~ 'westusstage','West US (Stage)',location =~ 'westus2stage','West US 2 (Stage)',location =~ 'asia','Asia',location =~ 'asiapacific','Asia Pacific',location =~ 'australia','Australia',location =~ 'brazil','Brazil',location =~ 'canada','Canada',location =~ 'europe','Europe',location =~ 'france','France',location =~ 'germany','Germany',location =~ 'global','Global',location =~ 'india','India',location =~ 'israel','Israel',location =~ 'italy','Italy',location =~ 'japan','Japan',location =~ 'korea','Korea',location =~ 'newzealand','New Zealand',location =~ 'norway','Norway',location =~ 'poland','Poland',location =~ 'qatar','Qatar',location =~ 'singapore','Singapore',location =~ 'southafrica','South Africa',location =~ 'sweden','Sweden',location =~ 'switzerland','Switzerland',location =~ 'uae','United Arab Emirates',location =~ 'uk','United Kingdom',location =~ 'unitedstates','United States',location =~ 'unitedstateseuap','United States EUAP',location =~ 'eastasiastage','East Asia (Stage)',location =~ 'southeastasiastage','Southeast Asia (Stage)',location =~ 'brazilus','Brazil US',location =~ 'eastus2','East US 2',location =~ 'northcentralus','North Central US',location =~ 'westus','West US',location =~ 'japanwest','Japan West',location =~ 'jioindiawest','Jio India West',location =~ 'westcentralus','West Central US',location =~ 'southafricawest','South Africa West',location =~ 'australiacentral','Australia Central',location =~ 'australiacentral2','Australia Central 2',location =~ 'australiasoutheast','Australia Southeast',location =~ 'jioindiacentral','Jio India Central',location =~ 'koreasouth','Korea South',location =~ 'southindia','South India',location =~ 'westindia','West India',location =~ 'canadaeast','Canada East',location =~ 'francesouth','France South',location =~ 'germanynorth','Germany North',location =~ 'norwaywest','Norway West',location =~ 'switzerlandwest','Switzerland West',location =~ 'ukwest','UK West',location =~ 'uaecentral','UAE Central',location =~ 'brazilsoutheast','Brazil Southeast',location)\r\n| extend typeDisplayName=case(type =~ 'microsoft.azurestackhci/clusters','Azure Local',type =~ 'microsoft.arc/all','Azure Arc enabled resource',(type =~ 'microsoft.kubernetes/connectedclusters') and (kind =~ 'provisionedcluster'),'Kubernetes - Azure Arc',type =~ 'microsoft.kubernetes/connectedclusters','Kubernetes - Azure Arc',type =~ 'microsoft.hybridcontainerservice/provisionedclusters','Kubernetes hybrid - Azure Arc',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'avs'),'Machine - Azure Arc (AVS)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'vmware'),'Machine - Azure Arc (VMware)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'scvmm'),'Machine - Azure Arc (SCVMM)',(type =~ 'microsoft.hybridcompute/machines') and (kind =~ 'hci'),'Machine - Azure Arc (Azure Local)',type =~ 'microsoft.hybridcompute/machines','Machine - Azure Arc',type =~ 'microsoft.azurearcdata/datacontrollers','Azure Arc data controller',type =~ 'microsoft.azurearcdata/sqlserverinstances','SQL Server - Azure Arc',type)\r\n| where (type !~ ('dell.storage/filesystems'))\r\n| where (type !~ ('arizeai.observabilityeval/organizations'))\r\n| where (type !~ ('lambdatest.hyperexecute/organizations'))\r\n| where (type !~ ('pinecone.vectordb/organizations'))\r\n| where (type !~ ('microsoft.weightsandbiases/instances'))\r\n| where (type !~ ('paloaltonetworks.cloudngfw/globalrulestacks'))\r\n| where (type !~ ('purestorage.block/storagepools/avsstoragecontainers'))\r\n| where (type !~ ('purestorage.block/reservations'))\r\n| where (type !~ ('purestorage.block/storagepools'))\r\n| where (type !~ ('solarwinds.observability/organizations'))\r\n| where (type !~ ('splitio.experimentation/experimentationworkspaces'))\r\n| where (type !~ ('microsoft.agfoodplatform/farmbeats'))\r\n| where (type !~ ('microsoft.agricultureplatform/agriservices'))\r\n| where (type !~ ('microsoft.appsecurity/policies'))\r\n| where (type !~ ('microsoft.arc/allfairfax'))\r\n| where (type !~ ('microsoft.cdn/profiles/customdomains'))\r\n| where (type !~ ('microsoft.cdn/profiles/afdendpoints'))\r\n| where (type !~ ('microsoft.cdn/profiles/origingroups/origins'))\r\n| where (type !~ ('microsoft.cdn/profiles/origingroups'))\r\n| where (type !~ ('microsoft.cdn/profiles/afdendpoints/routes'))\r\n| where (type !~ ('microsoft.cdn/profiles/rulesets/rules'))\r\n| where (type !~ ('microsoft.cdn/profiles/rulesets'))\r\n| where (type !~ ('microsoft.cdn/profiles/secrets'))\r\n| where (type !~ ('microsoft.cdn/profiles/securitypolicies'))\r\n| where (type !~ ('microsoft.chaos/privateaccesses'))\r\n| where (type !~ ('microsoft.sovereign/transparencylogs'))\r\n| where (type !~ ('microsoft.sovereign/landingzoneconfigurations'))\r\n| where (type !~ ('microsoft.hardwaresecuritymodules/cloudhsmclusters'))\r\n| where (type !~ ('microsoft.cloudtest/accounts'))\r\n| where (type !~ ('microsoft.cloudtest/hostedpools'))\r\n| where (type !~ ('microsoft.cloudtest/images'))\r\n| where (type !~ ('microsoft.cloudtest/pools'))\r\n| where (type !~ ('microsoft.compute/computefleetinstances'))\r\n| where (type !~ ('microsoft.compute/standbypoolinstance'))\r\n| where (type !~ ('microsoft.compute/virtualmachineflexinstances'))\r\n| where (type !~ ('microsoft.kubernetesconfiguration/extensions'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/extensions'))\r\n| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/namespaces'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/namespaces'))\r\n| where (type !~ ('microsoft.kubernetes/connectedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))\r\n| where (type !~ ('microsoft.containerservice/managedclusters/microsoft.kubernetesconfiguration/fluxconfigurations'))\r\n| where (type !~ ('microsoft.portalservices/extensions/deployments'))\r\n| where (type !~ ('microsoft.portalservices/extensions'))\r\n| where (type !~ ('microsoft.portalservices/extensions/slots'))\r\n| where (type !~ ('microsoft.portalservices/extensions/versions'))\r\n| where (type !~ ('microsoft.datacollaboration/workspaces'))\r\n| where (type !~ ('microsoft.deviceregistry/devices'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/activedeployments'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/agents'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/deployments'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/deviceclasses'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts/updates'))\r\n| where (type !~ ('microsoft.deviceupdate/updateaccounts'))\r\n| where (type !~ ('private.easm/workspaces'))\r\n| where (type !~ ('microsoft.impact/connectors'))\r\n| where (type !~ ('microsoft.edgeorder/virtual_orderitems'))\r\n| where (type !~ ('microsoft.workloads/epicvirtualinstances'))\r\n| where (type !~ ('microsoft.fairfieldgardens/provisioningresources/provisioningpolicies'))\r\n| where (type !~ ('microsoft.fairfieldgardens/provisioningresources'))\r\n| where (type !~ ('microsoft.healthmodel/healthmodels'))\r\n| where (type !~ ('microsoft.hybridcompute/arcserverwithwac'))\r\n| where (type !~ ('microsoft.hybridcompute/machinessovereign'))\r\n| where (type !~ ('microsoft.hybridcompute/machinesesu'))\r\n| where (type !~ ('microsoft.hybridcompute/machinespaygo'))\r\n| where (type !~ ('microsoft.hybridcompute/machinessoftwareassurance'))\r\n| where (type !~ ('microsoft.network/virtualhubs')) or ((kind =~ ('routeserver')))\r\n| where (type !~ ('microsoft.network/networkvirtualappliances'))\r\n| where (type !~ ('microsoft.devhub/iacprofiles'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/files'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/filerequests'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/licenses'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/connectors'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/sharedstorages'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/storages'))\r\n| where (type !~ ('microsoft.modsimworkbench/workbenches/chambers/workloads'))\r\n| where (type !~ ('microsoft.insights/diagnosticsettings'))\r\n| where not((type =~ ('microsoft.network/serviceendpointpolicies')) and ((kind =~ ('internal'))))\r\n| where (type !~ ('microsoft.resources/resourcegraphvisualizer'))\r\n| where (type !~ ('microsoft.orbital/cloudaccessrouters'))\r\n| where (type !~ ('microsoft.orbital/terminals'))\r\n| where (type !~ ('microsoft.orbital/sdwancontrollers'))\r\n| where (type !~ ('microsoft.orbital/spacecrafts/contacts'))\r\n| where (type !~ ('microsoft.orbital/contactprofiles'))\r\n| where (type !~ ('microsoft.orbital/edgesites'))\r\n| where (type !~ ('microsoft.orbital/geocatalogs'))\r\n| where (type !~ ('microsoft.orbital/groundstations'))\r\n| where (type !~ ('microsoft.orbital/l2connections'))\r\n| where (type !~ ('microsoft.orbital/spacecrafts'))\r\n| where (type !~ ('microsoft.recommendationsservice/accounts/modeling'))\r\n| where (type !~ ('microsoft.recommendationsservice/accounts/serviceendpoints'))\r\n| where (type !~ ('microsoft.recoveryservicesbvtd/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesbvtd2/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesintd/vaults'))\r\n| where (type !~ ('microsoft.recoveryservicesintd2/vaults'))\r\n| where (type !~ ('microsoft.relationships/servicegroupmember'))\r\n| where (type !~ ('microsoft.relationships/dependencyof'))\r\n| where (type !~ ('microsoft.resources/deletedresources'))\r\n| where (type !~ ('microsoft.deploymentmanager/rollouts'))\r\n| where (type !~ ('microsoft.features/featureprovidernamespaces/featureconfigurations'))\r\n| where (type !~ ('microsoft.saashub/cloudservices/hidden'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations/customrollouts'))\r\n| where (type !~ ('microsoft.providerhub/providerregistrations/defaultrollouts'))\r\n| where (type !~ ('microsoft.edge/configurations'))\r\n| where not((type =~ ('microsoft.synapse/workspaces/sqlpools')) and ((kind =~ ('v3'))))\r\n| where (type !~ ('microsoft.mission/virtualenclaves/workloads'))\r\n| where (type !~ ('microsoft.mission/virtualenclaves'))\r\n| where (type !~ ('microsoft.mission/communities/transithubs'))\r\n| where (type !~ ('microsoft.mission/virtualenclaves/enclaveendpoints'))\r\n| where (type !~ ('microsoft.mission/enclaveconnections'))\r\n| where (type !~ ('microsoft.mission/communities/communityendpoints'))\r\n| where (type !~ ('microsoft.mission/communities'))\r\n| where (type !~ ('microsoft.mission/catalogs'))\r\n| where (type !~ ('microsoft.mission/approvals'))\r\n| where (type !~ ('microsoft.workloads/insights'))\r\n| where (type !~ ('microsoft.hanaonazure/sapmonitors'))\r\n| where (type !~ ('microsoft.cloudhealth/healthmodels'))\r\n| where (type !~ ('microsoft.connectedcache/enterprisemcccustomers/enterprisemcccachenodes'))\r\n| where not((type =~ ('microsoft.sql/servers/databases')) and ((kind in~ ('system','v2.0,system','v12.0,system','v12.0,system,serverless','v12.0,user,datawarehouse,gen2,analytics'))))\r\n| where not((type =~ ('microsoft.sql/servers')) and ((kind =~ ('v12.0,analytics'))))\r\n//| where (type in~ ('Microsoft.Arc/all','Microsoft.HybridCompute/machines','Microsoft.Kubernetes/connectedclusters','Microsoft.HybridContainerService/provisionedClusters','Microsoft.AzureArcData/sqlServerInstances','Microsoft.AzureArcData/dataControllers','Microsoft.AzureStackHCI/clusters'))\r\n| where (type in~ ('Microsoft.HybridCompute/machines'))\r\n| project name, domain\r\n| summarize Domains = make_list(domain), TotalMachineCount = sum(1), Computers = make_list(name)\r\n| mvexpand EachDomain = Domains, EachComputer = Computers\r\n| summarize PerDomainMachineCount = count(), ComputersInDomain = make_list(EachComputer) by tostring(EachDomain), TotalMachineCount\r\n| extend Pct = 100 * bin(todouble(PerDomainMachineCount) / todouble(TotalMachineCount), 0.001)\r\n| project EachDomain, PerDomainMachineCount, Pct",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Machine Distribution by Domain",
+                "subtitle": "Count and percentage of machines per domain."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 15,
+              "colSpan": 21,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Inventory & Configuration Management</span>\n<span> - Tracking Changes and Configuration Data Across Resource.</span>\n</div>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 16,
+              "colSpan": 3,
+              "rowSpan": 14
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='display:flex; justify-content:flex-start; align-items:flex-start; height:100px;'>\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Change Tracking and Inventory</span>\n</div>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 16,
+              "colSpan": 12,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "14fa402f-02a3-4430-8518-b27af415159f",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P30D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\"\n| project Computer, Publisher, SoftwareName, SoftwareType, Previous, Current, TimeGenerated\n| order by Computer, Publisher, SoftwareName, TimeGenerated desc\n| summarize LatestChange = arg_max(TimeGenerated, Previous, Current) by Computer, Publisher, SoftwareName, SoftwareType\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "//https://learn.microsoft.com/en-us/azure/azure-monitor/reference/queries/configurationchange\nConfigurationChange\n| where ConfigChangeType == \"Software\"\n| project Computer, Publisher, SoftwareName, SoftwareType, Previous, Current, TimeGenerated\n| order by Computer, Publisher, SoftwareName, TimeGenerated desc\n| summarize LatestChange = arg_max(TimeGenerated, Previous, Current) by Computer, Publisher, SoftwareName, SoftwareType\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Latest Software Configuration Changes",
+                "subtitle": "Tracking the Most Recent Software Changes by Computer and Publisher"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 16,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15098adc-724d-4de9-8a23-85a7c515f20a",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "// To create an alert for this query, click '+ New alert rule'\nConfigurationChange  // (relies on the Change Tracking solution): \n| where ConfigChangeType == \"WindowsServices\" and SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\" and SvcState == \"Stopped\"\n| where SvcStartupType == \"Auto\" and TimeGenerated > ago(30m)\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "// To create an alert for this query, click '+ New alert rule'\nConfigurationChange  // (relies on the Change Tracking solution): \n| where (ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\") and SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\" and SvcState == \"Stopped\"\n| where SvcStartupType == \"Auto\" and TimeGenerated > ago(30m)\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Stopped Windows services",
+                "subtitle": "Find all windows services that stopped in the last 30 minutes."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 19,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "1413fead-109f-4a68-9169-06719896365f",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\"\n| sort by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Software changes",
+                "subtitle": "Lists software changes sorted by time (newest first)."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 22,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "94f878ec-43ce-4c94-a70c-39a481041a16",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Services\"\n| sort by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "ConfigurationChange\n| where ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\"\n| sort by TimeGenerated desc\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Service changes",
+                "subtitle": "Lists service changes sorted by time (newest first)."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 9,
+              "y": 22,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "300f00bd-e6fd-4d88-a143-9f7fcc485c46",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange \n| where ConfigChangeType == \"Software\"\n| summarize AggregatedValue = count() by Computer\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Software change type per computer",
+                "subtitle": "Count software changes by computer."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 22,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "47906f13-5ad4-4627-b150-16f74c13028c",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange \n| where ConfigChangeType == \"WindowsServices\" and SvcState == \"Stopped\" \n| sort by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "ConfigurationChange \n| where (ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\") and SvcState == \"Stopped\" \n| sort by TimeGenerated desc\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Stopped services",
+                "subtitle": "Lists stopped service changes sorted by time."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 25,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "27d1135d-7c1e-4b33-b101-b638b60396f2",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\"\n| summarize AggregatedValue = count() by ChangeCategory\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Software change count per category",
+                "subtitle": "Count software changes by change category."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 9,
+              "y": 25,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "4b312201-e0d6-4c0f-b126-dc1865115646",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\" and ChangeCategory == \"Removed\"\n| order by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Removed software changes",
+                "subtitle": "Shows change records for removed software."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 25,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "1060c020-3e9b-4b4d-8d8d-0d231a57524f",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\" and ChangeCategory == \"Removed\"\n| order by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Recent stopped auto services",
+                "subtitle": "Shows most recent services that were set to Auto but reported as being stopped."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 28,
+              "colSpan": 18,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Inventory & Configuration Management</span>\n<span> - Tracking Registry Changes and Configuration Data.</span>\n</div>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 29,
+              "colSpan": 18,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='line-height:50px; background-color: yellow; padding: 10px;'>\n  <span style='font-size:16px;font-weight:bold'>Under construction</span>\n  <span> - Dashboard Under Construction – Stay Tuned for Upcoming Features.</span>\n</div>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "local",
+                "granularity": "auto",
+                "relative": "30d"
+              },
+              "displayCache": {
+                "name": "Local Time",
+                "value": "Past 30 days"
+              },
+              "filteredPartIds": [
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29ad9eb",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29ada82",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adad2",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adb2a",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adb8b",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adbf5",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adc68",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adce4",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29add69"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Azure Arc Demo",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Azure Arc Demo"
+  },
+  "apiVersion": "2022-12-01-preview"
+}
