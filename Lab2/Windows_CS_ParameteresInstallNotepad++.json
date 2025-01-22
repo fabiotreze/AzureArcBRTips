@@ -1,0 +1,19 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "value": "vmName"
+        },
+        "location": {
+            "value": "brazilsouth"
+        },
+        "fileUris": {
+            "value": 
+                "https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7.4/npp.8.7.4.Installer.x64.exe"
+        },
+        "commandToExecute": {
+            "value": "start cmd.exe /c npp.8.7.4.Installer.x64.exe /S"
+        }
+    }
+}
