@@ -13,3 +13,5 @@ Este dashboard pode ser totalmente **customizado** de acordo com as **necessidad
 - **Visibilidade Centralizada**: Uma visão única de todos os recursos conectados ao Azure Arc.
 - **Customização de Layout**: Alteração da estrutura do dashboard para melhor atender as preferências e necessidades de sua equipe.
 - **Ajuste de Funcionalidades**: Possibilidade de incluir novas funcionalidades ou excluir as que não são necessárias, mantendo o foco nas informações essenciais.
+
+**Link para Dashboard** [Azure Arc Demo](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab5/Azure%20Arc%20Demo.json)
