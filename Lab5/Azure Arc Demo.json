@@ -16,7 +16,7 @@
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<td style=\"background-color:#2D2D2D; color:#FFFFFF; padding:20px; border-radius:10px;\">\r\n  <div style=\"line-height:1.5; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position:relative;\">\r\n    <a href=\"/html/classic/index.shtm\" tabindex=\"-1\" style=\"position:absolute; top:10px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; background-color:#8B0000; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab5/seulogoaqui.png\" style=\"width:100%; height:auto; display:block;\" alt=\"SeuLogoAqui\">\r\n      </div>\r\n    </a>\r\n    <span style=\"font-size:32px; font-weight:bold; color:#000000; display:block; margin-bottom:10px;\">Azure Arc Demo</span>\r\n    <span style=\"font-size:14px; font-weight:normal; color:#000000; display:block;\">Dashboard with information and status of installed Azure Arc agents.</span>\r\n    <br>\r\n    <span style=\"font-size:14px; color:#000000; font-weight:bold;\">&#x1F517;</span>\r\n    <a href=\"http://aka.ms/azurearc\" style=\"color:#1E90FF; text-decoration:none; font-weight:bold;\">Azure Arc Documentation</a>\r\n    <br><br>\r\n    <a href=\"https://www.microsoft.com\" tabindex=\"-1\" style=\"position:absolute; top:50px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/UHFbanner-MSlogo?fmt=png-alpha&bfc=off&qlt=100,1\" alt=\"Microsoft logo\" style=\"width:100%; height:auto; display:block;\">\r\n      </div>\r\n    </a>\r\n    <div style=\"position:absolute; bottom:10px; right:10px; font-size:14px; color:#000000; font-weight:normal; direction:rtl;\">\r\n      <span>Provided by</span> <span style=\"font-weight:bold;\">fabiotreze</span>\r\n    </div>\r\n  </div>\r\n</td>",
+                  "content": "<td style=\"background-color:#2D2D2D; color:#FFFFFF; padding:20px; border-radius:10px;\">\r\n  <div style=\"line-height:1.5; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position:relative;\">\r\n    <a href=\"/html/classic/index.shtm\" tabindex=\"-1\" style=\"position:absolute; top:10px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; background-color:#8B0000; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab5/seulogoaqui.png\" style=\"width:100%; height:auto; display:block;\" alt=\"Logo seu logo aqui\">\r\n      </div>\r\n    </a>\r\n    <span style=\"font-size:32px; font-weight:bold; color:#000000; display:block; margin-bottom:10px;\">Azure Arc Demo</span>\r\n    <span style=\"font-size:14px; font-weight:normal; color:#000000; display:block;\">Dashboard with information and status of installed Azure Arc agents.</span>\r\n    <br>\r\n    <span style=\"font-size:14px; color:#000000; font-weight:bold;\">&#x1F517;</span>\r\n    <a href=\"http://aka.ms/azurearc\" style=\"color:#1E90FF; text-decoration:none; font-weight:bold;\">Azure Arc Documentation</a>\r\n    <br><br>\r\n    <a href=\"https://www.microsoft.com\" tabindex=\"-1\" style=\"position:absolute; top:50px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/UHFbanner-MSlogo?fmt=png-alpha&bfc=off&qlt=100,1\" alt=\"Microsoft logo\" style=\"width:100%; height:auto; display:block;\">\r\n      </div>\r\n    </a>\r\n    <div style=\"position:absolute; bottom:10px; right:10px; font-size:14px; color:#000000; font-weight:normal; direction:rtl;\">\r\n      <span>Provided by</span> <span style=\"font-weight:bold;\">fabiotreze</span>\r\n    </div>\r\n  </div>\r\n</td>",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
@@ -253,14 +253,14 @@
               "x": 0,
               "y": 16,
               "colSpan": 3,
-              "rowSpan": 14
+              "rowSpan": 15
             },
             "metadata": {
               "inputs": [],
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<div style='display:flex; justify-content:flex-start; align-items:flex-start; height:100px;'>\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Change Tracking and Inventory</span>\n</div>\n",
+                  "content": "<div style='display:flex; justify-content:flex-start; align-items:center; height:100px;'>\n  <img src='https://cdn1.iconfinder.com/data/icons/ionicons-fill-vol-2/512/logo-usd-256.png' \n       alt='Cost' \n       style='width:40px; height:40px; margin-right:8px;' />\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Change Tracking and Inventory</span>\n</div>\n",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
@@ -396,7 +396,7 @@
                 },
                 {
                   "name": "PartId",
-                  "value": "15098adc-724d-4de9-8a23-85a7c515f20a",
+                  "value": "27d1135d-7c1e-4b33-b101-b638b60396f2",
                   "isOptional": true
                 },
                 {
@@ -406,6 +406,7 @@
                 },
                 {
                   "name": "TimeRange",
+                  "value": "P1D",
                   "isOptional": true
                 },
                 {
@@ -418,7 +419,7 @@
                 },
                 {
                   "name": "Query",
-                  "value": "// To create an alert for this query, click '+ New alert rule'\nConfigurationChange  // (relies on the Change Tracking solution): \n| where ConfigChangeType == \"WindowsServices\" and SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\" and SvcState == \"Stopped\"\n| where SvcStartupType == \"Auto\" and TimeGenerated > ago(30m)\n",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\"\n| summarize AggregatedValue = count() by ChangeCategory\n",
                   "isOptional": true
                 },
                 {
@@ -450,19 +451,39 @@
                 },
                 {
                   "name": "IsQueryContainTimeRange",
-                  "value": true,
+                  "value": false,
                   "isOptional": true
                 }
               ],
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
               "settings": {
                 "content": {
-                  "Query": "// To create an alert for this query, click '+ New alert rule'\nConfigurationChange  // (relies on the Change Tracking solution): \n| where (ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\") and SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\" and SvcState == \"Stopped\"\n| where SvcStartupType == \"Auto\" and TimeGenerated > ago(30m)\n\n"
+                  "Query": "ConfigurationChange\n| where ConfigChangeType == \"Software\"\n| summarize AggregatedValue = count() by ChangeCategory\n| render piechart \n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "Pie",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "ChangeCategory",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "AggregatedValue",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
                 }
               },
               "partHeader": {
-                "title": "Stopped Windows services",
-                "subtitle": "Find all windows services that stopped in the last 30 minutes."
+                "title": "Software change count per category",
+                "subtitle": "Count software changes by change category."
               }
             }
           },
@@ -565,107 +586,8 @@
             "position": {
               "x": 3,
               "y": 22,
-              "colSpan": 6,
-              "rowSpan": 3
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "94f878ec-43ce-4c94-a70c-39a481041a16",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "value": "P1D",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Services\"\n| sort by TimeGenerated desc\n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "AnalyticsGrid",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "log-azurearc-itpro-br",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": false,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {
-                "content": {
-                  "Query": "ConfigurationChange\n| where ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\"\n| sort by TimeGenerated desc\n\n"
-                }
-              },
-              "partHeader": {
-                "title": "Service changes",
-                "subtitle": "Lists service changes sorted by time (newest first)."
-              }
-            }
-          },
-          {
-            "position": {
-              "x": 9,
-              "y": 22,
-              "colSpan": 6,
-              "rowSpan": 3
+              "colSpan": 12,
+              "rowSpan": 6
             },
             "metadata": {
               "inputs": [
@@ -748,7 +670,31 @@
                 }
               ],
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {},
+              "settings": {
+                "content": {
+                  "Query": "ConfigurationChange \n| where ConfigChangeType == \"Software\"\n| summarize AggregatedValue = count() by Computer\n| render columnchart \n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "StackedColumn",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Computer",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "AggregatedValue",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
+                }
+              },
               "partHeader": {
                 "title": "Software change type per computer",
                 "subtitle": "Count software changes by computer."
@@ -759,200 +705,6 @@
             "position": {
               "x": 15,
               "y": 22,
-              "colSpan": 6,
-              "rowSpan": 3
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "47906f13-5ad4-4627-b150-16f74c13028c",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "value": "P1D",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "ConfigurationChange \n| where ConfigChangeType == \"WindowsServices\" and SvcState == \"Stopped\" \n| sort by TimeGenerated desc\n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "AnalyticsGrid",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "log-azurearc-itpro-br",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": false,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {
-                "content": {
-                  "Query": "ConfigurationChange \n| where (ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\") and SvcState == \"Stopped\" \n| sort by TimeGenerated desc\n\n"
-                }
-              },
-              "partHeader": {
-                "title": "Stopped services",
-                "subtitle": "Lists stopped service changes sorted by time."
-              }
-            }
-          },
-          {
-            "position": {
-              "x": 3,
-              "y": 25,
-              "colSpan": 6,
-              "rowSpan": 3
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "27d1135d-7c1e-4b33-b101-b638b60396f2",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "value": "P1D",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Software\"\n| summarize AggregatedValue = count() by ChangeCategory\n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "AnalyticsGrid",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "log-azurearc-itpro-br",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": false,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {},
-              "partHeader": {
-                "title": "Software change count per category",
-                "subtitle": "Count software changes by change category."
-              }
-            }
-          },
-          {
-            "position": {
-              "x": 9,
-              "y": 25,
               "colSpan": 6,
               "rowSpan": 3
             },
@@ -1072,6 +824,204 @@
                 },
                 {
                   "name": "PartId",
+                  "value": "94f878ec-43ce-4c94-a70c-39a481041a16",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Services\"\n| sort by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "ConfigurationChange\n| where ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\"\n| sort by TimeGenerated desc\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Service changes",
+                "subtitle": "Lists service changes sorted by time (newest first)."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 28,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15098adc-724d-4de9-8a23-85a7c515f20a",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "// To create an alert for this query, click '+ New alert rule'\nConfigurationChange  // (relies on the Change Tracking solution): \n| where ConfigChangeType == \"WindowsServices\" and SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\" and SvcState == \"Stopped\"\n| where SvcStartupType == \"Auto\" and TimeGenerated > ago(30m)\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "// To create an alert for this query, click '+ New alert rule'\nConfigurationChange  // (relies on the Change Tracking solution): \n| where (ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\") and SvcChangeType == \"State\"\n| where SvcPreviousState == \"Running\" and SvcState == \"Stopped\"\n| where SvcStartupType == \"Auto\" //and TimeGenerated > ago(30m)\n\n",
+                  "IsQueryContainTimeRange": false
+                }
+              },
+              "partHeader": {
+                "title": "Stopped Windows services",
+                "subtitle": "Find all windows services that stopped based on dashboard configuration"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 9,
+              "y": 28,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
                   "value": "1060c020-3e9b-4b4d-8d8d-0d231a57524f",
                   "isOptional": true
                 },
@@ -1141,9 +1091,108 @@
           },
           {
             "position": {
-              "x": 3,
+              "x": 15,
               "y": 28,
-              "colSpan": 18,
+              "colSpan": 6,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "47906f13-5ad4-4627-b150-16f74c13028c",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange \n| where ConfigChangeType == \"WindowsServices\" and SvcState == \"Stopped\" \n| sort by TimeGenerated desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "ConfigurationChange \n| where (ConfigChangeType == \"WindowsServices\" or ConfigChangeType == \"Services\") and SvcState == \"Stopped\" \n| sort by TimeGenerated desc\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Stopped services",
+                "subtitle": "Lists stopped service changes sorted by time."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 31,
+              "colSpan": 21,
               "rowSpan": 1
             },
             "metadata": {
@@ -1151,7 +1200,28 @@
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Inventory & Configuration Management</span>\n<span> - Tracking Registry Changes and Configuration Data.</span>\n</div>",
+                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc and Microsoft Defender for Cloud - Plan 2</span>\n<span> - File integrity monitoring for detecting changes in files and registries based on security analysis.</span>\n</div>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 32,
+              "colSpan": 3,
+              "rowSpan": 15
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='display:flex; justify-content:flex-start; align-items:flex-start; height:100px;'>\n  <img src='https://cdn1.iconfinder.com/data/icons/ionicons-fill-vol-2/512/logo-usd-256.png' \n       alt='Cost' \n       style='width:40px; height:40px; margin-right:8px;' />\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Microsoft Defender for Cloud - Plan 2</span>\n</div>\n",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
@@ -1163,8 +1233,531 @@
           {
             "position": {
               "x": 3,
-              "y": 29,
+              "y": 32,
+              "colSpan": 8,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourcegroups/rg-azurearc-itpro-br/providers/microsoft.operationalinsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "0ae4705a-48f3-4e8b-a75c-2f56cb150fbe",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "MDCFileIntegrityMonitoringEvents  \n| where TimeGenerated > ago(14d)\n| where MonitoredEntityType in ('Registry', 'File')\n| summarize count() by Computer, MonitoredEntityType\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "MDCFileIntegrityMonitoringEvents  \n| where TimeGenerated > ago(14d)\n| where MonitoredEntityType in ('Registry', 'File')\n| summarize count() by Computer, MonitoredEntityType\n| render piechart \n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "Pie",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Computer",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 11,
+              "y": 32,
+              "colSpan": 10,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourcegroups/rg-azurearc-itpro-br/providers/microsoft.operationalinsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "13b45e8b-1163-48b5-aae9-27eb35b41e56",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "MDCFileIntegrityMonitoringEvents  \n| where TimeGenerated > ago(14d)\n| where MonitoredEntityType in ('Registry', 'File')\n| summarize count() by Computer, MonitoredEntityType\n| render piechart \n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "MDCFileIntegrityMonitoringEvents  \n//| where TimeGenerated > ago(14d)\n| where MonitoredEntityType in ('Registry', 'File')\n| summarize count() by Computer, MonitoredEntityType\n| render piechart \n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "StackedColumn",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Computer",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "MonitoredEntityType",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "IsQueryContainTimeRange": false
+                }
+              },
+              "partHeader": {
+                "title": "File Integrity Monitoring Summary",
+                "subtitle": "File and registry change breakdown based on dashboard configuration"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 37,
               "colSpan": 18,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourcegroups/rg-azurearc-itpro-br/providers/microsoft.operationalinsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "92af782e-b4a4-4a36-9097-c31949b72e06",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "// Filtrar eventos onde a entidade monitorada é \"Registry\" ou \"File\"\nMDCFileIntegrityMonitoringEvents\n| where MonitoredEntityType in ('Registry', 'File')\n// Selecionar os campos relevantes organizados por categorias\n| project \n    // Identificação geral\n    //TenantId,\n    //AADTenantID,\n    //AzureResourceId,\n    Computer,\n    //CloudProvider,\n    //CloudIdentifier,\n    //CloudResourceType,    \n    // Informações de monitoramento\n    TimeGenerated,\n    MonitoredEntityType,\n    ChangeType,    \n    // Detalhes do arquivo (se aplicável)\n    FileName,\n    FileType,\n    FilePath,\n    FileSize,\n    OriginalFileName,\n    OriginalFilePath,\n    FileMd5,\n    FileSha256,\n    FileSha1,    \n    // Detalhes de registro (se aplicável)\n    RegistryKey,\n    RegistryHive,\n    OldValueData,\n    OldValueType,\n    OldValueName,\n    OldValueFullRegistryKey,\n    NewValueData,\n    NewValueType,\n    NewValueName,    \n    // Conta que iniciou a ação\n    RequestAccountName,\n    RequestAccountDomain,\n    RequestAccountSid,\n    RequestSourceIP,\n    RequestSourcePort,\n    RequestSource,    \n    // Processo que iniciou a ação\n    InitiatingProcessId,\n    InitiatingProcessName,\n    InitiatingProcessCreationTime,\n    InitiatingProcessSessionId,\n    InitiatingProcessFirstSeen,\n    InitiatingProcessAccountSid,\n    InitiatingProcessAccountDomainName,\n    InitiatingProcessAccountName,\n    InitiatingProcessImageFileName,\n    InitiatingProcessImageFilePath,\n    InitiatingProcessImageFileType,   \n    // Detalhes do executável do processo iniciador\n    InitProcImageFileSizeInBytes,\n    InitProcImageCreationTimeUtc,\n    InitProcImagePeTimestampUtc,\n    InitProcImageLastWriteTimeUtc,\n    InitProcImageLastAccessTimeUtc,\n    InitProcImageLsHash,\n    InitProcImageMd5,\n    InitProcImageSha256,\n    InitProcImageSha1,\n    InitiatingProcessSource,    \n    // Informações do executável do processo iniciador\n    InitProcVersionInfoCompanyName,\n    InitProcVersionInfoProductName,\n    InitProcVersionInfoProductVersion,\n    InitProcVersionInfoInternalFileName,\n    InitProcVersionInfoOriginalFileName,\n    InitProcVersionInfoFileDescription,\n    // Sistema de origem e tipo de evento\n    SourceSystem,\n    Type\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "File and Registry Integrity Monitoring",
+                "subtitle": "Track changes to files and registry keys with detailed process insights."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 43,
+              "colSpan": 9,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourcegroups/rg-azurearc-itpro-br/providers/microsoft.operationalinsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "65814fab-01dd-4d36-9714-7366c614bdde",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "MDCFileIntegrityMonitoringEvents\n| where MonitoredEntityType == 'Registry'\n| project \n    Computer,\n    TimeGenerated,\n    MonitoredEntityType,\n    ChangeType,\n    RegistryKey,\n    RegistryHive,\n    OldValueData,\n    OldValueType,\n    OldValueName,\n    OldValueFullRegistryKey,\n    NewValueData,\n    NewValueType,\n    NewValueName,\n    RequestAccountName,\n    RequestAccountDomain,\n    RequestAccountSid,\n    RequestSourceIP,\n    RequestSourcePort,\n    RequestSource,\n    InitiatingProcessId,\n    InitiatingProcessName,\n    InitiatingProcessCreationTime,\n    InitiatingProcessSessionId,\n    InitiatingProcessFirstSeen,\n    InitiatingProcessAccountSid,\n    InitiatingProcessAccountDomainName,\n    InitiatingProcessAccountName,\n    InitiatingProcessImageFileName,\n    InitiatingProcessImageFilePath,\n    InitiatingProcessImageFileType,\n    InitProcImageFileSizeInBytes,\n    InitProcImageCreationTimeUtc,\n    InitProcImagePeTimestampUtc,\n    InitProcImageLastWriteTimeUtc,\n    InitProcImageLastAccessTimeUtc,\n    InitProcImageLsHash,\n    InitProcImageMd5,\n    InitProcImageSha256,\n    InitProcImageSha1,\n    InitiatingProcessSource,\n    InitProcVersionInfoCompanyName,\n    InitProcVersionInfoProductName,\n    InitProcVersionInfoProductVersion,\n    InitProcVersionInfoInternalFileName,\n    InitProcVersionInfoOriginalFileName,\n    InitProcVersionInfoFileDescription,\n    SourceSystem,\n    Type\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Registry Integrity Monitoring",
+                "subtitle": "Detect and analyze changes to registry keys with comprehensive process details."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 12,
+              "y": 43,
+              "colSpan": 9,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourcegroups/rg-azurearc-itpro-br/providers/microsoft.operationalinsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "0cb3ecd8-5cd4-4761-b1c8-295bf396fd84",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P1D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "MDCFileIntegrityMonitoringEvents\n| where MonitoredEntityType == 'File'\n| project \n    Computer,\n    TimeGenerated,\n    MonitoredEntityType,\n    ChangeType,\n    FileName,\n    FileType,\n    FilePath,\n    FileSize,\n    OriginalFileName,\n    OriginalFilePath,\n    FileMd5,\n    FileSha256,\n    FileSha1,\n    RequestAccountName,\n    RequestAccountDomain,\n    RequestAccountSid,\n    RequestSourceIP,\n    RequestSourcePort,\n    RequestSource,\n    InitiatingProcessId,\n    InitiatingProcessName,\n    InitiatingProcessCreationTime,\n    InitiatingProcessSessionId,\n    InitiatingProcessFirstSeen,\n    InitiatingProcessAccountSid,\n    InitiatingProcessAccountDomainName,\n    InitiatingProcessAccountName,\n    InitiatingProcessImageFileName,\n    InitiatingProcessImageFilePath,\n    InitiatingProcessImageFileType,\n    InitProcImageFileSizeInBytes,\n    InitProcImageCreationTimeUtc,\n    InitProcImagePeTimestampUtc,\n    InitProcImageLastWriteTimeUtc,\n    InitProcImageLastAccessTimeUtc,\n    InitProcImageLsHash,\n    InitProcImageMd5,\n    InitProcImageSha256,\n    InitProcImageSha1,\n    InitiatingProcessSource,\n    InitProcVersionInfoCompanyName,\n    InitProcVersionInfoProductName,\n    InitProcVersionInfoProductVersion,\n    InitProcVersionInfoInternalFileName,\n    InitProcVersionInfoOriginalFileName,\n    InitProcVersionInfoFileDescription,\n    SourceSystem,\n    Type\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "File Integrity Monitoring",
+                "subtitle": "Identify and track changes to files with detailed process and source information."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 47,
+              "colSpan": 21,
               "rowSpan": 1
             },
             "metadata": {
@@ -1204,22 +1797,27 @@
               "model": {
                 "format": "local",
                 "granularity": "auto",
-                "relative": "30d"
+                "relative": "7d"
               },
               "displayCache": {
                 "name": "Local Time",
-                "value": "Past 30 days"
+                "value": "Past 7 days"
               },
               "filteredPartIds": [
                 "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29ad9eb",
-                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29ada82",
-                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adad2",
-                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adb2a",
-                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adb8b",
-                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adbf5",
                 "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adc68",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adad2",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adb8b",
                 "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adce4",
-                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29add69"
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adb2a",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29ada82",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29add69",
+                "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adbf5",
+                "StartboardPart-LogsDashboardPart-a3b53822-be17-4b7c-9cb5-3861abb542b9",
+                "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f661f4",
+                "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f663ff",
+                "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f664ee",
+                "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f665b6"
               ]
             }
           }
