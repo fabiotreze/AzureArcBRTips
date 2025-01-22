@@ -1,6 +1,6 @@
 # Gerenciamento de Conformidade
 
-## Requerimentos Técnicos
+## Referências Técnicos
 Importante se atentar aos requerimentos técnicos de módulos para a máquina que será utilizada para criar o pacote personalizado e uso do Azure Policy.
 
 - [Software Installation Using Machine Configuration and Azure Policy](https://techcommunity.microsoft.com/blog/coreinfrastructureandsecurityblog/software-installation-using-machine-configuration-and-azure-policy/3695636)
