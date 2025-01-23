@@ -1,12 +1,12 @@
 # Segurança e Governança
 
-## Requisitos do Laboratório
+## 1 - Requisitos do Laboratório
 
-1. Criar um **Log Analytics Workspace**
+Criar um **Log Analytics Workspace**
 
 ---
 
-## Coletando eventos de segurança do Windows
+### 2 - Coletando eventos de segurança do Windows
 
 Coletar eventos de auditoria de logon para monitorar atividades de autenticação e acesso ao sistema, garantindo maior controle de segurança. Para isso, utilizaremos o **Azure Arc** com o **Azure Monitoring Agent**.
 
@@ -15,7 +15,7 @@ Vamos criar uma **Data Collection Rule** e usaremos o artigo de referência para
 
 ---
 
-## Logon Events
+### Logon Events
 
 | **Event ID** | **Descrição**                                                                                     |
 |--------------|---------------------------------------------------------------------------------------------------|
@@ -28,7 +28,7 @@ Vamos criar uma **Data Collection Rule** e usaremos o artigo de referência para
 
 ---
 
-## Configurações de Coleta
+### 3 - Configurações de Coleta
 
 Para o **Data Source**, definiremos a opção **Custom**.
 
@@ -36,7 +36,7 @@ Já para o **Destination**, utilizaremos o **Log Analytics Workspace**, que ser�
 - Ingerir as informações listadas acima.
 - Armazená-las conforme as configurações definidas.
 
-### Query para Coleta de Eventos de Logon:
+### 4 - Query para Coleta de Eventos de Logon:
 
 ```bash
 Security!*[System[(EventID=4624) or (EventID=4625) or (EventID=4634) or (EventID=4647) or (EventID=4648) or (EventID=4779)]]
@@ -45,4 +45,4 @@ Após é ir até o **Resources** e adicionar os computadores do **Azure Arc** qu
 
 ---
 
-**Link para Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab4/AzureArc-AuditLogonEvents.workbook)
+### 5- Workbook **Link para Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab4/AzureArc-AuditLogonEvents.workbook)

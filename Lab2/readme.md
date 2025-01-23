@@ -1,15 +1,15 @@
 # Distribuição de Software
 
-## Requisitos do Laboratório
+## 1 - Requisitos do Laboratório
 *Importante: Para este cenário, não foram adotadas as boas práticas de segurança.*
 
-1. Criar uma **conta de armazenamento (Storage Account)**.
-2. Habilitar a configuração **Allow Blob anonymous access**.
-3. Criar um **container** com a configuração **Blob - anonymous read access for blobs only**.
-4. Copiar os binários necessários para o laboratório para este container, ou utilizar o link público do fornecedor do 7-Zip.
-5. Para este exemplo, foi utilizado o utilitário **7-Zip**, disponível em [https://www.7-zip.org/](https://www.7-zip.org/).
+- Criar uma **conta de armazenamento (Storage Account)**.
+- Habilitar a configuração **Allow Blob anonymous access**.
+- Criar um **container** com a configuração **Blob - anonymous read access for blobs only**.
+- Copiar os binários necessários para o laboratório para este container, ou utilizar o link público do fornecedor do 7-Zip.
+- Para este exemplo, foi utilizado o utilitário **7-Zip**, disponível em [https://www.7-zip.org/](https://www.7-zip.org/).
 
-## Exemplos para o mesmo arquivo:
+### Exemplos para o mesmo arquivo:
 
 ### **Windows**
 - [7z2409-x64.exe](https://www.7-zip.org/a/7z2409-x64.exe) - Utilizando o repositório do fornecedor
@@ -23,7 +23,7 @@
 
 ---
 
-# Distribuição de Software
+## 2 - Distribuição de Software
 
 Utilizaremos a **Custom Script Extension** para Windows e Linux. Mais informações podem ser encontradas [aqui](https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/custom-script-windows).
 
@@ -41,7 +41,7 @@ az connectedmachine extension delete --name CustomScriptExtension --resource-gro
 
 ---
 
-# Exemplos de Comandos para Windows e Linux
+## 3 - Exemplos de Comandos para Windows e Linux
 
 ### Windows
 
@@ -73,5 +73,5 @@ az deployment group create --resource-group rg-azurearc-itpro-br --template-file
 
 ---
 
-# Para o futuro
-https://learn.microsoft.com/en-us/azure/azure-arc/servers/run-command
+## Considere outras posibilidades para uso como o Run-Command
+[Azure Arc Run-Command](https://learn.microsoft.com/en-us/azure/azure-arc/servers/run-command)
