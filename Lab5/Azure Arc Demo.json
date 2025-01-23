@@ -37,7 +37,7 @@
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Overview</span>\n<span> - Overview of the Arc agents installed and current status.</span>\n</div>\n",
+                  "content": "<div style='line-height:50px; background-color:#FFCCCC;'>\n    <span style='font-size:16px;font-weight:bold'>Azure Arc Overview</span>\n    <span> - Overview of the Arc agents installed and current status.</span>\n</div>",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
@@ -239,7 +239,7 @@
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Inventory & Configuration Management</span>\n<span> - Tracking Changes and Configuration Data Across Resource.</span>\n</div>",
+                  "content": "<div style='line-height:50px; background-color:#FFCCCC;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Inventory & Configuration Management</span>\n<span> - Tracking Changes and Configuration Data Across Resource.</span>\n</div>",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
@@ -253,7 +253,7 @@
               "x": 0,
               "y": 16,
               "colSpan": 3,
-              "rowSpan": 15
+              "rowSpan": 19
             },
             "metadata": {
               "inputs": [],
@@ -1190,8 +1190,198 @@
           },
           {
             "position": {
-              "x": 0,
+              "x": 3,
               "y": 31,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "2dab043f-36f4-40c1-8146-d5d38509c1f1",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Files\"",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {}
+            }
+          },
+          {
+            "position": {
+              "x": 9,
+              "y": 31,
+              "colSpan": 12,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/rg-azurearc-itpro-br/providers/Microsoft.OperationalInsights/workspaces/log-azurearc-itpro-br"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "2b66e234-6414-46e8-a2af-1f5c11413f37",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "P7D",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "ConfigurationChange\n| where ConfigChangeType == \"Files\"\n| project Computer, ChangeCategory, Name, FileSystemPath, Size, PreviousSize, DateCreated, DateModified, PreviousDateModified, Attributes, Acls, FieldsChanged, FileContentBlobLink, FileContentChecksum, PreviousFileContentChecksum\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "log-azurearc-itpro-br",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": false,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "ConfigurationChange\n| where ConfigChangeType == \"Files\"\n| project Computer, ChangeCategory, Name, FileSystemPath, Size, PreviousSize, DateCreated, DateModified, PreviousDateModified, Attributes, Acls, FieldsChanged, FileContentBlobLink, FileContentChecksum, PreviousFileContentChecksum\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "File Change Analysis",
+                "subtitle": "Tracking Configuration Changes in Files"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 35,
               "colSpan": 21,
               "rowSpan": 1
             },
@@ -1200,7 +1390,7 @@
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<div style='line-height:50px;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc and Microsoft Defender for Cloud - Plan 2</span>\n<span> - File integrity monitoring for detecting changes in files and registries based on security analysis.</span>\n</div>",
+                  "content": "<div style='line-height:50px; background-color:#FFCCCC;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc and Microsoft Defender for Cloud - Plan 2</span>\n<span> - File integrity monitoring for detecting changes in files and registries based on security analysis.</span>\n</div>",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
@@ -1212,9 +1402,9 @@
           {
             "position": {
               "x": 0,
-              "y": 32,
+              "y": 36,
               "colSpan": 3,
-              "rowSpan": 15
+              "rowSpan": 16
             },
             "metadata": {
               "inputs": [],
@@ -1233,9 +1423,9 @@
           {
             "position": {
               "x": 3,
-              "y": 32,
+              "y": 36,
               "colSpan": 8,
-              "rowSpan": 5
+              "rowSpan": 6
             },
             "metadata": {
               "inputs": [
@@ -1347,9 +1537,9 @@
           {
             "position": {
               "x": 11,
-              "y": 32,
+              "y": 36,
               "colSpan": 10,
-              "rowSpan": 5
+              "rowSpan": 6
             },
             "metadata": {
               "inputs": [
@@ -1471,7 +1661,7 @@
           {
             "position": {
               "x": 3,
-              "y": 37,
+              "y": 42,
               "colSpan": 18,
               "rowSpan": 6
             },
@@ -1566,7 +1756,7 @@
           {
             "position": {
               "x": 3,
-              "y": 43,
+              "y": 48,
               "colSpan": 9,
               "rowSpan": 4
             },
@@ -1651,7 +1841,13 @@
                 }
               ],
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {},
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "RegistryKey": "328px"
+                  }
+                }
+              },
               "partHeader": {
                 "title": "Registry Integrity Monitoring",
                 "subtitle": "Detect and analyze changes to registry keys with comprehensive process details."
@@ -1661,7 +1857,7 @@
           {
             "position": {
               "x": 12,
-              "y": 43,
+              "y": 48,
               "colSpan": 9,
               "rowSpan": 4
             },
@@ -1756,7 +1952,262 @@
           {
             "position": {
               "x": 0,
-              "y": 47,
+              "y": 52,
+              "colSpan": 21,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='line-height:50px; background-color:#FFCCCC;'>\n<span style='font-size:16px;font-weight:bold'>Azure Arc Guest Configuration (Machine Configuration)</span>\n<span> - Ensuring compliance and configuration consistency across your hybrid and multi-cloud environments.</span>\n</div>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 53,
+              "colSpan": 3,
+              "rowSpan": 12
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='display:flex; justify-content:flex-start; align-items:flex-start; height:100px;'>\n  <img src='https://cdn1.iconfinder.com/data/icons/ionicons-fill-vol-2/512/logo-usd-256.png' \n       alt='Cost' \n       style='width:40px; height:40px; margin-right:8px;' />\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Guest Configuration (Machine Configuration)</span>\n</div>\n\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 53,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "GuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| extend vmid = split(properties.targetResourceId,'/')\r\n| mvexpand properties.latestAssignmentReport.resources\r\n| where properties_latestAssignmentReport_resources.resourceId != 'Invalid assignment package.'\r\n| project machine = tostring(vmid[(-1)]),type = tostring(vmid[(-3)])\r\n| distinct machine, type\r\n| summarize count() by type",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Guest Configuration Assignments Summary",
+                "subtitle": "Count of Machines by Type"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 9,
+              "y": 53,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "GuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| project id, name, resources = properties.latestAssignmentReport.resources, vmid = tostring(split(properties.targetResourceId,'/')[(-1)]), status = tostring(properties.complianceStatus)\r\n| extend resources = iff(isnull(resources), dynamic([{}]), resources)\r\n| mvexpand resources\r\n| extend reasons = resources.reasons\r\n| extend reasons = iff(isnull(reasons), dynamic([{}]), reasons)\r\n| mvexpand reasons\r\n| where name == 'CertificateExpiration' and status == 'NonCompliant'\r\n| summarize reasons_list = make_list(reasons.phrase) by vmid\r\n| extend reasons_count = array_length(reasons_list)\r\n| project vmid, reasons_count\r\n| order by reasons_count desc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Certificate Compliance",
+                "subtitle": "Non-Compliant Certificates by Machine"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 15,
+              "y": 53,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "GuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| project id, name, resources = properties.latestAssignmentReport.resources, vmid = tostring(split(properties.targetResourceId,'/')[(-1)]), status = tostring(properties.complianceStatus)\r\n| extend resources = iff(isnull(resources), dynamic([{}]), resources)\r\n| mvexpand resources\r\n| extend reasons = resources.reasons\r\n| extend reasons = iff(isnull(reasons), dynamic([{}]), reasons)\r\n| mvexpand reasons\r\n| where name == 'CertificateExpiration' and status == 'NonCompliant'\r\n| summarize reasons_list = make_list(reasons.phrase) by vmid\r\n| extend reasons_count = array_length(reasons_list)\r\n| project vmid, reasons_count\r\n| order by reasons_count desc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Certificate Compliance",
+                "subtitle": "Non-Compliant Certificates by Machine"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 3,
+              "y": 59,
+              "colSpan": 18,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "value": true,
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "GuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| project id, name, resources = properties.latestAssignmentReport.resources, vmid = tostring(split(properties.targetResourceId,'/')[(-1)]), status = tostring(properties.complianceStatus)\r\n| extend resources = iff(isnull(resources), dynamic([{}]), resources)\r\n| mvexpand resources\r\n| extend reasons = resources.reasons\r\n| extend reasons = iff(isnull(reasons), dynamic([{}]), reasons)\r\n| mvexpand reasons\r\n| where name == 'CertificateExpiration' and status == 'NonCompliant'\r\n| summarize reasons_list = make_list(reasons.phrase) by id, vmid, name, status, resource = tostring(resources.resourceId)\r\n| extend reasons_count = array_length(reasons_list)\r\n| project id, vmid, name, status, reasons_count, resource\r\n| order by name asc, status asc",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Non-Compliant Guest Configurations",
+                "subtitle": "Certificate Expiration Status"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 65,
               "colSpan": 21,
               "rowSpan": 1
             },
@@ -1813,6 +2264,8 @@
                 "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29ada82",
                 "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29add69",
                 "StartboardPart-LogsDashboardPart-58743aec-8d8e-4dee-9d60-5310e29adbf5",
+                "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f669bd",
+                "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f66b01",
                 "StartboardPart-LogsDashboardPart-a3b53822-be17-4b7c-9cb5-3861abb542b9",
                 "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f661f4",
                 "StartboardPart-LogsDashboardPart-f9866da9-d2c7-43a2-a336-884607f663ff",
