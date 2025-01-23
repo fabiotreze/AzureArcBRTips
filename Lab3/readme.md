@@ -84,6 +84,8 @@ Após a execução, as definições estarão disponíveis no Azure Policy para a
 
 # DICA EXTRA
 
+## 1 - Identificar os dois campos importantes: **contentUri** e **contentHash** nos arquivos json gerados anteriormente
+
 Nos passos mencionados anteriormente, foram criados arquivos JSON que serão utilizados no **Azure Policy**, especificamente para a criação das **Definitions**.
 
 Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura segue um formato semelhante ao exemplo apresentado. Temos dois campos importantes: **contentUri** e **contentHash**.
@@ -98,11 +100,13 @@ Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura seg
             }
 ```
 
-Podemos utilizar esses arquivos para a criação do **Guest Assignments** e integrá-los com a funcionalidade do **Machine Configuration** juntamente do Azure Arc.
+## 2 - Podemos utilizar para a criação do **Guest Assignments** 
+Com este passo será integrado com a funcionalidade do **Machine Configuration** juntamente do Azure Arc.
 
+## 3 - Como criar uma atribuição
 [Atribuir uma configuração](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/assign-configuration/overview)
 
-Talvez surja a dúvida: quando devo utilizar o **Guest Configuration** e quando utilizar o **Azure Policy**?
+## 4 - Talvez surja a dúvida: quando devo utilizar o **Guest Configuration** e quando utilizar o **Azure Policy**?
 
 Lembre-se de que as informações apresentadas abaixo são apenas exemplos e não se limitam ao que está mostrado na tabela, podendo ser aplicadas de forma mais ampla conforme o cenário.
 
