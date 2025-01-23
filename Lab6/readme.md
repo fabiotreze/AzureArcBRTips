@@ -28,7 +28,7 @@ GuestConfigurationResources
 | where name == 'CertificateExpiration' and status == 'NonCompliant'
 | summarize reasons_list = make_list(reasons.phrase) by id, vmid, name, status, resource = tostring(resources.resourceId)
 | extend reasons_count = array_length(reasons_list)
-| project id, vmid, name, status, reasons_count, resource
+| project id, vmid, name, status, reasons_count, reasons_list
 | order by name asc, status asc
 ```
 
