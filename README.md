@@ -2,30 +2,40 @@
 
 ## Isenção de Responsabilidade
 
-Este repositório contém conteúdos e laboratórios destinados exclusivamente para testes de funcionalidades do **Azure Arc**. O uso de qualquer material disponível aqui é de **responsabilidade exclusiva do usuário**. O criador deste repositório se isenta de qualquer responsabilidade relacionada a efeitos, custos ou impactos, sejam eles esperados ou inesperados, no ambiente onde os artefatos, scripts ou informações postadas sejam aplicados.
+Este repositório contém conteúdos e laboratórios voltados exclusivamente para testes das funcionalidades do **Azure Arc**. O uso de qualquer material disponível aqui é de **responsabilidade exclusiva do usuário**. O criador deste repositório não se responsabiliza por quaisquer efeitos, custos ou impactos, esperados ou inesperados, no ambiente onde os artefatos, scripts ou informações sejam aplicados.
 
-**Importante**: O uso de qualquer material deste repositório é feito por sua própria conta e risco. Não nos responsabilizamos por danos, perdas de dados ou outros efeitos decorrentes do uso dos conteúdos aqui disponibilizados.
+**Importante**: Utilize os conteúdos deste repositório por sua própria conta e risco. Não assumimos responsabilidade por danos, perdas de dados ou outros efeitos resultantes do uso dos materiais aqui disponibilizados.
+
+---
 
 ## Estrutura do Repositório
 
-O repositório está organizado em laboratórios, cada um com cenários práticos para guiar a implementação das funcionalidades do **Azure Arc**. Recomendamos que leia sempre o arquivo `readme.md` de cada laboratório para obter orientações adicionais e informações sobre o uso de cada cenário.
+O repositório está organizado em laboratórios que apresentam cenários práticos para guiar a implementação das funcionalidades do **Azure Arc**. Antes de iniciar qualquer laboratório, leia o arquivo `README.md` correspondente para obter orientações detalhadas e informações sobre cada cenário.
 
 ### Links para os Laboratórios
-- Acesse todos os **Labs** disponíveis no repositório: (Labs do AzureArcDemo)[https://github.com/fabiotreze/AzureArcDemo/tree/main]
+- Acesse todos os **Labs** disponíveis no repositório: [Labs do AzureArcDemo](https://github.com/fabiotreze/AzureArcDemo/tree/main)
 
 ### Atenção
-Lembre-se de que o uso de todos os artefatos e scripts é feito por sua própria responsabilidade.
+O uso de todos os artefatos e scripts disponíveis neste repositório é feito sob sua própria responsabilidade.
+
+---
 
 ## Estrutura de Pastas
 
-A estrutura de pastas do repositório é a seguinte:
+O repositório está organizado nas seguintes pastas principais:
 
-- **images**: Contém arquivos de imagem utilizados no projeto, como capturas de tela, diagramas ou ícones.
-- **labs**: Inclui exercícios de laboratório ou tarefas práticas, frequentemente usados em contextos educacionais ou de treinamento.
-- **scripts**: Armazena vários scripts para automação, configuração ou outras tarefas relacionadas ao projeto.
-- **templates**: Contém arquivos de modelo reutilizáveis, como modelos de configuração, documentos ou código.
-- **workbooks**: Contém arquivos relacionados a painéis de visualização de dados, monitoramento ou relatórios. Diferentemente dos dashboards, os workbooks tendem a ser mais interativos e oferecem uma interface gráfica mais detalhada.
-- **LICENSE**: Contém as informações de licenciamento do projeto, especificando como ele pode ser usado, modificado e distribuído.
-- **README.md**: O principal arquivo de documentação do projeto, incluindo uma visão geral, instruções de configuração e uso, e outras informações relevantes.
-- **dashboards**: Contém arquivos relacionados a painéis de visualização de dados, monitoramento ou relatórios.
-- **docs**: Inclui documentação adicional do projeto, como guias detalhados, documentações ou manuais do usuário.
+- **images**: Arquivos de imagem utilizados no projeto, como capturas de tela, diagramas ou ícones.
+- **labs**: Exercícios de laboratório ou tarefas práticas voltados para aprendizado e treinamento.
+- **scripts**: Scripts para automação, configuração ou outras tarefas relacionadas ao projeto.
+- **templates**: Modelos reutilizáveis, como arquivos de configuração, documentos ou código.
+- **workbooks**: Arquivos relacionados a painéis de visualização, monitoramento ou relatórios interativos.
+- **LICENSE**: Informações de licenciamento do projeto, detalhando como ele pode ser usado, modificado e distribuído.
+- **README.md**: Documento principal do projeto, contendo visão geral, instruções de configuração e uso.
+- **dashboards**: Arquivos específicos para painéis de visualização e monitoramento de dados.
+- **docs**: Documentação adicional, incluindo guias, manuais de usuário e informações detalhadas.
+
+---
+
+## Contribuições
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir uma _issue_ ou enviar um _pull request_ para melhorar este repositório.
