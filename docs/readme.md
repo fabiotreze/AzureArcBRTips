@@ -8,12 +8,13 @@ Esta pasta contém documentação relacionada às implementações e configuraç
 
 Os documentos estão organizados de acordo com os tópicos e laboratórios aos quais pertencem. Cada documento tem um nome que começa com o nome do laboratório ou tópico correspondente, seguido por uma descrição da sua função. Abaixo estão alguns exemplos de documentos disponíveis:
 
-- **lab1_guide.md**: Usaremos o Azure Arc JumpStart para Criar o Ambiente de Demonstração.
-- **lab2_tutorial.md**: Distribuição de Software.
-- **lab3_reference.md**: Gerenciamento de Conformidade.
-- **lab4_manual.md**: Segurança e Governança.
-- **lab5_instructions.md**: Azure Arc Dashboard em Construção.
-- **lab6_overview.md**: Identificação de Certificados Próximos à Expiração com Azure Arc.
+- **lab1**: Usaremos o Azure Arc JumpStart para Criar o Ambiente de Demonstração.
+- **lab2**: Distribuição de Software.
+- **lab3**: Gerenciamento de Conformidade.
+- **lab4**: Segurança e Governança.
+- **lab5**: Azure Arc Dashboard em Construção.
+- **lab6**: Identificação de Certificados Próximos à Expiração com Azure Arc.
+- **lab7**: Script de Herança de Tags para Instâncias SQL no Azure Arc.
 
 ## Uso dos Documentos
 
