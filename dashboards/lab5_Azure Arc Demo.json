@@ -11,16 +11,16 @@
               "colSpan": 21,
               "rowSpan": 2
             },
-            "metadata": {
+           "metadata": {
               "inputs": [],
               "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "content": "<td style=\"background-color:#2D2D2D; color:#FFFFFF; padding:20px; border-radius:10px;\">\r\n  <div style=\"line-height:1.5; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position:relative;\">\r\n    <a href=\"/html/classic/index.shtm\" tabindex=\"-1\" style=\"position:absolute; top:10px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; background-color:#8B0000; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab5/seulogoaqui.png\" style=\"width:100%; height:auto; display:block;\" alt=\"Logo seu logo aqui\">\r\n      </div>\r\n    </a>\r\n    <span style=\"font-size:32px; font-weight:bold; color:#000000; display:block; margin-bottom:10px;\">Azure Arc Demo</span>\r\n    <span style=\"font-size:14px; font-weight:normal; color:#000000; display:block;\">Dashboard with information and status of installed Azure Arc agents.</span>\r\n    <br>\r\n    <span style=\"font-size:14px; color:#000000; font-weight:bold;\">&#x1F517;</span>\r\n    <a href=\"http://aka.ms/azurearc\" style=\"color:#1E90FF; text-decoration:none; font-weight:bold;\">Azure Arc Documentation</a>\r\n    <br><br>\r\n    <a href=\"https://www.microsoft.com\" tabindex=\"-1\" style=\"position:absolute; top:50px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/UHFbanner-MSlogo?fmt=png-alpha&bfc=off&qlt=100,1\" alt=\"Microsoft logo\" style=\"width:100%; height:auto; display:block;\">\r\n      </div>\r\n    </a>\r\n    <div style=\"position:absolute; bottom:10px; right:10px; font-size:14px; color:#000000; font-weight:normal; direction:rtl;\">\r\n      <span>Provided by</span> <span style=\"font-weight:bold;\">fabiotreze</span>\r\n    </div>\r\n  </div>\r\n</td>",
+                  "content": "<td style=\"background-color:#2D2D2D; color:#FFFFFF; padding:20px; border-radius:10px;\">\r\n  <div style=\"line-height:1.5; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position:relative;\">\r\n    <a href=\"/html/classic/index.shtm\" tabindex=\"-1\" style=\"position:absolute; top:10px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; background-color:#8B0000; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/images/lab5_seulogoaqui.png\" style=\"width:100%; height:auto; display:block;\" alt=\"Logo seu logo aqui\">\r\n      </div>\r\n    </a>\r\n    <span style=\"font-size:32px; font-weight:bold; color:#000000; display:block; margin-bottom:10px;\">Azure Arc Demo</span>\r\n    <span style=\"font-size:14px; font-weight:normal; color:#000000; display:block;\">Dashboard with information and status of installed Azure Arc agents.</span>\r\n    <br>\r\n    <span style=\"font-size:14px; color:#000000; font-weight:bold;\">&#x1F517;</span>\r\n    <a href=\"http://aka.ms/azurearc\" style=\"color:#1E90FF; text-decoration:none; font-weight:bold;\">Azure Arc Documentation</a>\r\n    <br><br>\r\n    <a href=\"https://www.microsoft.com\" tabindex=\"-1\" style=\"position:absolute; top:50px; right:10px;\">\r\n      <div style=\"width:168px; height:38px; padding:5px; display:inline-block; border-radius:5px;\">\r\n        <img src=\"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/UHFbanner-MSlogo?fmt=png-alpha&bfc=off&qlt=100,1\" alt=\"Microsoft logo\" style=\"width:100%; height:auto; display:block;\">\r\n      </div>\r\n    </a>\r\n    <div style=\"position:absolute; bottom:10px; right:10px; font-size:14px; color:#000000; font-weight:normal; direction:rtl;\">\r\n      <span>Provided by</span> <span style=\"font-weight:bold;\">fabiotreze</span>\r\n    </div>\r\n  </div>\r\n</td>",
                   "title": "",
                   "subtitle": "",
                   "markdownSource": 1,
-                  "markdownUri": "https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab5/seulogoaqui.png"
+                  "markdownUri": "https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/images/lab5_seulogoaqui.png"
                 }
               }
             }
@@ -250,27 +250,6 @@
           },
           {
             "position": {
-              "x": 0,
-              "y": 16,
-              "colSpan": 3,
-              "rowSpan": 19
-            },
-            "metadata": {
-              "inputs": [],
-              "type": "Extension/HubsExtension/PartType/MarkdownPart",
-              "settings": {
-                "content": {
-                  "content": "<div style='display:flex; justify-content:flex-start; align-items:center; height:100px;'>\n  <img src='https://cdn1.iconfinder.com/data/icons/ionicons-fill-vol-2/512/logo-usd-256.png' \n       alt='Cost' \n       style='width:40px; height:40px; margin-right:8px;' />\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Change Tracking and Inventory</span>\n</div>\n",
-                  "title": "",
-                  "subtitle": "",
-                  "markdownSource": 1,
-                  "markdownUri": ""
-                }
-              }
-            }
-          },
-          {
-            "position": {
               "x": 3,
               "y": 16,
               "colSpan": 12,
@@ -484,6 +463,27 @@
               "partHeader": {
                 "title": "Software change count per category",
                 "subtitle": "Count software changes by change category."
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 18,
+              "colSpan": 3,
+              "rowSpan": 16
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<div style='display:flex; justify-content:flex-start; align-items:center; height:100px;'>\n  <img src='https://cdn1.iconfinder.com/data/icons/ionicons-fill-vol-2/512/logo-usd-256.png' \n       alt='Cost' \n       style='width:40px; height:40px; margin-right:8px;' />\n  <span style='font-size:18px; font-weight:bold; text-align:left;'>Change Tracking and Inventory</span>\n</div>\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
               }
             }
           },
@@ -1369,6 +1369,10 @@
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
               "settings": {
                 "content": {
+                  "GridColumnsWidth": {
+                    "FileSystemPath": "268px",
+                    "FileContentBlobLink": "463px"
+                  },
                   "Query": "ConfigurationChange\n| where ConfigChangeType == \"Files\"\n| project Computer, ChangeCategory, Name, FileSystemPath, Size, PreviousSize, DateCreated, DateModified, PreviousDateModified, Attributes, Acls, FieldsChanged, FileContentBlobLink, FileContentChecksum, PreviousFileContentChecksum\n\n"
                 }
               },
@@ -1531,6 +1535,10 @@
                     "position": "Bottom"
                   }
                 }
+              },
+              "partHeader": {
+                "title": "File Integrity Monitoring",
+                "subtitle": "Events by Computer and Entity Type"
               }
             }
           },
@@ -2093,7 +2101,7 @@
               "settings": {},
               "partHeader": {
                 "title": "Certificate Compliance",
-                "subtitle": "Non-Compliant Certificates by Machine"
+                "subtitle": "Machines with Certificates Expiring Within 30 Days"
               }
             }
           },
@@ -2147,7 +2155,7 @@
               "settings": {},
               "partHeader": {
                 "title": "Certificate Compliance",
-                "subtitle": "Non-Compliant Certificates by Machine"
+                "subtitle": "Machines with Certificates Expiring Within 30 Days"
               }
             }
           },
@@ -2187,12 +2195,12 @@
                   "isOptional": true
                 },
                 {
-                  "name": "query",
-                  "value": "GuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| project id, name, resources = properties.latestAssignmentReport.resources, vmid = tostring(split(properties.targetResourceId,'/')[(-1)]), status = tostring(properties.complianceStatus)\r\n| extend resources = iff(isnull(resources), dynamic([{}]), resources)\r\n| mvexpand resources\r\n| extend reasons = resources.reasons\r\n| extend reasons = iff(isnull(reasons), dynamic([{}]), reasons)\r\n| mvexpand reasons\r\n| where name == 'CertificateExpiration' and status == 'NonCompliant'\r\n| summarize reasons_list = make_list(reasons.phrase) by id, vmid, name, status, resource = tostring(resources.resourceId)\r\n| extend reasons_count = array_length(reasons_list)\r\n| project id, vmid, name, status, reasons_count, resource\r\n| order by name asc, status asc",
+                  "name": "queryId",
                   "isOptional": true
                 },
                 {
-                  "name": "queryId",
+                  "name": "query",
+                  "value": "GuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| where name =~ \"CertificateExpiration\"\r\n|extend lastComplianceStatusChecked=todatetime(properties.lastComplianceStatusChecked)\r\n| project id, name, resources = properties.latestAssignmentReport.resources, machine = split(properties.targetResourceId,'/')[(-1)], lastComplianceStatusChecked\r\n| extend resources = iff(isnull(resources[0]), dynamic([{}]), resources)\r\n| mv-expand resources limit 400 \r\n| extend reasons = resources.reasons\r\n| extend reasons = iff(isnull(reasons[0]), dynamic([{}]), reasons)\r\n| mv-expand reasons limit 99 \r\n| project machine, name, lastComplianceStatusChecked, compliant = tostring(resources.complianceStatus), baselineCheck = resources.resourceId, reason = reasons.phrase\r\n| where compliant =~ \"false\"",
                   "isOptional": true
                 }
               ],
@@ -2200,7 +2208,7 @@
               "settings": {},
               "partHeader": {
                 "title": "Non-Compliant Guest Configurations",
-                "subtitle": "Certificate Expiration Status"
+                "subtitle": "Certificates Expiring Within 30 Days"
               }
             }
           },

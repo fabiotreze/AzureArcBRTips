@@ -45,4 +45,4 @@ Após é ir até o **Resources** e adicionar os computadores do **Azure Arc** qu
 
 ---
 
-### 5- Workbook **Link para Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab4/AzureArc-AuditLogonEvents.workbook)
+### 5- Workbook **Link para Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/workbooks/lab4_AzureArc-AuditLogonEvents.workbook)

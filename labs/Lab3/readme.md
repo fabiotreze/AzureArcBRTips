@@ -24,7 +24,7 @@ O repositório abaixo pode ser utilizado como referência para a criação de no
 ---
 
 ## 3 - Para criar o arquivo MOF, baseie-se no documento oficial da Microsoft Como criar um pacote personalizado.
-Salve e execute o arquivo [sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/Lab3/sample7zip.ps1). Com isso, teremos o arquivo **localhost.mof**.
+Salve e execute o arquivo [lab3_sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/scripts/lab3_sample7zip.ps1). Com isso, teremos o arquivo **localhost.mof**.
 
 ## 4 - Para criar o arquivo ZIP, baseie-se no documento oficial da Microsoft Como criar um pacote personalizado e utilize o arquivo .MOF gerado anteriormente
 
