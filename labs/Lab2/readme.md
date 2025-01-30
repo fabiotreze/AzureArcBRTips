@@ -47,28 +47,28 @@ az connectedmachine extension delete --name CustomScriptExtension --resource-gro
 
 - **Instalação do 7-Zip 24.08**
 ```azurecli
-az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresInstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
+az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\lab2_Windows_CS_Template.json --parameters .\lab2_Windows_CS_ParameteresInstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
 ```
 
 - **Desinstalação do 7-Zip 24.08**
 ```azurecli
-az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresUninstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
+az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\lab2_Windows_CS_Template.json --parameters .\lab2_Windows_CS_ParameteresUninstall7zip.json --parameters vmName=ArcBox-Win2k25 --verbose
 ```
 
 - **Atualização de versão do 7-Zip 24.08 para 7-Zip 24.09**
 ```azurecli
-az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Windows_CS_Template.json --parameters .\Windows_CS_ParameteresInstall7zip09.json --parameters vmName=ArcBox-Win2k25 --verbose
+az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\lab2_Windows_CS_Template.json --parameters .\lab2_Windows_CS_ParameteresInstall7zip09.json --parameters vmName=ArcBox-Win2k25 --verbose
 ```
 
 ### Linux
 - **Instalação**
 ```azurecli
-az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Linux_CS_Template.json --parameters .\Linux_CS_ParameteresMotdInstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
+az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\lab2_Linux_CS_Template.json --parameters .\lab2_Linux_CS_ParameteresMotdInstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
 ```
 
 - **Desinstalação**
 ```azurecli
-az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\Linux_CS_Template.json --parameters .\Linux_CS_ParameteresMotdUninstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
+az deployment group create --resource-group rg-azurearc-itpro-br --template-file .\lab2_Linux_CS_Template.json --parameters .\lab2_Linux_CS_ParameteresMotdUninstall.json --parameters vmName=Arcbox-Ubuntu-01 --verbose
 ```
 
 ---
