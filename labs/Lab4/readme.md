@@ -1,48 +1,47 @@
-# Segurança e Governança
+# Security and Governance
 
-## 1 - Requisitos do Laboratório
+## 1 - Laboratory Requirements
 
-Criar um **Log Analytics Workspace**
+Create a **Log Analytics Workspace**
 
 ---
 
-### 2 - Coletando eventos de segurança do Windows
+### 2 - Collecting Windows Security Events
 
-Coletar eventos de auditoria de logon para monitorar atividades de autenticação e acesso ao sistema, garantindo maior controle de segurança. Para isso, utilizaremos o **Azure Arc** com o **Azure Monitoring Agent**.
+Collect audit logon events to monitor authentication activities and system access, ensuring better security control. For this, we will use **Azure Arc** with the **Azure Monitoring Agent**.
 
-Vamos criar uma **Data Collection Rule** e usaremos o artigo de referência para eventos de segurança:  
+We will create a **Data Collection Rule** and use the reference article for security events:  
 [Audit logon events](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/basic-audit-logon-events#configure-this-audit-setting)
 
 ---
 
 ### Logon Events
 
-| **Event ID** | **Descrição**                                                                                     |
-|--------------|---------------------------------------------------------------------------------------------------|
-| **4624**     | Um usuário fez login com sucesso em um computador. Para informações sobre o tipo de login, consulte a tabela **Logon Types** abaixo. |
-| **4625**     | Falha de login. Uma tentativa de login foi feita com um nome de usuário desconhecido ou um nome de usuário conhecido com uma senha incorreta. |
-| **4634**     | O processo de logoff foi concluído para um usuário.                                                |
-| **4647**     | Um usuário iniciou o processo de logoff.                                                           |
-| **4648**     | Um usuário fez login com sucesso em um computador usando credenciais explícitas, enquanto já estava logado como outro usuário. |
-| **4779**     | Um usuário desconectou uma sessão de terminal sem fazer logoff.                                    |
+| **Event ID** | **Description**                                                                                     |
+|--------------|-----------------------------------------------------------------------------------------------------|
+| **4624**     | A user successfully logged in to a computer. For information about the type of logon, refer to the **Logon Types** table below. |
+| **4625**     | Logon failure. A login attempt was made with an unknown username or a known username with an incorrect password. |
+| **4634**     | The logoff process was completed for a user.                                                        |
+| **4647**     | A user initiated the logoff process.                                                                |
+| **4648**     | A user successfully logged into a computer using explicit credentials while already logged in as another user. |
+| **4779**     | A user disconnected a terminal session without logging off.                                        |
 
 ---
 
-### 3 - Configurações de Coleta
+### 3 - Collection Settings
 
-Para o **Data Source**, definiremos a opção **Custom**.
+For the **Data Source**, we will define the **Custom** option.
 
-Já para o **Destination**, utilizaremos o **Log Analytics Workspace**, que será responsável por:
-- Ingerir as informações listadas acima.
-- Armazená-las conforme as configurações definidas.
+For the **Destination**, we will use the **Log Analytics Workspace**, which will be responsible for:
+- Ingesting the information listed above.
+- Storing it according to the defined settings.
 
-### 4 - Query para Coleta de Eventos de Logon:
+### 4 - Query for Collecting Logon Events:
 
 ```bash
-Security!*[System[(EventID=4624) or (EventID=4625) or (EventID=4634) or (EventID=4647) or (EventID=4648) or (EventID=4779)]]
+Security!*[System[(EventID=4624) or (EventID=4625) or (EventID=4634) or (EventID=4647) or (EventID=4648) or (EventID=4779)]] 
 ```
-Após é ir até o **Resources** e adicionar os computadores do **Azure Arc** que deverão receber a configuração relacionada a este **Data Collection Rule**. Com isso, deverá ser instalada a extensão do **Azure Monitoring Agent** e aplicada a configuração.
 
 ---
 
-### 5- Workbook **Link para Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/workbooks/lab4_AzureArc-AuditLogonEvents.workbook)
+### 5- Workbook **Link to Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/workbooks/lab4_AzureArc-AuditLogonEvents.workbook)

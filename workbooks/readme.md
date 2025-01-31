@@ -1,21 +1,21 @@
-# Workbooks do AzureArcDemo
+# AzureArcDemo Workbooks
 
-## Visão Geral
+## Overview
 
-Esta pasta contém workbooks utilizados para monitorar e visualizar dados relacionados às implementações do **Azure Arc**. Os workbooks fornecem uma interface gráfica interativa para acompanhar métricas, logs e outros dados importantes.
+This folder contains workbooks used to monitor and visualize data related to **Azure Arc** deployments. The workbooks provide an interactive graphical interface to track metrics, logs, and other important data.
 
-## Estrutura
+## Structure
 
-Os workbooks estão organizados de acordo com os laboratórios aos quais pertencem. Cada workbook tem um nome que começa com o nome do laboratório correspondente, seguido por uma descrição da sua função. 
+The workbooks are organized according to the labs they belong to. Each workbook is named starting with the corresponding lab's name, followed by a description of its function.
 
-## Uso dos Workbooks
+## Using the Workbooks
 
-1. Navegue até a subpasta do workbook que deseja utilizar.
-2. Leia o arquivo `README.md` da subpasta para obter instruções detalhadas sobre o uso do workbook.
-3. Importe o workbook no portal do Azure ou utilize a linha de comando para implementá-lo.
+1. Navigate to the subfolder of the workbook you want to use.
+2. Read the `README.md` file in the subfolder for detailed instructions on using the workbook.
+3. Import the workbook in the Azure portal or use the command line to deploy it.
 
-## Atenção
+## Attention
 
-Lembre-se de que o uso de todos os workbooks é feito por sua própria responsabilidade. Recomendamos que leia atentamente todas as instruções e entenda os impactos das ações antes de utilizá-los.
+Please note that the use of all workbooks is at your own risk. We recommend reading all instructions carefully and understanding the impact of the actions before using them.
 
-Se precisar de mais alguma coisa ou tiver dúvidas, estou à disposição!
+If you need anything else or have questions, feel free to reach out!

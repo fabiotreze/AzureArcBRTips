@@ -1,21 +1,21 @@
-# Templates do AzureArcDemo
+# AzureArcDemo Templates
 
-## Visão Geral
+## Overview
 
-Esta pasta contém templates utilizados para automatizar a criação e configuração de recursos relacionados ao **Azure Arc**. Os templates são projetados para facilitar a implementação e a configuração dos recursos do Azure Arc de forma padronizada e repetível.
+This folder contains templates used to automate the creation and configuration of resources related to **Azure Arc**. The templates are designed to simplify the implementation and configuration of Azure Arc resources in a standardized and repeatable manner.
 
-## Estrutura
+## Structure
 
-Os templates estão organizados de acordo com os laboratórios aos quais pertencem. Cada template tem um nome que começa com o nome do laboratório correspondente, seguido por uma descrição da sua função. 
+The templates are organized according to the labs they belong to. Each template is named starting with the corresponding lab's name, followed by a description of its function.
 
-## Uso dos Templates
+## Using the Templates
 
-1. Navegue até a subpasta do template que deseja utilizar.
-2. Leia o arquivo `README.md` da subpasta para obter instruções detalhadas sobre o uso do template.
-3. Importe o template no portal do Azure ou utilize a linha de comando para implementá-lo.
+1. Navigate to the subfolder of the template you want to use.
+2. Read the `README.md` file in the subfolder for detailed instructions on using the template.
+3. Import the template in the Azure portal or use the command line to deploy it.
 
-## Atenção
+## Attention
 
-Lembre-se de que o uso de todos os templates é feito por sua própria responsabilidade. Recomendamos que leia atentamente todas as instruções e entenda os impactos das ações antes de utilizá-las.
+Please note that the use of all templates is at your own risk. We recommend reading all instructions carefully and understanding the impact of the actions before using them.
 
-Se precisar de mais alguma coisa ou tiver dúvidas, estou à disposição!
+If you need anything else or have questions, feel free to reach out!

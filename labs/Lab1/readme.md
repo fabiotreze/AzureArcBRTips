@@ -1,10 +1,10 @@
-# Usaremos o Azure Arc JumpStart para Criar o Ambiente de Demonstração
+# Demo Environment
 [Azure Arc JumpStart ITPro](https://azurearcjumpstart.com/azure_jumpstart_arcbox/ITPro)
 
-## 1 - Alterações no Arquivo `main.bicep`
-O arquivo em `azure_arc\azure_jumpstart_arcbox\bicep` foi modificado com os seguintes parâmetros, que são exemplos de configuração.
+## 1 - Changes in the `main.bicep` File
+The file located in `azure_arc\azure_jumpstart_arcbox\bicep` has been modified with the following parameters, which are configuration examples.
 
-**Exemplo de Parâmetros no arquivo `main.bicepparam`:**
+**Example Parameters in the `main.bicepparam` File:**
 
 ```bicep
 using 'main.bicep'
@@ -18,7 +18,7 @@ param deployBastion = false
 param vmAutologon = true
 ```
 
-## 2 - Comando de exemplo para implementar a solução:
+## 2 - Example command to deploy the solution
 ```azurecli
 az deployment group create -g "rg-azurearc-itpro-br" -f "main.bicep" -p "main.bicepparam" --verbose
 ``` 

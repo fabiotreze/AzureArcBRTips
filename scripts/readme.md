@@ -1,21 +1,21 @@
-# Scripts do AzureArcDemo
+# AzureArcDemo Scripts
 
-## Visão Geral
+## Overview
 
-Esta pasta contém scripts utilizados para automatizar tarefas e configurações relacionadas ao **Azure Arc**. Os scripts são projetados para facilitar a implementação, configuração e gerenciamento dos recursos do Azure Arc.
+This folder contains scripts used to automate tasks and configurations related to **Azure Arc**. The scripts are designed to simplify the implementation, configuration, and management of Azure Arc resources.
 
-## Estrutura
+## Structure
 
-Os scripts estão organizados de acordo com os laboratórios aos quais pertencem. Cada script tem um nome que começa com o nome do laboratório correspondente, seguido por uma descrição da sua função. 
+The scripts are organized according to the labs they belong to. Each script is named starting with the corresponding lab's name, followed by a description of its function.
 
-## Uso dos Scripts
+## Using the Scripts
 
-1. Navegue até a subpasta do script que deseja executar.
-2. Leia o arquivo `README.md` da subpasta para obter instruções detalhadas sobre o uso do script.
-3. Execute o script conforme as instruções fornecidas.
+1. Navigate to the subfolder of the script you want to run.
+2. Read the `README.md` file in the subfolder for detailed instructions on using the script.
+3. Run the script as instructed.
 
-## Atenção
+## Attention
 
-Lembre-se de que o uso de todos os scripts é feito por sua própria responsabilidade. Recomendamos que leia atentamente todas as instruções e entenda os impactos das ações antes de executá-las.
+Please note that the use of all scripts is at your own risk. We recommend reading all instructions carefully and understanding the impact of the actions before running them.
 
-Se precisar de mais alguma coisa ou tiver dúvidas, estou à disposição!
+If you need anything else or have questions, feel free to reach out!

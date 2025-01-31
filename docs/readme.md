@@ -1,33 +1,33 @@
-# Documentação do AzureArcDemo
+# AzureArcDemo Documentation
 
-## Visão Geral
+## Overview
 
-Esta pasta contém documentação relacionada às implementações e configurações do **Azure Arc**. Os documentos fornecem informações detalhadas, guias de configuração, tutoriais e outros recursos úteis para ajudar na utilização do Azure Arc.
+This folder contains documentation related to the implementations and configurations of **Azure Arc**. The documents provide detailed information, setup guides, tutorials, and other useful resources to assist in the use of Azure Arc.
 
-## Estrutura
+## Structure
 
-Os documentos estão organizados de acordo com os tópicos e laboratórios aos quais pertencem. Cada documento tem um nome que começa com o nome do laboratório ou tópico correspondente, seguido por uma descrição da sua função. Abaixo estão alguns exemplos de documentos disponíveis:
+The documents are organized according to the topics and labs to which they belong. Each document is named starting with the corresponding lab or topic name, followed by a description of its function. Below are some examples of available documents:
 
-- **lab1**: Usaremos o Azure Arc JumpStart para Criar o Ambiente de Demonstração.
-- **lab2**: Distribuição de Software.
-- **lab3**: Gerenciamento de Conformidade.
-- **lab4**: Segurança e Governança.
-- **lab5**: Azure Arc Dashboard em Construção.
-- **lab6**: Identificação de Certificados Próximos à Expiração com Azure Arc.
-- **lab7**: Script de Herança de Tags para Instâncias SQL no Azure Arc.
+- **lab1**: Demo Environment.
+- **lab2**: Software Deployment.
+- **lab3**: Compliance Management.
+- **lab4**: Security and Governance.
+- **lab5**: Azure Arc Dashboard Under Construction.
+- **lab6**: Identifying Certificates Near Expiration with Azure Arc.
+- **lab7**: Tag Inheritance Script for SQL Instances in Azure Arc.
 
 ### Links 
 
-- Explore todos os laboratórios disponíveis: [Laboratórios do AzureArcDemo](https://github.com/fabiotreze/AzureArcDemo/tree/main/labs)  
+- Explore all available labs: [AzureArcDemo Labs](https://github.com/fabiotreze/AzureArcDemo/tree/main/labs)  
 
-## Uso dos Documentos
+## Using the Documents
 
-1. Navegue até a subpasta do documento que deseja utilizar.
-2. Leia o documento para obter informações detalhadas sobre o tópico ou laboratório específico.
-3. Siga as instruções fornecidas no documento para configurar e utilizar os recursos do Azure Arc.
+1. Navigate to the subfolder of the document you want to use.
+2. Read the document to get detailed information about the specific topic or lab.
+3. Follow the instructions provided in the document to configure and use Azure Arc resources.
 
-## Atenção
+## Disclaimer
 
-Lembre-se de que o uso de todos os documentos é feito por sua própria responsabilidade. Recomendamos que leia atentamente todas as instruções e entenda os impactos das ações antes de utilizá-las.
+Remember that the use of all documents is at your own responsibility. We recommend that you carefully read all instructions and understand the impact of actions before using them.
 
-Se precisar de mais alguma coisa ou tiver dúvidas, estou à disposição!
+If you need anything else or have any questions, I'm available!

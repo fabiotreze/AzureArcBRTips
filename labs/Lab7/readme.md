@@ -1,40 +1,40 @@
 ## Azure Arc SQL Instance - Tag Inheritance Script
 
-## Propósito
+## Purpose
 
-Este repositório contém um script PowerShell chamado **Azure Arc SQL Instance - Tag Inheritance**, criado para resolver **inconsistências na gestão de tags** em cenários de integração de **máquinas SQL com o Azure Arc**.
+This repository contains a PowerShell script called **Azure Arc SQL Instance - Tag Inheritance**, created to resolve **tag management inconsistencies** in scenarios involving **SQL machines integrated with Azure Arc**.
 
-**Por que usar este script?**  
-Por padrão, a Instância SQL do Azure Arc **não herda automaticamente as tags** da VM do Azure Arc, o que pode dificultar o gerenciamento de recursos. Este script garante que as tags da VM sejam replicadas na Instância SQL associada, promovendo consistência e organização no ambiente Azure.
+**Why use this script?**  
+By default, the Azure Arc SQL Instance **does not automatically inherit tags** from the Azure Arc VM, which can complicate resource management. This script ensures that the tags from the VM are replicated to the associated SQL Instance, promoting consistency and organization in the Azure environment.
 
-O script **`lab7_AzureArcSQLTags-Inheritance.ps1`** pode ser utilizado no **runbook** e está disponível na pasta **scripts** deste repositório. Você pode acessá-lo diretamente no link:  
+The script **`lab7_AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
 [lab7_AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/scripts/lab7_AzureArcSQLTags-Inheritance.ps1).  
 
 ---
 
-### Requisitos
+### Requirements
 
-#### Conta de Automação
-- Os módulos **Az.Account** e **Az.ResourceGraph** devem estar instalados para o funcionamento correto do script.  
-- Uma **identidade gerenciada** (*managed identity*) deve ser configurada para a Conta de Automação, permitindo acesso seguro aos recursos necessários no Azure.  
+#### Automation Account
+- The **Az.Account** and **Az.ResourceGraph** modules must be installed for the script to work correctly.  
+- A **managed identity** must be configured for the Automation Account, enabling secure access to the required resources in Azure.  
 
 #### Runbook
-- É necessário configurar um **agendamento** para o **runbook**, garantindo a execução automática do script em intervalos predefinidos.  
+- A **schedule** for the **runbook** must be configured, ensuring the script runs automatically at predefined intervals.  
 
 ---
 
-### Parâmetros
+### Parameters
 
-O script exige os seguintes parâmetros:
+The script requires the following parameters:
 
-- **ResourceGroupName**: Nome do grupo de recursos onde a Instância SQL do Azure Arc e a VM associada estão localizadas.  
-- **SubscriptionID**: ID da assinatura do Azure onde os recursos estão registrados.  
-- **tagName**: Nome da tag que será aplicada à Instância SQL do Azure Arc, com base nas tags configuradas na VM associada.  
+- **ResourceGroupName**: The name of the resource group where the Azure Arc SQL Instance and the associated VM are located.  
+- **SubscriptionID**: The ID of the Azure subscription where the resources are registered.  
+- **tagName**: The name of the tag to be applied to the Azure Arc SQL Instance, based on the tags configured on the associated VM.  
 
-**O que isso resolve?**  
-Esses parâmetros garantem que as tags sejam sincronizadas corretamente entre os recursos do Azure Arc e suas VMs relacionadas, promovendo uma gestão de recursos mais eficiente e organizada.
+**What does this solve?**  
+These parameters ensure that the tags are properly synchronized between the Azure Arc resources and their related VMs, promoting more efficient and organized resource management.
 
 ---
 
-### Nota
-Certifique-se de que sua Conta de Automação e os recursos no Azure estão configurados corretamente antes de executar o script.
+### Note
+Make sure your Automation Account and Azure resources are correctly configured before running the script.

@@ -1,32 +1,32 @@
-# Gerenciamento de Conformidade
+# Compliance Management
 
-## 1 - Referências Técnicos
-Importante se atentar aos requerimentos técnicos de módulos para a máquina que será utilizada para criar o pacote personalizado e uso do Azure Policy.
+## 1 - Technical References
+It is important to pay attention to the technical requirements of modules for the machine that will be used to create the custom package and Azure Policy usage.
 
-- [Azure Arc JumpStart: Machine Configuration Custom Windows](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_windows) - **Instale os módulos mencionados neste artigo na máquina que será utilizada para a criação do pacote personalizado**
+- [Azure Arc JumpStart: Machine Configuration Custom Windows](https://azurearcjumpstart.io/azure_arc_jumpstart/azure_arc_servers/day2/arc_automanage/arc_automanage_machine_configuration_custom_windows) - **Install the modules mentioned in this article on the machine that will be used to create the custom package**
 
-Outros links podem e devem ser consultados como referências técnicas adicionais.
+Other links may and should be consulted as additional technical references.
 - [Software Installation Using Machine Configuration and Azure Policy](https://techcommunity.microsoft.com/blog/coreinfrastructureandsecurityblog/software-installation-using-machine-configuration-and-azure-policy/3695636)
-- [Visão Geral do Machine Configuration no Azure](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/overview)
-- [Correção](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/whats-new/agent)
+- [Overview of Machine Configuration in Azure](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview)
+- [Fix](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/whats-new/agent)
 
-**Exemplos de Utilização do DSC**
-O repositório abaixo pode ser utilizado como referência para a criação de novos recursos, permitindo uma ampla variedade de ações com o **Guest Configuration** e o Azure Arc. Ele contém diversos exemplos de DSC que servem como base e inspiração, simplificando o processo e evitando a necessidade de começar do zero.
+**DSC Usage Examples**
+The repository below can be used as a reference for creating new resources, allowing a wide variety of actions with **Guest Configuration** and Azure Arc. It contains various DSC examples that serve as a foundation and inspiration, simplifying the process and avoiding the need to start from scratch.
 
 - [Github PSDscResources](https://github.com/PowerShell/PSDscResources/tree/dev)
 - [Azure Policy built-in packages for guest configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-packages)
 
 ---
 
-## 2 - Criar um Pacote Personalizado
-[Como configurar um ambiente de criação de configuração de máquina](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/develop-custom-package/1-set-up-authoring-environment)
+## 2 - Create a Custom Package
+[How to set up a machine configuration authoring environment](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/how-to/develop-custom-package/1-set-up-authoring-environment)
 
 ---
 
-## 3 - Para criar o arquivo MOF, baseie-se no documento oficial da Microsoft Como criar um pacote personalizado.
-Salve e execute o arquivo [lab3_sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/scripts/lab3_sample7zip.ps1). Com isso, teremos o arquivo **localhost.mof**.
+## 3 - To create the MOF file, refer to the official Microsoft document on how to create a custom package.
+Save and run the file [lab3_sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/scripts/lab3_sample7zip.ps1). This will generate the **localhost.mof** file.
 
-## 4 - Para criar o arquivo ZIP, baseie-se no documento oficial da Microsoft Como criar um pacote personalizado e utilize o arquivo .MOF gerado anteriormente
+## 4 - To create the ZIP file, refer to the official Microsoft document on how to create a custom package and use the previously generated .MOF file.
 
 ```powershell
 New-GuestConfigurationPackage `
@@ -37,17 +37,17 @@ New-GuestConfigurationPackage `
 -Force
 ```
 
-Este comando gerará o pacote necessário para aplicar e auditar a configuração desejada. Para realizar testes, copie o arquivo **Install7zip_MsiPackageFromHttp.zip** para um servidor e valide-o utilizando o seguinte comando:
+This command will generate the necessary package to apply and audit the desired configuration. For testing, copy the **Install7zip_MsiPackageFromHttp.zip** file to a server and validate it using the following command:
 
 ```powershell
 Start-GuestConfigurationPackageRemediation -Path .\Install7zip_MsiPackageFromHttp.zip
 ```
 ---
 
-# 5 - Como próximo passo, podemos utilizar este arquivo para criar uma definição de política no Azure.
-[Como criar definições de políticas de configuração de computador personalizadas](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/create-policy-definition)
+# 5 - As the next step, we can use this file to create a policy definition in Azure.
+[How to create custom computer configuration policy definitions](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/how-to/create-policy-definition)
 
-Podemos seguir as orientações do artigo para armazenar o arquivo em uma **Storage Account** e, em seguida, obter o **URI** para utilizá-lo no comando abaixo:
+We can follow the guidelines in the article to store the file in a **Storage Account** and then get the **URI** to use in the following command:
 
 ```powershell
 $contentUri = "https://arcboxmachineconfigyqvkt.blob.core.windows.net/machineconfiguration/Install7zip_MsiPackageFromHttp.zip" #O acesso pode não estar disponível aqui; este é apenas um exemplo ilustrativo. :-)**
@@ -66,14 +66,14 @@ $PolicyConfig      = @{
 
 New-GuestConfigurationPolicy @PolicyConfig -verbose
 ```
-Na sua pasta de execução, será criada a estrutura de diretórios **\policies\auditIfNotExists.json** contendo pelo menos dois arquivos:
+In your working directory, the directory structure **\policies\auditIfNotExists.json** will be created containing at least two files:
 
 ```plaintext
 .\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json
 .\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json
 ```
 
-## 6 - Utilize os arquivos gerados anteriormente para criar as definições no Azure Policy. Execute o comando PowerShell abaixo
+## 6 - Use the previously generated files to create definitions in Azure Policy. Execute the following PowerShell command:
 ```powershell
 New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpAuditIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json' -verbose
 New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpDeployIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json' -verbose
@@ -82,13 +82,13 @@ Após a execução, as definições estarão disponíveis no Azure Policy para a
 
 ---
 
-# DICA EXTRA
+# EXTRA TIP
 
-## 1 - Identificar os dois campos importantes: **contentUri** e **contentHash** nos arquivos json gerados anteriormente
+## 1 - Identify the two important fields: **contentUri** and **contentHash** in the previously generated JSON files.
 
-Nos passos mencionados anteriormente, foram criados arquivos JSON que serão utilizados no **Azure Policy**, especificamente para a criação das **Definitions**.
+In the steps mentioned above, JSON files were created that will be used in **Azure Policy**, specifically for creating **Definitions**.
 
-Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura segue um formato semelhante ao exemplo apresentado. Temos dois campos importantes: **contentUri** e **contentHash**.
+Among these definitions, the **DeployIfNotExists**, stands out, and its structure follows a format similar to the example provided. We have two important fields: **contentUri** and **contentHash**.
 
 ```json
 "guestConfiguration": {
@@ -100,21 +100,21 @@ Entre essas definições, destaca-se a **DeployIfNotExists**, cuja estrutura seg
             }
 ```
 
-## 2 - Podemos utilizar para a criação do **Guest Assignments** 
-Com este passo será integrado com a funcionalidade do **Machine Configuration** juntamente do Azure Arc.
+## 2 - We can use this to create the  **Guest Assignments** 
+This step will integrate with the **Machine Configuration** functionality along with Azure Arc.
 
-## 3 - Como criar uma atribuição
-[Atribuir uma configuração](https://learn.microsoft.com/pt-br/azure/governance/machine-configuration/how-to/assign-configuration/overview)
+## 3 - How to create an assignment
+[Assign a configuration](https://learn.microsoft.com/en-us/azure/governance/machine-configuration/how-to/assign-configuration/overview)
 
-## 4 - Talvez surja a dúvida: quando devo utilizar o **Guest Configuration** e quando utilizar o **Azure Policy**?
+## 4 - A common question may arise: when should I use **Guest Configuration** and when should I use **Azure Policy**?
 
-Lembre-se de que as informações apresentadas abaixo são apenas exemplos e não se limitam ao que está mostrado na tabela, podendo ser aplicadas de forma mais ampla conforme o cenário.
+Remember that the information presented below are just examples and are not limited to what is shown in the table; they can be applied more broadly depending on the scenario.
 
-| **Aspecto**               | **Azure Policy**                              | **Guest Configuration (Machine Configuration)** |
-|----------------------------|-----------------------------------------------|-------------------------------------------------|
-| **Escopo**                | Infraestrutura e recursos                    | Sistema Operacional (Guest OS)                 |
-| **Habilitação**           | Regras para recursos gerenciados             | Extensão de VM ou Azure Arc                    |
-| **Granularidade**         | Macro (recursos, regiões, tags)              | Micro (SO, serviços, arquivos)                 |
-| **Exemplos de Uso**       | Restrições de local, SKUs, tags               | Configurações de SSH, serviços, arquivos       |
-| **Compatibilidade com Azure Arc** | Sim                                   | Sim                                             |
-| **Correção Automática**   | Limitada (aplica-se à infraestrutura)        | Sim (aplica-se à configuração no SO)           |
+| **Aspect**                | **Azure Policy**                              | **Guest Configuration (Machine Configuration)** |
+|---------------------------|-----------------------------------------------|-------------------------------------------------|
+| **Scope**                 | Infrastructure and resources                  | Operating System (Guest OS)                     |
+| **Enabling**              | Rules for managed resources                   | VM Extension or Azure Arc                      |
+| **Granularity**           | Macro (resources, regions, tags)              | Micro (OS, services, files)                    |
+| **Use Cases**             | Location restrictions, SKUs, tags             | SSH configurations, services, files            |
+| **Azure Arc Compatibility** | Yes                                         | Yes                                             |
+| **Auto Remediation**      | Limited (applies to infrastructure)           | Yes (applies to OS configuration)              |

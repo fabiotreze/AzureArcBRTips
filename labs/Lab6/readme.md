@@ -1,20 +1,20 @@
-# Identificação de Certificados Próximos à Expiração com Azure Arc
+# Identifying Certificates Near Expiration with Azure Arc
 
-Uma demanda importante na gestão híbrida é a identificação de certificados que estão próximos à expiração. Para atender a essa necessidade, utilizaremos o **Azure Arc, Azure Policy e Guest Configuration (Machine Configuration)**.
+An important task in hybrid management is identifying certificates that are near expiration. To address this need, we will use **Azure Arc, Azure Policy, and Guest Configuration (Machine Configuration)**.
 
-## 1. Assignment da Policy
+## 1. Policy Assignment
 
-Primeiramente, faremos o assignment da Policy **Audit Windows machines that contain certificates expiring within the specified number of days**. Essa política nos permitirá auditar máquinas Windows que possuem certificados próximos à expiração dentro de um número especificado de dias.
+First, we will assign the **Audit Windows machines that contain certificates expiring within the specified number of days** policy. This policy will allow us to audit Windows machines that have certificates close to expiration within a specified number of days.
 
-**É importante lembrar de habilitar o parâmetro que corresponde às máquinas híbridas do Azure Arc**. Isso garantirá que todas as máquinas, tanto locais quanto na nuvem, sejam monitoradas de forma eficaz.
+**It’s important to remember to enable the parameter that corresponds to Azure Arc hybrid machines**. This will ensure that all machines, both on-premises and in the cloud, are effectively monitored.
 
-Com essa abordagem, podemos garantir a conformidade e a segurança de nossos ambientes híbridos, evitando problemas relacionados à expiração de certificados.
+With this approach, we can ensure compliance and security in our hybrid environments, preventing issues related to certificate expiration.
 
-Referência: [policy-reference](https://learn.microsoft.com/en-us/azure/virtual-machines/policy-reference)
+Reference: [policy-reference](https://learn.microsoft.com/en-us/azure/virtual-machines/policy-reference)
 
-## 2. Execução da Query KQL no Azure Resource Graph
+## 2. Running KQL Query in Azure Resource Graph
 
-Após o assignment da policy, podemos executar a query KQL no Azure Resource Graph para identificar os certificados próximos à expiração. Aqui está um exemplo de query:
+After assigning the policy, we can run the KQL query in Azure Resource Graph to identify certificates nearing expiration. Here's an example query:
 
 ```kusto
 GuestConfigurationResources
@@ -32,4 +32,4 @@ GuestConfigurationResources
 | order by name asc, status asc
 ```
 
-Para mais opções de consulta, consulte a [azure-policy-guest-configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/resource-graph-samples?tabs=azure-cli#azure-policy-guest-configuration)
+For more query options, refer to [azure-policy-guest-configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/resource-graph-samples?tabs=azure-cli#azure-policy-guest-configuration)

@@ -1,22 +1,22 @@
-# Dashboards do AzureArcDemo
+# AzureArcDemo Dashboards
 
-## Visão Geral
+## Overview
 
-Esta pasta contém dashboards utilizados para monitorar e visualizar dados relacionados às implementações do **Azure Arc**. Os dashboards fornecem uma interface gráfica para acompanhar métricas, logs e outros dados importantes.
+This folder contains dashboards used to monitor and visualize data related to **Azure Arc** deployments. The dashboards provide a graphical interface to track metrics, logs, and other important data.
 
-## Estrutura
+## Structure
 
-Os dashboards estão organizados em arquivos JSON que podem ser importados diretamente no portal do Azure ou em outras ferramentas de visualização compatíveis. Cada arquivo de dashboard contém a configuração necessária para criar visualizações específicas.
+The dashboards are organized into JSON files that can be imported directly into the Azure portal or other compatible visualization tools. Each dashboard file contains the necessary configuration to create specific visualizations.
 
-## Uso dos Dashboards
+## Using the Dashboards
 
-1. Navegue até o portal do Azure.
-2. Acesse a seção de dashboards.
-3. Importe o arquivo JSON do dashboard desejado a partir desta pasta.
-4. Configure as fontes de dados conforme necessário para visualizar as métricas e logs.
+1. Navigate to the Azure portal.
+2. Access the dashboards section.
+3. Import the desired dashboard JSON file from this folder.
+4. Configure the data sources as needed to view metrics and logs.
 
-## Atenção
+## Important Notes
 
-Lembre-se de que os dashboards são fornecidos como exemplos e podem precisar de ajustes para se adequarem ao seu ambiente específico. Certifique-se de revisar e personalizar os dashboards conforme necessário antes de utilizá-los em produção.
+Please note that the dashboards are provided as examples and may require adjustments to fit your specific environment. Be sure to review and customize the dashboards as needed before using them in production.
 
-Se precisar de mais alguma coisa ou tiver dúvidas, estou à disposição!
+If you need anything else or have any questions, feel free to reach out!

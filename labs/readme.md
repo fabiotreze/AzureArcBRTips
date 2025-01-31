@@ -1,29 +1,29 @@
-# Laboratórios do AzureArcDemo
+# AzureArcDemo Labs
 
-## Visão Geral
+## Overview
 
-Esta pasta contém uma série de laboratórios práticos para demonstrar as funcionalidades do **Azure Arc**. Cada laboratório é projetado para fornecer um cenário específico e guiar o usuário através da implementação e configuração das funcionalidades do Azure Arc.
+This folder contains a series of hands-on labs to demonstrate the features of **Azure Arc**. Each lab is designed to provide a specific scenario and guide the user through the implementation and configuration of Azure Arc functionalities.
 
-## Estrutura dos Laboratórios
+## Lab Structure
 
-Os laboratórios estão organizados em subpastas, cada uma contendo um `README.md` com instruções detalhadas para aquele laboratório específico. 
+The labs are organized into subfolders, each containing a `README.md` with detailed instructions for that specific lab. 
 
-## Como Utilizar os Laboratórios
+## How to Use the Labs
 
-1. Navegue até a subpasta do laboratório que deseja executar.
-2. Leia o arquivo `README.md` da subpasta para obter instruções detalhadas.
-3. Siga os passos descritos no `README.md` para configurar e executar o laboratório.
+1. Navigate to the subfolder of the lab you want to run.
+2. Read the `README.md` file in the subfolder for detailed instructions.
+3. Follow the steps described in the `README.md` to configure and run the lab.
 
-## Requisitos
+## Requirements
 
-Certifique-se de atender aos seguintes requisitos antes de iniciar qualquer laboratório:
+Make sure you meet the following requirements before starting any lab:
 
-- Conta no Azure com permissões adequadas.
-- Ferramentas de linha de comando do Azure instaladas.
-- Conhecimento básico sobre Azure e Azure Arc.
+- An Azure account with appropriate permissions.
+- Azure command-line tools installed.
+- Basic knowledge of Azure and Azure Arc.
 
-## Atenção
+## Attention
 
-Lembre-se de que o uso de todos os artefatos e scripts é feito por sua própria responsabilidade. Recomendamos que leia atentamente todas as instruções e entenda os impactos das ações antes de executá-las.
+Please note that the use of all artifacts and scripts is at your own risk. We recommend reading all instructions carefully and understanding the impact of the actions before running them.
 
-Se precisar de ajuda ou tiver dúvidas, sinta-se à vontade para entrar em contato.
+If you need help or have questions, feel free to reach out.
