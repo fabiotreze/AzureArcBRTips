@@ -14,8 +14,8 @@ The repository is organized into labs that present practical scenarios to guide 
 
 ### Links
 
-- Check the detailed documentation in the repository: [AzureArcDemo Documentation](https://github.com/fabiotreze/AzureArcDemo/tree/main/docs)  
-- Explore all available labs: [AzureArcDemo Labs](https://github.com/fabiotreze/AzureArcDemo/tree/main/labs)  
+- Check the detailed documentation in the repository: [AzureArcTips Documentation](https://github.com/fabiotreze/AzureArcTips/tree/main/docs)  
+- Explore all available labs: [AzureArcTips Labs](https://github.com/fabiotreze/AzureArcTips/tree/main/labs)  
 
 ### Attention
 The use of all artifacts and scripts available in this repository is at your own responsibility.

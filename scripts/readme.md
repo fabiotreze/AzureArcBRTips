@@ -1,4 +1,4 @@
-# AzureArcDemo Scripts
+# AzureArcTips Scripts
 
 ## Overview
 

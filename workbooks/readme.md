@@ -1,4 +1,4 @@
-# AzureArcDemo Workbooks
+# AzureArcTips Workbooks
 
 ## Overview
 

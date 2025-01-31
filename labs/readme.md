@@ -1,4 +1,4 @@
-# AzureArcDemo Labs
+# AzureArcTips Labs
 
 ## Overview
 

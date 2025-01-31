@@ -6,7 +6,7 @@ I am currently developing a **Microsoft Azure Arc Dashboard**, with the intentio
 
 This dashboard can be fully **customized** according to the **specific needs** of a demo company. Some customization points include:
 
-- **Logos and Branding**: We can add your company's logo to ensure the dashboard has the desired visual identity. An example of the logo used during the dashboard's development was Microsoft's logo, which can be replaced with the fictitious logo [link to logo - seulogoaqui](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/images/lab5_seulogoaqui.png).
+- **Logos and Branding**: We can add your company's logo to ensure the dashboard has the desired visual identity. An example of the logo used during the dashboard's development was Microsoft's logo, which can be replaced with the fictitious logo [link to logo - seulogoaqui](https://raw.githubusercontent.com/fabiotreze/AzureArcTips/refs/heads/main/images/lab5_seulogoaqui.png).
 
 ## Benefits
 
@@ -14,4 +14,4 @@ This dashboard can be fully **customized** according to the **specific needs** o
 - **Layout Customization**: Altering the dashboard structure to better meet your team's preferences and needs.
 - **Feature Adjustment**: The possibility to add new features or remove those that are not needed, keeping the focus on essential information.
 
-**Dashboard Link** [Azure Arc Demo](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/dashboards/lab5_Azure%20Arc%20Demo.json)
+**Dashboard Link** [AzureArcTips](https://raw.githubusercontent.com/fabiotreze/AzureArcTips/refs/heads/main/dashboards/lab5_Azure%20Arc%20Demo.json)

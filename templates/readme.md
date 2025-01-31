@@ -1,4 +1,4 @@
-# AzureArcDemo Templates
+# AzureArcTips Templates
 
 ## Overview
 
