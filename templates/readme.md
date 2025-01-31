@@ -1,4 +1,4 @@
-# AzureArcTips Templates
+# AzureArcBRTips Templates
 
 ## Overview
 

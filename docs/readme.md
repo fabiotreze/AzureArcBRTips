@@ -1,4 +1,4 @@
-# AzureArcTips Documentation
+# AzureArcBRTips Documentation
 
 ## Overview
 
@@ -18,7 +18,7 @@ The documents are organized according to the topics and labs to which they belon
 
 ### Links 
 
-- Explore all available labs: [AzureArcTips Labs](https://github.com/fabiotreze/AzureArcTips/tree/main/labs)  
+- Explore all available labs: [AzureArcBRTips Labs](https://github.com/fabiotreze/AzureArcBRTips/tree/main/labs)  
 
 ## Using the Documents
 

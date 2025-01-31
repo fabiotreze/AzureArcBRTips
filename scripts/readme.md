@@ -1,4 +1,4 @@
-# AzureArcTips Scripts
+# AzureArcBRTips Scripts
 
 ## Overview
 

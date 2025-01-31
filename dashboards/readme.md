@@ -1,4 +1,4 @@
-# AzureArcTips Dashboards
+# AzureArcBRTips Dashboards
 
 ## Overview
 

@@ -1,4 +1,4 @@
-# AzureArcTips
+# AzureArcBRTips
 
 ## Disclaimer
 
@@ -14,8 +14,8 @@ The repository is organized into labs that present practical scenarios to guide 
 
 ### Links
 
-- Check the detailed documentation in the repository: [AzureArcTips Documentation](https://github.com/fabiotreze/AzureArcTips/tree/main/docs)  
-- Explore all available labs: [AzureArcTips Labs](https://github.com/fabiotreze/AzureArcTips/tree/main/labs)  
+- Check the detailed documentation in the repository: [AzureArcBRTips Documentation](https://github.com/fabiotreze/AzureArcBRTips/tree/main/docs)  
+- Explore all available labs: [AzureArcBRTips Labs](https://github.com/fabiotreze/AzureArcBRTips/tree/main/labs)  
 
 ### Attention
 The use of all artifacts and scripts available in this repository is at your own responsibility.

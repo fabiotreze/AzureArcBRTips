@@ -8,7 +8,7 @@ This repository contains a PowerShell script called **Azure Arc SQL Instance - T
 By default, the Azure Arc SQL Instance **does not automatically inherit tags** from the Azure Arc VM, which can complicate resource management. This script ensures that the tags from the VM are replicated to the associated SQL Instance, promoting consistency and organization in the Azure environment.
 
 The script **`lab7_AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
-[lab7_AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcDemo/refs/heads/main/scripts/lab7_AzureArcSQLTags-Inheritance.ps1).  
+[lab7_AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab7_AzureArcSQLTags-Inheritance.ps1).  
 
 ---
 
