@@ -48,4 +48,4 @@ Security!*[System[(EventID=4624) or (EventID=4625) or (EventID=4634) or (EventID
 
 ## Keywords for Search  
 
-`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AuditLogonEvents #SecurityEvents #AzureArcTips`
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AuditLogonEvents #SecurityEvents #AzureArcBRTips`

@@ -78,4 +78,4 @@ az deployment group create --resource-group rg-azurearc-itpro-br --template-file
 
 ## Keywords for Search  
 
-`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #CustomExtension #Automation #SoftwareDistribution #AzureArcTips`
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #CustomExtension #Automation #SoftwareDistribution #AzureArcBRTips`

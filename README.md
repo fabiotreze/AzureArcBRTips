@@ -44,4 +44,4 @@ Contributions are welcome! Feel free to open an _issue_ or submit a _pull reques
 
 ## Keywords for Search  
 
-`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureArcTips`
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureArcBRTips`

@@ -36,4 +36,4 @@ For more query options, refer to [azure-policy-guest-configuration](https://lear
 
 ## Keywords for Search  
 
-`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AzurePolicy #Certificate #AzureArcTips`
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AzurePolicy #Certificate #AzureArcBRTips`

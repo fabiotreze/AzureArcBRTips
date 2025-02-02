@@ -121,4 +121,4 @@ Remember that the information presented below are just examples and are not limi
 
 ## Keywords for Search  
 
-`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #Automation #DSC #PowerShell #MachineConfiguration #GuestConfiguration #AzureArcTips`
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #Automation #DSC #PowerShell #MachineConfiguration #GuestConfiguration #AzureArcBRTips`
