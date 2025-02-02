@@ -33,3 +33,7 @@ GuestConfigurationResources
 ```
 
 For more query options, refer to [azure-policy-guest-configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/resource-graph-samples?tabs=azure-cli#azure-policy-guest-configuration)
+
+## Keywords for Search  
+
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AzurePolicy #Certificate #AzureArcTips`

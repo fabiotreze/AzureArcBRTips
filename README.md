@@ -41,3 +41,7 @@ The repository is organized into the following main folders:
 ## Contributions
 
 Contributions are welcome! Feel free to open an _issue_ or submit a _pull request_ to improve this repository.
+
+## Keywords for Search  
+
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureArcTips`

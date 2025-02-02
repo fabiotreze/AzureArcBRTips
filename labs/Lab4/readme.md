@@ -45,3 +45,7 @@ Security!*[System[(EventID=4624) or (EventID=4625) or (EventID=4634) or (EventID
 ---
 
 ### 5- Workbook **Link to Workbook** [Audit Logon Events](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/workbooks/lab4_AzureArc-AuditLogonEvents.workbook)
+
+## Keywords for Search  
+
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AuditLogonEvents #SecurityEvents #AzureArcTips`

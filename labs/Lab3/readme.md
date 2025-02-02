@@ -118,3 +118,7 @@ Remember that the information presented below are just examples and are not limi
 | **Use Cases**             | Location restrictions, SKUs, tags             | SSH configurations, services, files            |
 | **Azure Arc Compatibility** | Yes                                         | Yes                                             |
 | **Auto Remediation**      | Limited (applies to infrastructure)           | Yes (applies to OS configuration)              |
+
+## Keywords for Search  
+
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #Automation #DSC #PowerShell #MachineConfiguration #GuestConfiguration #AzureArcTips`

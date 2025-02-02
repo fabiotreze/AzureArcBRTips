@@ -75,3 +75,7 @@ az deployment group create --resource-group rg-azurearc-itpro-br --template-file
 
 ## Consider other usage possibilities such as Run-Command
 [Azure Arc Run-Command](https://learn.microsoft.com/en-us/azure/azure-arc/servers/run-command)
+
+## Keywords for Search  
+
+`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #CustomExtension #Automation #SoftwareDistribution #AzureArcTips`
