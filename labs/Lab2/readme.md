@@ -9,6 +9,8 @@
 - Copy the necessary binaries for the lab to this container or use the public link from the 7-Zip provider.
 - For this example, the **7-Zip** utility was used, available at [https://www.7-zip.org/](https://www.7-zip.org/).
 
+> **Note:** The necessary templates and parameter files for this lab are located in the **templates** folder.
+
 ### Examples for the same file:
 
 ### **Windows**
