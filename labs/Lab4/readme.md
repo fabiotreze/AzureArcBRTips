@@ -1,5 +1,8 @@
 # Security and Governance
 
+## Objective  
+>Collect specific security events using the Azure Monitoring Agent on Azure Arc-enabled machines to monitor and analyze security-related activities.
+
 ## 1 - Laboratory Requirements
 
 Create a **Log Analytics Workspace**

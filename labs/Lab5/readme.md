@@ -1,17 +1,18 @@
 # Azure Arc Dashboard in Progress
 
-I am currently developing a **Microsoft Azure Arc Dashboard**, with the intention of providing a centralized and customized view of the resources managed in Azure Arc. The main idea is to allow our team to efficiently and personalized view the hybrid and multicloud environments of our organization.
+## Objective  
+>Provide customizable example dashboards that offer insights into the performance, security, and configuration of Azure Arc-enabled machines, tailored to your environment.
 
 ## Customization
 
-This dashboard can be fully **customized** according to the **specific needs** of a demo company. Some customization points include:
+The dashboard is fully **customizable** to meet the **specific needs** of your demo company. Key customization options include:
 
-- **Logos and Branding**: We can add your company's logo to ensure the dashboard has the desired visual identity. An example of the logo used during the dashboard's development was Microsoft's logo, which can be replaced with the fictitious logo [link to logo - seulogoaqui](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/images/lab5_seulogoaqui.png).
+- **Logos and Branding**: Add your company's logo to match the desired visual identity. For example, during development, Microsoft’s logo was used, but it can be replaced with any other logo. [Link to logo - Custom Logo](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/images/lab5_seulogoaqui.png).
 
 ## Benefits
 
-- **Centralized Visibility**: A single view of all resources connected to Azure Arc.
-- **Layout Customization**: Altering the dashboard structure to better meet your team's preferences and needs.
-- **Feature Adjustment**: The possibility to add new features or remove those that are not needed, keeping the focus on essential information.
+- **Centralized Visibility**: Get a unified view of all resources connected to Azure Arc.
+- **Layout Customization**: Modify the structure of the dashboard to align with your team's preferences.
+- **Feature Adjustment**: Add or remove features to focus on the most relevant information.
 
-**Dashboard Link** [AzureArcBRTips](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/dashboards/lab5_Azure%20Arc%20Demo.json)
+**Dashboard Link**: [AzureArcBRTips](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/dashboards/lab5_Azure%20Arc%20Demo.json)

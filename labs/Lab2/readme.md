@@ -1,5 +1,8 @@
 # Software Distribution
 
+## Objective  
+>Install, update, or uninstall software on Azure Arc-enabled machines using a public or private URI accessible to the devices.
+
 ## 1 - Laboratory Requirements
 *Important: Best security practices were not adopted for this scenario.*
 

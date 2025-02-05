@@ -1,6 +1,9 @@
 # Demo Environment
 [Azure Arc JumpStart ITPro](https://azurearcjumpstart.com/azure_jumpstart_arcbox/ITPro)
 
+## Objective  
+>The goal is to deploy an Azure Arc scenario following the Azure Arc Jumpstart guidelines in a sandbox environment, providing hands-on experience with Azure Arc technologies.
+
 ## 1 - Changes in the `main.bicep` File
 The file located in `azure_arc\azure_jumpstart_arcbox\bicep` has been modified with the following parameters, which are configuration examples.
 

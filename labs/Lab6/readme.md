@@ -1,6 +1,7 @@
 # Identifying Certificates Near Expiration with Azure Arc
 
-An important task in hybrid management is identifying certificates that are near expiration. To address this need, we will use **Azure Arc, Azure Policy, and Guest Configuration (Machine Configuration)**.
+## Objective  
+>Identify machines connected to Azure Arc with certificates close to expiration or already expired, using Azure Policy and Guest Configuration. This ensures proactive management of certificate renewals and maintains compliance across hybrid and multicloud environments.
 
 ## 1. Policy Assignment
 

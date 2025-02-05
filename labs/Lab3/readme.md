@@ -1,5 +1,8 @@
 # Compliance Management
 
+## Objective  
+>Utilize DSC (Desired State Configuration) in conjunction with Azure Arc Guest Configuration (Machine Configuration) to verify the presence of a specific software. If the software is not installed, it will be automatically installed on the Azure Arc-enabled machines.
+
 ## 1 - Technical References
 It is important to pay attention to the technical requirements of modules for the machine that will be used to create the custom package and Azure Policy usage.
 
