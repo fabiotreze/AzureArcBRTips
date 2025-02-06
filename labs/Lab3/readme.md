@@ -69,6 +69,8 @@ $PolicyConfig      = @{
 
 New-GuestConfigurationPolicy @PolicyConfig -verbose
 ```
+>Reexecute the command below without the Mode parameter to generate the two JSON files needed for policy creation.
+
 In your working directory, the directory structure **\policies\auditIfNotExists.json** will be created containing at least two files:
 
 ```plaintext
@@ -77,6 +79,9 @@ In your working directory, the directory structure **\policies\auditIfNotExists.
 ```
 
 ## 6 - Use the previously generated files to create definitions in Azure Policy. Execute the following PowerShell command:
+
+Make sure you are logged in to Azure before executing the commands.
+
 ```powershell
 New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpAuditIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_AuditIfNotExists.json' -verbose
 New-AzPolicyDefinition -Name '(ArcBox-Custom)-Install7zipMsiPackageFromHttpDeployIfNotExists' -Policy '.\Install7zip_MsiPackageFromHttp_DeployIfNotExists.json' -verbose
