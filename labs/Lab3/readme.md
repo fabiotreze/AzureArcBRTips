@@ -69,7 +69,7 @@ $PolicyConfig      = @{
 
 New-GuestConfigurationPolicy @PolicyConfig -verbose
 ```
->Reexecute the command below without the Mode parameter to generate the two JSON files needed for policy creation.
+>Reexecute the command below without the **Mode** parameter to generate the two JSON files needed for policy creation. Remember to change **DisplayName** of script.
 
 In your working directory, the directory structure **\policies\auditIfNotExists.json** will be created containing at least two files:
 
