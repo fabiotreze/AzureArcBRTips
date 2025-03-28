@@ -94,7 +94,7 @@ foreach ($endpoint in $allEndpoints) {
     try {
         $url = if ($trimmedEndpoint -match "^https://") { $trimmedEndpoint } else { "https://$trimmedEndpoint" }
         
-        $logMessage = "Running: Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10"
+        $logMessage = "Running: Invoke-WebRequest -Uri $url -Method Get"
         $logMessage | Out-File -FilePath $logFilePath -Append
         
         $httpResponse = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
