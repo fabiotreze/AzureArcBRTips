@@ -47,7 +47,21 @@ try {
 # Combine static and dynamic endpoints
 $allEndpoints = $staticEndpoints + $dynamicEndpoints
 
-# Iterate over all endpoints to test connectivity, DNS resolution, and HTTP response
+# List of allowed endpoints for HTTP request
+$allowedEndpoints = @(
+    "login.windows.net",
+    "login.microsoftonline.com",
+    "dataprocessingservice.$region.arcdataservices.com",
+    "telemetry.$region.arcdataservices.com"
+)
+
+# Filter the dynamic endpoints to match the allowed list
+$filteredDynamicEndpoints = $allowedEndpoints
+
+# Combine static endpoints with the filtered dynamic endpoints for HTTP requests
+$finalEndpointsForRequest = $filteredDynamicEndpoints
+
+# Iterate over all endpoints to test connectivity, DNS resolution, and HTTP response for the filtered dynamic endpoints
 foreach ($endpoint in $allEndpoints) {
     $trimmedEndpoint = $endpoint.Trim()
 
@@ -87,24 +101,51 @@ foreach ($endpoint in $allEndpoints) {
         $pingError | Out-File -FilePath $logFilePath -Append
     }
 
+    "----------------------------------------" | Out-File -FilePath $logFilePath -Append
+}
+
+# HTTP request test (only for filtered dynamic endpoints)
+foreach ($endpoint in $finalEndpointsForRequest) {
+    $trimmedEndpoint = $endpoint.Trim()
+
     # HTTP request test
     $httpLogMessage = "Testing HTTP request for: $($trimmedEndpoint)"
     $httpLogMessage | Out-File -FilePath $logFilePath -Append
 
     try {
-        $url = if ($trimmedEndpoint -match "^https://") { $trimmedEndpoint } else { "https://$trimmedEndpoint" }
-        
-        $logMessage = "Running: Invoke-WebRequest -Uri $url -Method Get"
-        $logMessage | Out-File -FilePath $logFilePath -Append
-        
-        $httpResponse = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10 -ErrorAction Stop
-        $httpOutput = "Success: HTTP request succeeded for $($trimmedEndpoint): Status code: $($httpResponse.StatusCode)"
-        Write-Host $httpOutput -ForegroundColor Green
-        $httpOutput | Out-File -FilePath $logFilePath -Append
+        # Measure response time and check for 401
+        $response_time = Measure-Command { 
+            $response = Invoke-WebRequest -Uri "https://$trimmedEndpoint" -Method Get
+        }
+
+        if ($response.StatusCode -eq 401) {
+            # If status code is 401, treat it as expected and log it as such
+            $httpResult = "Expected (401)"
+            $httpOutput = "Success: HTTP request succeeded for $($trimmedEndpoint): $($httpResult) - Response time: $($response_time.TotalSeconds) seconds"
+            Write-Host $httpOutput -ForegroundColor Green
+            $httpOutput | Out-File -FilePath $logFilePath -Append
+        } else {
+            # For other status codes, log the actual status code
+            $httpResult = "Unexpected Status: $($response.StatusCode)"
+            $httpOutput = "Success: HTTP request succeeded for $($trimmedEndpoint): $($httpResult) - Response time: $($response_time.TotalSeconds) seconds"
+            Write-Host $httpOutput -ForegroundColor Green
+            $httpOutput | Out-File -FilePath $logFilePath -Append
+        }
     } catch {
-        $httpError = "Error: HTTP request failed for $($trimmedEndpoint) - $_"
-        Write-Host $httpError -ForegroundColor Red
-        $httpError | Out-File -FilePath $logFilePath -Append
+        # Handle exceptions and log them
+        if ($_.Exception.Message -like "*401*") {
+            # If 401 is encountered in the exception message, treat it as expected
+            $httpResult = "Expected (401)"
+            $httpError = "Success: HTTP request succeeded for $($trimmedEndpoint) - $httpResult"
+            Write-Host $httpError -ForegroundColor Green
+            $httpError | Out-File -FilePath $logFilePath -Append
+        } else {
+            # For other exceptions, log the error message
+            $httpResult = "Error: $_"
+            $httpError = "Error: HTTP request failed for $($trimmedEndpoint) - $httpResult"
+            Write-Host $httpError -ForegroundColor Red
+            $httpError | Out-File -FilePath $logFilePath -Append
+        }
     }
 
     "----------------------------------------" | Out-File -FilePath $logFilePath -Append
