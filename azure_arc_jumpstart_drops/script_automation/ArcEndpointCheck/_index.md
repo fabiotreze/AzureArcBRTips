@@ -10,7 +10,7 @@ description: >
 
 This script was created to help identify connectivity issues with the Azure Arc Machine Agent and its endpoints. It tests the necessary URLs, validates Azure Arc functionality, and performs DNS resolution, network connectivity, and HTTP request checks, logging the results for review.
 
-### Prerequisites
+## Prerequisites
 
 - PowerShell
 - Network connectivity
@@ -33,7 +33,7 @@ Follow these steps to set up and use the script:
 
 ## Using the Script
 
-Execute the script from the server where the Azure Arc Agent will be installed. It's important to consider the environment, taking into account factors such as firewall, proxy, region, and whether the connection is public or private. Make necessary adjustments to the script based on these aspects. In one part of the script, it tests with `AzcmAgent.exe`; in this case, ensure that the Azure Arc Agent is already installed.
+Download the [ArcEndpointCheck.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/azure_arc_jumpstart_drops/script_automation/ArcEndpointCheck/ArcEndpointCheck.ps1) script and run it on the server where the Azure Arc Agent will be installed. When executing the script, keep in mind environmental factors such as firewall settings, proxy configuration, region, and whether the connection is public or private. Make the necessary adjustments in the script to account for these aspects. The script includes a check with `AzcmAgent.exe`, so ensure that the Azure Arc Agent is already installed on the server before running it.
 
 ## Contributions
 
