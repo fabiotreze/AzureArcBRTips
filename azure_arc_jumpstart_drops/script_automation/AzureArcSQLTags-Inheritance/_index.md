@@ -13,7 +13,7 @@ Ensure Azure Arc SQL Instances inherit tags from the associated Azure Arc VM, ad
 
 This repository contains the **Azure Arc SQL Instance - Tag Inheritance** script, designed to resolve **tag management inconsistencies** in scenarios with **SQL machines integrated with Azure Arc**.
 
-### Why Use This Script?  
+#### Why Use This Script?  
 By default, Azure Arc SQL Instances do not inherit tags from the associated Azure Arc VM, complicating resource management. This script ensures the tags from the VM are replicated to the SQL Instance, promoting better organization and consistency in your Azure environment.
 
 ## Deploying Artifacts
@@ -38,15 +38,15 @@ The script requires the following parameters:
 - **SubscriptionID**: The ID of the Azure subscription where the resources are registered.  
 - **tagName**: The name of the tag to be applied to the Azure Arc SQL Instance, based on the tags configured on the associated VM.  
 
-### What Does This Solve?  
+#### What Does This Solve?  
 These parameters ensure that the tags are properly synchronized between the Azure Arc resources and their related VMs, promoting more efficient and organized resource management.
 
-## Note
+#### Note
 Make sure your Automation Account and Azure resources are correctly configured before running the script.
 
-## Keywords for Search  
+#### Keywords for Search  
 `#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #Tags #AzureArcSQL #AzureArcBRTips`
 
-## Contributions
+### Contributions
 
 Contributions are welcome! Feel free to open an _issue_ or submit a _pull request_ to improve this repository.
