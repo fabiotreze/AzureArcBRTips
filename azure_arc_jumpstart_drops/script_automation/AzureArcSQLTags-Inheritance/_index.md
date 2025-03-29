@@ -1,4 +1,10 @@
-# Azure Arc SQL Instance - Tag Inheritance Script
+---
+type: docs
+title: "Azure Arc Connectivity Check"
+linkTitle: "Azure Arc Connectivity Check"
+weight: 1
+description: >
+---
 
 ## Overview  
 Ensure Azure Arc SQL Instances inherit tags from the associated Azure Arc VM, addressing the default behavior where SQL Instances do not replicate tags. This improves resource management and consistency in the Azure environment.
