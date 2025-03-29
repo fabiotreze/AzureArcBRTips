@@ -38,7 +38,7 @@ The script requires the following parameters:
 - **SubscriptionID**: The ID of the Azure subscription where the resources are registered.  
 - **tagName**: The name of the tag to be applied to the Azure Arc SQL Instance, based on the tags configured on the associated VM.  
 
-#### What Does This Solve?  
+## What Does This Solve?  
 These parameters ensure that the tags are properly synchronized between the Azure Arc resources and their related VMs, promoting more efficient and organized resource management.
 
 #### Note
