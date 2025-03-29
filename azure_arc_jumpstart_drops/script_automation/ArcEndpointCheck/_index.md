@@ -17,7 +17,7 @@ This script was created to help identify connectivity issues with the Azure Arc 
 
 ## Getting Started
 
-Follow these steps to set up and use the script:
+Download the [ArcEndpointCheck.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/azure_arc_jumpstart_drops/script_automation/ArcEndpointCheck/ArcEndpointCheck.ps1) and follow these steps to set up and use the script:
 
 1. **Define the Region**  
    Set the region for your Azure Arc deployment. For example:  
@@ -33,7 +33,7 @@ Follow these steps to set up and use the script:
 
 ## Using the Script
 
-Download the [ArcEndpointCheck.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/azure_arc_jumpstart_drops/script_automation/ArcEndpointCheck/ArcEndpointCheck.ps1) script and run it on the server where the Azure Arc Agent will be installed. When executing the script, keep in mind environmental factors such as firewall settings, proxy configuration, region, and whether the connection is public or private. Make the necessary adjustments in the script to account for these aspects. The script includes a check with `AzcmAgent.exe`, so ensure that the Azure Arc Agent is already installed on the server before running it.
+Execute the script on the server where the Azure Arc Agent will be installed. When running the script, keep in mind environmental factors such as firewall settings, proxy configuration, region, and whether the connection is public or private. Make the necessary adjustments in the script to account for these aspects. The script includes a check with `AzcmAgent.exe`, so ensure that the Azure Arc Agent is already installed on the server before running it.
 
 ## Contributions
 
