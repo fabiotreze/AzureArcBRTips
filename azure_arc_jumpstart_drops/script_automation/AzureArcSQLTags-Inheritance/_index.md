@@ -1,7 +1,7 @@
 ---
 type: docs
-title: "Azure Arc Connectivity Check"
-linkTitle: "Azure Arc Connectivity Check"
+title: "Azure Arc SQL Tags Inheritance"
+linkTitle: "Azure Arc SQL Tags Inheritance"
 weight: 1
 description: >
 ---
