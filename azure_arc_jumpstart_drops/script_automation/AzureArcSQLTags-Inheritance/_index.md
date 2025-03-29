@@ -3,7 +3,7 @@ type: docs
 title: "Azure Arc Connectivity Check"
 linkTitle: "Azure Arc Connectivity Check"
 weight: 1
-description: "This Drop provides a PowerShell script to check connectivity and DNS resolution of required Azure Arc endpoints. It tests static and dynamic endpoints, validates azcmagent.exe execution, and generates a log to help diagnose connectivity issues in hybrid environments.">
+description: >
 ---
 
 ## Overview  
