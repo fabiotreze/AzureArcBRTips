@@ -39,7 +39,7 @@ The script requires the following parameters:
 - **tagName**: The name of the tag to be applied to the Azure Arc SQL Instance, based on the tags configured on the associated VM.  
 
 #### What Does This Solve?
-These parameters ensure that the tags are properly synchronized between the Azure Arc resources and their related VMs, promoting more efficient and organized resource management.
+These parameters ensure that the tags are properly synchronized between the Azure Arc resources and their related VMs, promoting more efficient and organized resource management. 
 
 #### Note
 Make sure your Automation Account and Azure resources are correctly configured before running the script.
