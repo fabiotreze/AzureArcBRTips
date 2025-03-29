@@ -44,9 +44,6 @@ These parameters ensure that the tags are properly synchronized between the Azur
 #### Note
 Make sure your Automation Account and Azure resources are correctly configured before running the script.
 
-#### Keywords for Search  
-`#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #Tags #AzureArcSQL #AzureArcBRTips`
-
 ## Contributions
 
 Contributions are welcome! Feel free to open an _issue_ or submit a _pull request_ to improve this repository.
