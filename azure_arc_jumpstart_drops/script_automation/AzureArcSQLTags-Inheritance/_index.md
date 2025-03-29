@@ -23,11 +23,11 @@ The script **`AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** an
 
 ### Prerequisites
 
-#### Automation Account
+### Automation Account
 - The **Az.Account** and **Az.ResourceGraph** modules must be installed for the script to work correctly.  
 - A **managed identity** must be configured for the Automation Account, enabling secure access to the required resources in Azure.  
 
-#### Runbook
+### Runbook
 - A **schedule** for the **runbook** must be configured, ensuring the script runs automatically at predefined intervals.  
 
 ### Parameters
@@ -38,10 +38,10 @@ The script requires the following parameters:
 - **SubscriptionID**: The ID of the Azure subscription where the resources are registered.  
 - **tagName**: The name of the tag to be applied to the Azure Arc SQL Instance, based on the tags configured on the associated VM.  
 
-#### What Does This Solve?
+### What Does This Solve?
 These parameters ensure that the tags are properly synchronized between the Azure Arc resources and their related VMs, promoting more efficient and organized resource management. 
 
-#### Note
+### Note
 Make sure your Automation Account and Azure resources are correctly configured before running the script.
 
 ## Contributions
