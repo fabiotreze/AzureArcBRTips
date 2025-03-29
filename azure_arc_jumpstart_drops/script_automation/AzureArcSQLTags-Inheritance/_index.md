@@ -3,7 +3,7 @@ type: docs
 title: "Azure Arc Connectivity Check"
 linkTitle: "Azure Arc Connectivity Check"
 weight: 1
-description: >
+description: "This Drop provides a PowerShell script to check connectivity and DNS resolution of required Azure Arc endpoints. It tests static and dynamic endpoints, validates azcmagent.exe execution, and generates a log to help diagnose connectivity issues in hybrid environments.">
 ---
 
 ## Overview  
@@ -18,8 +18,8 @@ By default, Azure Arc SQL Instances do not inherit tags from the associated Azur
 
 ## Deploying Artifacts
 
-The script **`lab7_AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
-[lab7_AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/azure_arc_jumpstart_drops/script_automation/AzureArcSQLTags-Inheritance/AzureArcSQLTags-Inheritance.ps1).
+The script **`AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
+[AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/azure_arc_jumpstart_drops/script_automation/AzureArcSQLTags-Inheritance/AzureArcSQLTags-Inheritance.ps1).
 
 ## Prerequisites
 
