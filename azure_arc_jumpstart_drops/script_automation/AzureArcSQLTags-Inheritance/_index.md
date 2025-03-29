@@ -13,7 +13,7 @@ Ensure Azure Arc SQL Instances inherit tags from the associated Azure Arc VM, ad
 
 This repository contains the **Azure Arc SQL Instance - Tag Inheritance** script, designed to resolve **tag management inconsistencies** in scenarios with **SQL machines integrated with Azure Arc**.
 
-#### Why Use This Script?  
+### Why Use This Script?  
 By default, Azure Arc SQL Instances do not inherit tags from the associated Azure Arc VM, complicating resource management. This script ensures the tags from the VM are replicated to the SQL Instance, promoting better organization and consistency in your Azure environment.
 
 ## Deploying Artifacts
@@ -21,16 +21,16 @@ By default, Azure Arc SQL Instances do not inherit tags from the associated Azur
 The script **`AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
 [AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/azure_arc_jumpstart_drops/script_automation/AzureArcSQLTags-Inheritance/AzureArcSQLTags-Inheritance.ps1).
 
-## Prerequisites
+### Prerequisites
 
-### Automation Account
+#### Automation Account
 - The **Az.Account** and **Az.ResourceGraph** modules must be installed for the script to work correctly.  
 - A **managed identity** must be configured for the Automation Account, enabling secure access to the required resources in Azure.  
 
-### Runbook
+#### Runbook
 - A **schedule** for the **runbook** must be configured, ensuring the script runs automatically at predefined intervals.  
 
-## Parameters
+### Parameters
 
 The script requires the following parameters:
 
@@ -47,6 +47,6 @@ Make sure your Automation Account and Azure resources are correctly configured b
 #### Keywords for Search  
 `#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #Tags #AzureArcSQL #AzureArcBRTips`
 
-### Contributions
+## Contributions
 
 Contributions are welcome! Feel free to open an _issue_ or submit a _pull request_ to improve this repository.
