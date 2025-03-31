@@ -15,6 +15,7 @@ The documents are organized according to the topics and labs to which they belon
 - **lab5**: Azure Arc Dashboard Under Construction.
 - **lab6**: Identifying Certificates Near Expiration with Azure Arc.
 - **lab7**: Tag Inheritance Script for SQL Instances in Azure Arc.
+- **lab8**: Windows Server Management Enabled by Azure Arc.
 
 ### Links 
 
