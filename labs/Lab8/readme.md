@@ -13,14 +13,14 @@ This repository contains the **Azure Arc Windows SA Script**, designed to facili
 By default, when onboarding Windows to Azure Arc, the Windows SA Benefit is not enabled automatically.
 
 The script **`lab8_AzureArcWindowsSAScript.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
-[lab8_AzureArcWindowsSAScript.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab8_AzureArcWindowsSAScript.ps1).  **Recommended**
+[lab8_AzureArcWindowsSAScript.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/lab8_AzureArcWindowsSAScript.ps1).  **Recommended**
 
 ---
 
 If you prefer to perform the process manually, I have also provided a PowerShell script.
 
 The script **`lab8_AzureArcWindowsSAScriptPSManual.ps1`** can be used in a **command line** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
-[lab8_AzureArcWindowsSAScriptPSManual.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab8_AzureArcWindowsSAScriptPSManual.ps1).  
+[lab8_AzureArcWindowsSAScriptPSManual.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/lab8_AzureArcWindowsSAScriptPSManual.ps1).  
 
 ---
 
