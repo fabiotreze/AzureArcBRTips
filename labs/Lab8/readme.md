@@ -19,8 +19,8 @@ The script **`lab8_AzureArcWindowsSAScript.ps1`** can be used in a **runbook** a
 
 If you prefer to perform the process manually, I have also provided a PowerShell script.
 
-The script **`lab8_AzureArcWindowsSAScriptManual.ps1`** can be used in a **command line** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
-[lab8_AzureArcWindowsSAScriptManual.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab8_AzureArcWindowsSAScriptManual.ps1).  
+The script **`lab8_AzureArcWindowsSAScriptPSManual.ps1`** can be used in a **command line** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
+[lab8_AzureArcWindowsSAScriptPSManual.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab8_AzureArcWindowsSAScriptPSManual.ps1).  
 
 ---
 
