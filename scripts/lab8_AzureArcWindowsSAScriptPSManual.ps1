@@ -1,17 +1,19 @@
-# Definir variáveis iniciais
-$subscriptionId = 'YourSubscriptionID' # Seu ID da assinatura
-$location = "BrazilSouth" # Região onde as máquinas estão registradas no Azure Arc
+# Define initial variables
+$subscriptionId = 'YourSubscriptionID' # Enter your Subscription ID
+$resourceGroupName = 'YourResourceGroupName' # Enter your Resource Group for Azure Arc resources
+$location = "BrazilSouth" # Enter your Location for Azure Arc resources
 
-# Conectar ao Azure
+# Connect to Azure
 $account = Connect-AzAccount
 $context = Set-AzContext -Subscription $subscriptionId
 
-# Buscar lista de máquinas não ativadas no Azure Resource Graph
+# Retrieve a list of non-activated machines from Azure Resource Graph
 $query = @"
 resources
 | where type =~ "microsoft.hybridcompute/machines"
 | extend status = properties.status
 | extend operatingSystem = properties.osSku
+| extend locationDisplayName = location
 | where properties.osType =~ 'windows'
 | extend licenseProfile = coalesce(properties.licenseProfile, properties.licenseProfileStorage.properties)
 | extend licenseStatus = tostring(licenseProfile.licenseStatus)
@@ -27,25 +29,28 @@ resources
 | where (benefitsStatus =~ 'Not activated')
 | where (operatingSystem !~ ('windows 11 enterprise'))
 | where (type in~ ('Microsoft.HybridCompute/machinesSoftwareAssurance','Microsoft.HybridCompute/machines'))
+| where subscriptionId == "$subscriptionId"  // Filter by provided subscriptionId
+| where resourceGroup =~ "$resourceGroupName"  // Filter by provided resourceGroupName
+| where location =~ "$location"  // Filter by provided location
 | project name, resourceGroup, subscriptionId, operatingSystem, location
 "@
 
-Write-Host "Executando consulta no Azure Resource Graph..."
+Write-Host "Executing query in Azure Resource Graph..."
 $result = Search-AzGraph -Query $query
 
-# Garantir que os resultados sejam armazenados como um array
+# Ensure results are stored as an array
 $machines = @()
 if ($result) {
     $machines = $result
 }
 
-# Verificar se há máquinas retornadas
+# Check if any machines were returned
 if ($machines.Count -eq 0) {
-    Write-Host "Nenhuma máquina não ativada encontrada!"
+    Write-Host "No non-activated machines found!"
     exit
 }
 
-# Obter token de autenticação para a API REST
+# Obtain authentication token for the REST API
 $profile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
 $profileClient = [Microsoft.Azure.Commands.ResourceManager.Common.rmProfileClient]::new($profile)
 $token = $profileClient.AcquireAccessToken($context.Subscription.TenantId)
@@ -55,18 +60,18 @@ $header = @{
     'Authorization' = 'Bearer ' + $token.AccessToken
 }
 
-# Loop para processar cada máquina
+# Loop to process each machine
 foreach ($machine in $machines) {
     $machineName = $machine.name
     $resourceGroupName = $machine.resourceGroup
     $subscriptionId = $machine.subscriptionId
 
-    Write-Host "`n🔹 Processando máquina: $machineName (RG: $resourceGroupName, Subscription: $subscriptionId)"
+    Write-Host "`n🔹 Processing machine: $machineName (RG: $resourceGroupName, Subscription: $subscriptionId)"
 
-    # Definir URI para a API REST
+    # Define URI for the REST API
     $uri = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.HybridCompute/machines/$machineName/licenseProfiles/default?api-version=2023-10-03-preview"
 
-    # Criar payload JSON
+    # Create JSON payload
     $data = @{
         location = $machine.location
         properties = @{
@@ -78,15 +83,15 @@ foreach ($machine in $machines) {
     
     $json = $data | ConvertTo-Json -Depth 3
 
-    # Executar chamada REST
+    # Execute REST API call
     try {
         $response = Invoke-RestMethod -Method PUT -Uri $uri -ContentType "application/json" -Headers $header -Body $json
-        Write-Host "✅ Máquina $machineName processada com sucesso!"
-        Write-Host "Resposta da API: $($response.properties | ConvertTo-Json -Depth 3)"
+        Write-Host "✅ Machine $machineName processed successfully!"
+        Write-Host "API Response: $($response.properties | ConvertTo-Json -Depth 3)"
     }
     catch {
-        Write-Host "⚠️ Erro ao processar a máquina `${machineName}`: $_"
+        Write-Host "⚠️ Error processing machine `${machineName}`: $_"
     }
 }
 
-Write-Host "`n✅ Script finalizado!"
+Write-Host "`n✅ Script completed!"
