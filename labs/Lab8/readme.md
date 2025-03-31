@@ -15,6 +15,8 @@ By default, when onboarding Windows to Azure Arc, the Windows SA Benefit is not 
 The script **`lab8_AzureArcWindowsSAScript.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
 [lab8_AzureArcWindowsSAScript.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/lab8_AzureArcWindowsSAScript.ps1).  **Recommended**
 
+RBAC required Azure Connected Machine Resource Administrator and Reader in Subscription Level
+
 ---
 
 If you prefer to perform the process manually, I have also provided a PowerShell script.

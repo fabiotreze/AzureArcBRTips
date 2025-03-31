@@ -12,7 +12,7 @@ param(
     [string]$location         # Enter your Location for Azure Arc resources
 )
 
-# Authenticate to Azure using Managed Identity - RBAC required Azure Connected Machine Resource Administrator
+# Authenticate to Azure using Managed Identity - RBAC required Azure Connected Machine Resource Administrator and Reader in Subscription Level
 try {
     Write-Host "Logging in to Azure..."
     Connect-AzAccount -Identity -ErrorAction Stop
