@@ -15,4 +15,4 @@ The dashboard is fully **customizable** to meet the **specific needs** of your d
 - **Layout Customization**: Modify the structure of the dashboard to align with your team's preferences.
 - **Feature Adjustment**: Add or remove features to focus on the most relevant information.
 
-**Dashboard Link**: [AzureArcBRTips](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/dashboards/lab5_Azure%20Arc%20Demo.json)
+**Dashboard Link**: [AzureArcBRTips](https://github.com/fabiotreze/AzureArcBRTips/blob/main/dashboards/lab5_Azure%20Arc%20Demo.json)

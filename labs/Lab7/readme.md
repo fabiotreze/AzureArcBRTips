@@ -12,7 +12,7 @@ By default, Azure Arc SQL Instances do not inherit tags from the associated Azur
 
 
 The script **`lab7_AzureArcSQLTags-Inheritance.ps1`** can be used in a **runbook** and is available in the **scripts** folder of this repository. You can access it directly at the following link:  
-[lab7_AzureArcSQLTags-Inheritance.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab7_AzureArcSQLTags-Inheritance.ps1).  
+[lab7_AzureArcSQLTags-Inheritance.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/lab7_AzureArcSQLTags-Inheritance.ps1).  
 
 ---
 

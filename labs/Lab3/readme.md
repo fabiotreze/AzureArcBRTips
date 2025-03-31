@@ -27,7 +27,7 @@ The repository below can be used as a reference for creating new resources, allo
 ---
 
 ## 3 - To create the MOF file, refer to the official Microsoft document on how to create a custom package.
-Save and run the file [lab3_sample7zip.ps1](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/scripts/lab3_sample7zip.ps1). This will generate the **localhost.mof** file.
+Save and run the file [lab3_sample7zip.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/lab3_sample7zip.ps1). This will generate the **localhost.mof** file.
 
 ## 4 - To create the ZIP file, refer to the official Microsoft document on how to create a custom package and use the previously generated .MOF file.
 
