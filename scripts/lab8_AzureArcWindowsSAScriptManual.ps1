@@ -1,36 +1,12 @@
-# Required versions of Az.Accounts and Az.ResourceGraph modules are installed
+# Definir variáveis iniciais
+$subscriptionId = 'YourSubscriptionID' # Seu ID da assinatura
+$location = "BrazilSouth" # Região onde as máquinas estão registradas no Azure Arc
 
-# Define the required parameters
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$subscriptionId,  # Enter your Subscription ID
+# Conectar ao Azure
+$account = Connect-AzAccount
+$context = Set-AzContext -Subscription $subscriptionId
 
-    [Parameter(Mandatory=$true)]
-    [string]$location         # Enter your Location for Azure Arc resources
-)
-
-# Authenticate to Azure using Managed Identity - RBAC required Azure Connected Machine Resource Administrator
-try {
-    Write-Host "Logging in to Azure..."
-    Connect-AzAccount -Identity -ErrorAction Stop
-}
-catch {
-    Write-Error -Message $_.Exception
-    throw $_.Exception
-}
-
-# Validate the provided subscription
-$subscription = Get-AzSubscription -SubscriptionId $subscriptionId -ErrorAction SilentlyContinue
-if (-not $subscription) {
-    Write-Host "Subscription ID $subscriptionId not found! Ensure you have access."
-    exit
-}
-
-# Set the execution context to the provided Subscription ID
-Write-Host "Setting execution context to Subscription ID: $subscriptionId"
-Set-AzContext -SubscriptionId $subscriptionId | Out-Null
-
-# Query Azure Resource Graph to get the list of machines
+# Buscar lista de máquinas não ativadas no Azure Resource Graph
 $query = @"
 resources
 | where type =~ "microsoft.hybridcompute/machines"
@@ -51,49 +27,46 @@ resources
 | where (benefitsStatus =~ 'Not activated')
 | where (operatingSystem !~ ('windows 11 enterprise'))
 | where (type in~ ('Microsoft.HybridCompute/machinesSoftwareAssurance','Microsoft.HybridCompute/machines'))
-| where subscriptionId == "$subscriptionId"  // Filter by provided subscriptionId
 | project name, resourceGroup, subscriptionId, operatingSystem, location
 "@
 
-#$query
-
-Write-Host "Executing query in Azure Resource Graph..."
+Write-Host "Executando consulta no Azure Resource Graph..."
 $result = Search-AzGraph -Query $query
 
-# Ensure the results are stored as an array
+# Garantir que os resultados sejam armazenados como um array
 $machines = @()
 if ($result) {
     $machines = $result
 }
 
-# Check if any machines were returned
+# Verificar se há máquinas retornadas
 if ($machines.Count -eq 0) {
-    Write-Host "No unactivated machines found!"
+    Write-Host "Nenhuma máquina não ativada encontrada!"
     exit
 }
 
-#$machines.name
+# Obter token de autenticação para a API REST
+$profile = [Microsoft.Azure.Commands.Common.Authentication.Abstractions.AzureRmProfileProvider]::Instance.Profile
+$profileClient = [Microsoft.Azure.Commands.ResourceManager.Common.rmProfileClient]::new($profile)
+$token = $profileClient.AcquireAccessToken($context.Subscription.TenantId)
 
-# Loop through each machine to process
+$header = @{
+    'Content-Type'  = 'application/json'
+    'Authorization' = 'Bearer ' + $token.AccessToken
+}
+
+# Loop para processar cada máquina
 foreach ($machine in $machines) {
     $machineName = $machine.name
     $resourceGroupName = $machine.resourceGroup
-    $machineSubscriptionId = $machine.subscriptionId
+    $subscriptionId = $machine.subscriptionId
 
-    Write-Host "`n🔹 Processing machine: $machineName (RG: $resourceGroupName, Subscription: $machineSubscriptionId)"
+    Write-Host "`n🔹 Processando máquina: $machineName (RG: $resourceGroupName, Subscription: $subscriptionId)"
 
-    # Define URI for the REST API
-    $uri = "https://management.azure.com/subscriptions/$machineSubscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.HybridCompute/machines/$machineName/licenseProfiles/default?api-version=2023-10-03-preview"
+    # Definir URI para a API REST
+    $uri = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.HybridCompute/machines/$machineName/licenseProfiles/default?api-version=2023-10-03-preview"
 
-    # Get the authentication token using Managed Identity
-    $token = (Get-AzAccessToken -ResourceUrl "https://management.azure.com").Token
-
-    $header = @{
-        'Content-Type'  = 'application/json'
-        'Authorization' = 'Bearer ' + $token
-    }
-
-    # Create the JSON payload
+    # Criar payload JSON
     $data = @{
         location = $machine.location
         properties = @{
@@ -102,19 +75,18 @@ foreach ($machine in $machines) {
             }
         }
     }
-
+    
     $json = $data | ConvertTo-Json -Depth 3
 
-    # Execute the REST API call
+    # Executar chamada REST
     try {
         $response = Invoke-RestMethod -Method PUT -Uri $uri -ContentType "application/json" -Headers $header -Body $json
-        Write-Host "Machine $machineName processed successfully!"
-        Write-Host "API Response: $($response.properties | ConvertTo-Json -Depth 3)"
+        Write-Host "✅ Máquina $machineName processada com sucesso!"
+        Write-Host "Resposta da API: $($response.properties | ConvertTo-Json -Depth 3)"
     }
     catch {
-        Write-Host "Error processing machine ${machineName}: $_"
+        Write-Host "⚠️ Erro ao processar a máquina `${machineName}`: $_"
     }
 }
 
-Write-Host "`nScript completed!"
- 
+Write-Host "`n✅ Script finalizado!"
