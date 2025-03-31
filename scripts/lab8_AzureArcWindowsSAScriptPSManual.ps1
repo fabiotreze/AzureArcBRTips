@@ -1,7 +1,7 @@
 # Define initial variables
 $subscriptionId = 'YourSubscriptionID' # Enter your Subscription ID
 $resourceGroupName = 'YourResourceGroupName' # Enter your Resource Group for Azure Arc resources
-$location = "BrazilSouth" # Enter your Location for Azure Arc resources
+$location = "YourLocation" # Enter your Location for Azure Arc resources
 
 # Connect to Azure
 $account = Connect-AzAccount
