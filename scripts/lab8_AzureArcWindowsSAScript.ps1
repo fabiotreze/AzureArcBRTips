@@ -6,6 +6,9 @@ param(
     [string]$subscriptionId,  # Enter your Subscription ID
 
     [Parameter(Mandatory=$true)]
+    [string]$resourceGroupName, # Enter your Resource Group for Azure Arc resources
+
+    [Parameter(Mandatory=$true)]
     [string]$location         # Enter your Location for Azure Arc resources
 )
 
@@ -36,6 +39,7 @@ resources
 | where type =~ "microsoft.hybridcompute/machines"
 | extend status = properties.status
 | extend operatingSystem = properties.osSku
+| extend locationDisplayName = location
 | where properties.osType =~ 'windows'
 | extend licenseProfile = coalesce(properties.licenseProfile, properties.licenseProfileStorage.properties)
 | extend licenseStatus = tostring(licenseProfile.licenseStatus)
@@ -52,6 +56,8 @@ resources
 | where (operatingSystem !~ ('windows 11 enterprise'))
 | where (type in~ ('Microsoft.HybridCompute/machinesSoftwareAssurance','Microsoft.HybridCompute/machines'))
 | where subscriptionId == "$subscriptionId"  // Filter by provided subscriptionId
+| where resourceGroup =~ "$resourceGroupName"  // Filter by provided resourceGroupName
+| where location =~ "$location"  // Filter by provided location
 | project name, resourceGroup, subscriptionId, operatingSystem, location
 "@
 
@@ -119,4 +125,5 @@ foreach ($machine in $machines) {
     }
 }
 
-Write-Host "`nScript completed!" 
+Write-Host "`nScript completed!"
+ 
