@@ -17,10 +17,9 @@
 ### Examples for the same file:
 
 ### **Windows**
-- [Windows_CS_ParameteresInstall7zip09]([https://www.7-zip.org/a/7z2409-x64.exe](https://github.com/fabiotreze/AzureArcBRTips/blob/main/templates/lab2_Windows_CS_ParameteresInstall7zip09.json
-)) - Using the provider's repository  
-- [Windows_CS_ParameteresInstall7zip]([https://arcboxapps.blob.core.windows.net/apps/7z2408-x64.exe](https://github.com/fabiotreze/AzureArcBRTips/blob/main/templates/lab2_Windows_CS_ParameteresInstall7zip.json
-)) - Using my Storage Account. **Access may not be available here; this is just an illustrative example. :-)**
+- [Windows_CS_ParameteresInstall7zip09](https://github.com/fabiotreze/AzureArcBRTips/blob/main/templates/lab2_Windows_CS_ParameteresInstall7zip09.json) - Using the provider's repository  
+- [Windows_CS_ParameteresInstall7zip](https://github.com/fabiotreze/AzureArcBRTips/blob/main/templates/lab2_Windows_CS_ParameteresInstall7zip.json
+) - Using my Storage Account. **Access may not be available here; this is just an illustrative example. :-)**
 
 ### **Linux**
 - [custom_script_linux_v1.sh](https://github.com/fabiotreze/AzureArcBRTips/blob/main/templates/lab2_custom_script_linux_v1.sh) - Using the provider's repository  
