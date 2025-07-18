@@ -1,0 +1,411 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 21,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "<td style=\"background-color:#2D2D2D; color:#FFFFFF; padding:20px; border-radius:10px;\">\n  <div style=\"line-height:1.5; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; position:relative;\">\n    <a href=\"/html/classic/index.shtm\" tabindex=\"-1\" style=\"position:absolute; top:10px; right:10px;\">\n      <div style=\"width:168px; height:38px; background-color:#8B0000; padding:5px; display:inline-block; border-radius:5px;\">\n        <img src=\"https://banco.bradesco/assets/classic/home/images/logo-mobile.png\" style=\"width:100%; height:auto; display:block;\" alt=\"Logo Bradesco\">\n      </div>\n    </a>\n    <span style=\"font-size:32px; font-weight:bold; color:#000000; display:block; margin-bottom:10px;\">Azure Arc Demo</span>\n    <span style=\"font-size:14px; font-weight:normal; color:#000000; display:block;\">Dashboard with information and status of installed Azure Arc agents.</span>\n    <br>\n    <span style=\"font-size:14px; color:#000000; font-weight:bold;\">&#x1F517;</span>\n    <a href=\"http://aka.ms/azurearc\" style=\"color:#1E90FF; text-decoration:none; font-weight:bold;\">Azure Arc Documentation</a>\n    <br><br>\n    <a href=\"https://www.microsoft.com\" tabindex=\"-1\" style=\"position:absolute; top:50px; right:10px;\">\n      <div style=\"width:168px; height:38px; padding:5px; display:inline-block; border-radius:5px;\">\n        <img src=\"https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/UHFbanner-MSlogo?fmt=png-alpha&bfc=off&qlt=100,1\" alt=\"Microsoft logo\" style=\"width:100%; height:auto; display:block;\">\n      </div>\n    </a>\n    <div style=\"position:absolute; bottom:10px; right:10px; font-size:14px; color:#000000; font-weight:normal; direction:rtl;\">\n      <span>Provided by</span> <span style=\"font-weight:bold;\">CSA</span>\n    </div>\n  </div>\n</td>",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 2,
+              "colSpan": 7,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Total Certificates Count (including duplicates)\r\n// Counts all certificate thumbprints across all machines\r\nGuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| where name == 'CertificateExpiration'\r\n| extend \r\n    resources = iif(isnull(properties.latestAssignmentReport.resources), dynamic([{}]), properties.latestAssignmentReport.resources)\r\n| mvexpand resources\r\n| extend reasons = iif(isnull(resources.reasons), dynamic([{}]), resources.reasons)\r\n| mvexpand reasons\r\n| extend thumbprint = extract(\"thumbprint '([^']*)'\", 1, tostring(reasons.phrase))\r\n| where isnotempty(thumbprint)\r\n| project thumbprint\r\n| summarize total_certificates = count()\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Total Certificates Count (including duplicates)",
+                "subtitle": "Counts all certificate thumbprints across all machines"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 7,
+              "y": 2,
+              "colSpan": 7,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Machine Count by Resource Category\r\n// Counts distinct machines grouped by resource type\r\nGuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| extend vmIdParts = split(properties.targetResourceId, '/')\r\n| mvexpand properties.latestAssignmentReport.resources\r\n| where properties_latestAssignmentReport_resources.resourceId != 'Invalid assignment package.'\r\n| project MachineName = tostring(vmIdParts[-1]), ResourceType = tostring(vmIdParts[-3])\r\n| distinct MachineName, ResourceType\r\n| extend ResourceCategory = case(\r\n    ResourceType == \"Microsoft.Compute\", \"Azure Virtual Machines\",\r\n    ResourceType == \"Microsoft.HybridCompute\", \"Azure Arc Enabled-Servers\",\r\n    ResourceType\r\n)\r\n| summarize TotalMachines = count() by ResourceCategory\r\n| order by TotalMachines desc\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Machine Count by Resource Type",
+                "subtitle": "Counts distinct machines grouped by resource type"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 2,
+              "colSpan": 7,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Compliance Status Overview"
+                },
+                {
+                  "name": "chartType",
+                  "value": 2
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Certificate Compliance Status Summary\n// Counts total assignments by compliance status\nGuestConfigurationResources\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\n| extend vmid = tostring(split(properties.targetResourceId, '/')[(-1)]),\n         status = tostring(properties.complianceStatus)\n| where name == 'CertificateExpiration'\n| summarize total = count() by status"
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Certificate Compliance Status Summary",
+                "subtitle": "Counts total assignments by compliance status"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "colSpan": 7,
+              "rowSpan": 3
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Unique Certificates Count (no duplicates)\r\n// Counts distinct certificate thumbprints across all machines\r\nGuestConfigurationResources\r\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\r\n| where name == 'CertificateExpiration'\r\n| extend \r\n    resources = iif(isnull(properties.latestAssignmentReport.resources), dynamic([{}]), properties.latestAssignmentReport.resources)\r\n| mvexpand resources\r\n| extend reasons = iif(isnull(resources.reasons), dynamic([{}]), resources.reasons)\r\n| mvexpand reasons\r\n| extend thumbprint = extract(\"thumbprint '([^']*)'\", 1, tostring(reasons.phrase))\r\n| where isnotempty(thumbprint)\r\n| project thumbprint\r\n| summarize total_certificates = dcount(thumbprint)\r\n",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {
+                "content": {}
+              },
+              "partHeader": {
+                "title": "Unique Certificates Count (no duplicates)",
+                "subtitle": "Counts distinct certificate thumbprints across all machines"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 8,
+              "colSpan": 21,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Top 10 VMs with Expired Certificates"
+                },
+                {
+                  "name": "chartType",
+                  "value": 1
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// Top 10 VMs with Most NonCompliant Certificates\n// Lists machines with the highest count of noncompliant certificates\nGuestConfigurationResources\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\n| extend vmid = tostring(split(properties.targetResourceId, '/')[(-1)]),\n         status = tostring(properties.complianceStatus),\n         resources = iif(isnull(properties.latestAssignmentReport.resources), dynamic([{}]), properties.latestAssignmentReport.resources)\n| mvexpand resources\n| extend reasons = iif(isnull(resources.reasons), dynamic([{}]), resources.reasons)\n| mvexpand reasons\n| where name == 'CertificateExpiration' and status == 'NonCompliant'\n| summarize expirando = count() by vmid\n| top 10 by expirando desc"
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Top 10 VMs with Most NonCompliant Certificates",
+                "subtitle": "Lists machines with the highest count of noncompliant certificates"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 13,
+              "colSpan": 21,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Expired Certificates Details"
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// NonCompliant Certificate Details by VM\n// Lists noncompliant certificates with thumbprint, name, and expiration per machine\nGuestConfigurationResources\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\n| extend vmid = tostring(split(properties.targetResourceId, '/')[(-1)]),\n         status = tostring(properties.complianceStatus),\n         resources = iif(isnull(properties.latestAssignmentReport.resources), dynamic([{}]), properties.latestAssignmentReport.resources)\n| mvexpand resources\n| extend reasons = iif(isnull(resources.reasons), dynamic([{}]), resources.reasons)\n| mvexpand reasons\n| where name == 'CertificateExpiration' and status == 'NonCompliant'\n| extend\n    thumbprint = extract(\"thumbprint '([^']*)'\", 1, tostring(reasons.phrase)),\n    friendlyName = extract(\"friendly name '([^']*)'\", 1, tostring(reasons.phrase)),\n    expirationDate = extract(\"expiring after '([^']*)'\", 1, tostring(reasons.phrase)),\n    resourceId = tostring(resources.resourceId)\n| project vmid, resourceId, thumbprint, friendlyName, expirationDate\n| order by vmid asc, expirationDate asc"
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "NonCompliant Certificate Details by VM",
+                "subtitle": "Lists noncompliant certificates with thumbprint, name, and expiration per machine"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 18,
+              "colSpan": 21,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Certificates Expired Over 90 Days"
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "// NonCompliant Certificates Expiring Soon or Expired\n// Lists noncompliant certificates grouped by expiration range and metadata per VM\nGuestConfigurationResources\n| where type =~ 'microsoft.guestconfiguration/guestconfigurationassignments'\n| where name == 'CertificateExpiration'\n| extend \n    vmid = tostring(split(properties.targetResourceId, '/')[(-1)]),\n    status = tostring(properties.complianceStatus),\n    resources = iif(isnull(properties.latestAssignmentReport.resources), dynamic([{}]), properties.latestAssignmentReport.resources)\n| where status == 'NonCompliant'\n| mvexpand resources\n| extend reasons = iif(isnull(resources.reasons), dynamic([{}]), resources.reasons)\n| mvexpand reasons\n| extend \n    thumbprint = extract(\"thumbprint '([^']*)'\", 1, tostring(reasons.phrase)),\n    friendlyName = extract(\"friendly name '([^']*)'\", 1, tostring(reasons.phrase)),\n    expirationDateStr = extract(\"expiring after '([^']*)'\", 1, tostring(reasons.phrase)),\n    maxDays = extract(\"within the specified '([^']*)'\", 1, tostring(reasons.phrase)),\n    reasonCode = tostring(reasons.code),\n    resourceId = tostring(resources.resourceId)\n| where isnotempty(expirationDateStr)\n| extend expirationDate = todatetime(expirationDateStr)\n| extend diasRestantes = datetime_diff(\"day\", expirationDate, now(-3h))\n| extend faixaExpiracao = case(\n    diasRestantes < 0, \"Expirado\",\n    diasRestantes <= 30, \"0–30 dias\",\n    diasRestantes <= 60, \"31–60 dias\",\n    diasRestantes <= 90, \"61–90 dias\",\n    \"Mais de 90 dias\"\n)\n| project vmid, thumbprint, friendlyName, expirationDate, diasRestantes, faixaExpiracao, reasonCode, resourceId\n| order by expirationDate asc"
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "NonCompliant Certificates Expiring Soon or Expired",
+                "subtitle": "Lists noncompliant certificates with expiration date, days remaining, and metadata per VM"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        }
+      }
+    }
+  },
+  "name": "Arc Demo - Certificates v2",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Arc Demo - Certificates v2"
+  },
+  "apiVersion": "2022-12-01-preview"
+}
