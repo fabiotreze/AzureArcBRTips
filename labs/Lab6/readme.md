@@ -35,6 +35,9 @@ GuestConfigurationResources
 
 For more query options, refer to [azure-policy-guest-configuration](https://learn.microsoft.com/en-us/azure/governance/policy/samples/resource-graph-samples?tabs=azure-cli#azure-policy-guest-configuration)
 
+## Sample certificate dashboard
+Dashboard Link: [AzureArcBRTips](https://github.com/fabiotreze/AzureArcBRTips/blob/main/dashboards/lab6_Arc%20Demo%20-%20Certificates.json)
+
 ## Keywords for Search  
 
 `#AzureArc #Microsoft #Azure #HybridCompute #HybridCloud #Cloud #AzureMonitor #AzurePolicy #Certificate #AzureArcBRTips`
