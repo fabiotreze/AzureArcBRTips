@@ -1,8 +1,6 @@
 ## Azure Arc – Agent Upgrade Monitoring via Logic App
 
-## Overview
-
-This Logic App identifies Azure Arc-enabled machines that have the `agentUpgrade.enableAutomaticUpgrade` property set to **false**, indicating that automatic agent upgrades are disabled. It runs on a weekly schedule and sends an HTML report via email to a designated recipient.
+![Azure Arc Agent Upgrade Monitoring](https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/refs/heads/main/images/lab9_AzureArcAgentUpgradeMonitoringtifies Azure Arc-enabled machines that have the `agentUpgrade.enableAutomaticUpgrade` property set to **false**, indicating that automatic agent upgrades are disabled. It runs on a weekly schedule and sends an HTML report via email to a designated recipient.
 
 The Logic App definition **`lab9_AzureArcAgentUpgradeMonitoring.json`** can be used in an **automation workflow** and is available in the **templates** folder of this repository. You can access it directly at the following link:  
 https://github.com/fabiotreze/AzureArcBRTips/blob/main/templates/lab9_AzureArcAgentUpgradeMonitoring.json.  **Recommended**
