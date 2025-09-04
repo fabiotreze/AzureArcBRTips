@@ -1,0 +1,421 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "contentVersion": "1.0.0.0",
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "frequency": "Week",
+                    "interval": 1,
+                    "timeZone": "E. South America Standard Time"
+                },
+                "evaluatedRecurrence": {
+                    "frequency": "Week",
+                    "interval": 1,
+                    "timeZone": "E. South America Standard Time"
+                },
+                "type": "Recurrence"
+            }
+        },
+        "actions": {
+            "For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": {
+                "foreach": "@body('Parse_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')?['data']",
+                "actions": {
+                    "Set_AzureArc_URI": {
+                        "type": "SetVariable",
+                        "inputs": {
+                            "name": "AzureArcURI",
+                            "value": "@concat('https://portal.azure.com/#@',items('For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')?['tenantId'],'/resource',items('For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')?['id'])"
+                        }
+                    },
+                    "Compose_AzureArc": {
+                        "runAfter": {
+                            "Set_AzureArc_URI": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "Compose",
+                        "inputs": "@variables('AzureArcURI')"
+                    },
+                    "Append_to_AzureArc_HTML": {
+                        "runAfter": {
+                            "Compose_AzureArc": [
+                                "Succeeded"
+                            ]
+                        },
+                        "type": "AppendToStringVariable",
+                        "inputs": {
+                            "name": "AzureArcHTML",
+                            "value": "  <tr>\n    <td style=\"padding: 8px;\"><a href=\"@{outputs('Compose_AzureArc')}\">@{items('For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')?['name']}</a></td>\n    <td style=\"padding: 8px;\">@{items('For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')?['resourceGroup']}</td>\n    <td style=\"padding: 8px;\"><a href=\"@{outputs('Compose_AzureArc')}\">@{items('For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')?['subscriptionName']}</a></td>\n  </tr>"
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Condition_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach",
+                "runtimeConfiguration": {
+                    "concurrency": {
+                        "repetitions": 1
+                    }
+                }
+            },
+            "Get_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": {
+                "runAfter": {
+                    "Initialize_resources_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Http",
+                "inputs": {
+                    "uri": "https://management.azure.com///providers/Microsoft.ResourceGraph/resources?api-version=2021-03-01",
+                    "method": "POST",
+                    "body": {
+                        "query": "@{variables('resourcesTable')}\n| where type =~ \"Microsoft.HybridCompute/machines\"\n| extend osName = tostring(properties.osName),\n         osVersion = tostring(properties.osVersion),\n         status = tostring(properties.status),\n         agentVersion = tostring(properties.agentVersion),\n         enableAutomaticUpgrade = tostring(properties.agentUpgrade.enableAutomaticUpgrade)\n| where enableAutomaticUpgrade == 'false'\n| project id, name, resourceGroup, subscriptionId, location,\n          osName, osVersion, status, agentVersion, enableAutomaticUpgrade\n| join kind=leftouter (\n    resourcecontainers\n    | where type == \"microsoft.resources/subscriptions\"\n    | project subscriptionId, subscriptionName = name\n) on subscriptionId\n| project-away subscriptionId1\n| project id, name, resourceGroup, subscriptionId, subscriptionName, location,\n          osName, osVersion, status, agentVersion, enableAutomaticUpgrade\n| order by id asc",
+                        "scope": "Tenant"
+                    },
+                    "authentication": {
+                        "type": "ManagedServiceIdentity"
+                    }
+                }
+            },
+            "Initialize_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade_URI": {
+                "runAfter": {
+                    "Parse_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "AzureArcURI",
+                            "type": "string"
+                        }
+                    ]
+                }
+            },
+            "Excluded_subscriptions": {
+                "runAfter": {
+                    "Included_subscriptions": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "ExcludedSubscriptions",
+                            "type": "array",
+                            "value": []
+                        }
+                    ]
+                }
+            },
+            "Parse_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": {
+                "runAfter": {
+                    "Get_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@body('Get_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "properties": {
+                                "type": "object",
+                                "properties": {
+                                    "count": {
+                                        "type": "object",
+                                        "properties": {
+                                            "type": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "data": {
+                                        "type": "object",
+                                        "properties": {
+                                            "items": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "properties": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string"
+                                                                },
+                                                                "resourceGroup": {
+                                                                    "type": "string"
+                                                                },
+                                                                "subscriptionId": {
+                                                                    "type": "string"
+                                                                },
+                                                                "subscriptionName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "location": {
+                                                                    "type": "string"
+                                                                },
+                                                                "osName": {
+                                                                    "type": "string"
+                                                                },
+                                                                "osVersion": {
+                                                                    "type": "string"
+                                                                },
+                                                                "status": {
+                                                                    "type": "string"
+                                                                },
+                                                                "agentVersion": {
+                                                                    "type": "string"
+                                                                },
+                                                                "enableAutomaticUpgrade": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Set_alert_recipient": {
+                "runAfter": {
+                    "Set_email_subject": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "SendAlertTo",
+                            "type": "string",
+                            "value": "youremail@yourcompany.com"
+                        }
+                    ]
+                }
+            },
+            "Initialize_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": {
+                "runAfter": {
+                    "Initialize_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade_URI": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "AzureArcHTML",
+                            "type": "string",
+                            "value": "<h2>Azure Arc machines with the agentUpgrade.enableAutomaticUpgrade property set to false</h2>"
+                        }
+                    ]
+                }
+            },
+            "Send_an_email_(V2)": {
+                "runAfter": {
+                    "EmailNotice": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['office365-1']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "body": {
+                        "To": "@variables('SendAlertTo')",
+                        "Subject": "@variables('SetEmailSubject')",
+                        "Body": "<p class=\"editor-paragraph\">@{variables('EmailNotice')}</p><p class=\"editor-paragraph\">@{variables('AzureArcHTML')}<br><br><b><strong class=\"editor-text-bold\" style=\"font-size: 18px;\">Azure Arc Machines – Agent Upgrade Status</strong></b><br><br>The following Azure Arc machines have automatic upgrades disabled <i><b><strong class=\"editor-text-bold editor-text-italic\">(agentUpgrade.enableAutomaticUpgrade = false)</strong></b></i>. It is recommended to review these settings to ensure your Arc-enabled machines stay compliant, secure, and optimized. Please enable automatic upgrades or manually update the agent versions as needed.<br><br>For more information, see: <a href=\"https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-agent?tabs=windows#automatic-agent-upgrade-preview\" class=\"editor-link\">Automatic agent upgrade (preview)</a></p><h1 class=\"editor-heading-h1\"><br></h1>"
+                    },
+                    "path": "/v2/Mail"
+                }
+            },
+            "End_to_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade_HTML": {
+                "runAfter": {
+                    "For_each_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "AppendToStringVariable",
+                "inputs": {
+                    "name": "AzureArcHTML",
+                    "value": "</tbody></table>"
+                }
+            },
+            "Set_email_subject": {
+                "runAfter": {},
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "SetEmailSubject",
+                            "type": "string",
+                            "value": "Azure Arc machines with the agentUpgrade.enableAutomaticUpgrade property set to false"
+                        }
+                    ]
+                }
+            },
+            "Included_subscriptions": {
+                "runAfter": {
+                    "Set_alert_recipient": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "IncludedSubscriptions",
+                            "type": "array",
+                            "value": []
+                        }
+                    ]
+                }
+            },
+            "Initialize_resources_table": {
+                "runAfter": {
+                    "Excluded_subscriptions": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "resourcesTable",
+                            "type": "string",
+                            "value": "resources@{if(equals(length(variables('IncludedSubscriptions')), 0), '', concat('| where subscriptionId in (', replace(replace(replace(string(variables('IncludedSubscriptions')), '\n', ''), '[', ''), ']', ''), ')'))}@{if(equals(length(variables('ExcludedSubscriptions')), 0), '', concat('| where subscriptionId !in (', replace(replace(replace(string(variables('ExcludedSubscriptions')), '\n', ''), '[', ''), ']', ''), ')'))}"
+                        }
+                    ]
+                }
+            },
+            "Condition_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": {
+                "actions": {
+                    "Append_no_AzureArc_results_text": {
+                        "type": "AppendToStringVariable",
+                        "inputs": {
+                            "name": "AzureArcHTML",
+                            "value": "No resources with the agentUpgrade.enableAutomaticUpgrade property set to false."
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Initialize_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade": [
+                        "Succeeded"
+                    ]
+                },
+                "else": {
+                    "actions": {
+                        "Append_AzureArc_results_in_table": {
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "AzureArcHTML",
+                                "value": "<table border=\"1\" style=\"border-collapse: collapse;\">\n  <thead><tr>\n    <th style=\"padding: 8px;\">Name</th>\n    <th style=\"padding: 8px;\">Resource Group</th>\n    <th style=\"padding: 8px;\">Subscription</th>\n  </tr></thead>\n<tbody>"
+                            }
+                        }
+                    }
+                },
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@length(body('Get_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')['data'])",
+                                0
+                            ]
+                        }
+                    ]
+                },
+                "type": "If"
+            },
+            "Condition_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgr_next_steps": {
+                "actions": {},
+                "runAfter": {
+                    "End_to_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade_HTML": [
+                        "Succeeded"
+                    ]
+                },
+                "else": {
+                    "actions": {
+                        "Append_to_AzureArc_table": {
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "AzureArcHTML",
+                                "value": "<div style=\"margin-top: 16px;\">\n  <strong>👉 Next steps:</strong> <span>Review Azure Arc machines to verify their agent upgrade settings (agentUpgrade.enableAutomaticUpgrade).</span>\n</div>"
+                            }
+                        }
+                    }
+                },
+                "expression": {
+                    "and": [
+                        {
+                            "equals": [
+                                "@length(body('Get_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgrade')['data'])",
+                                0
+                            ]
+                        }
+                    ]
+                },
+                "type": "If"
+            },
+            "EmailNotice": {
+                "runAfter": {
+                    "Condition_Azure_Arc_Agent_properties_agentUpgrade.enableAutomaticUpgr_next_steps": [
+                        "Succeeded"
+                    ],
+                    "Initialize_resources_table": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "EmailNotice",
+                            "type": "string",
+                            "value": "<p class=\"editor-paragraph\">\n  <b><strong class=\"editor-text-bold\">The following Azure Arc machines have been identified through Logic App queries based on their Agent status and Automatic Upgrade settings.</strong></b>\n  <b><strong class=\"editor-text-bold\">Please review each machine's agent version and upgrade configuration, and proceed with the necessary actions outlined below:</strong></b>\n</p>\n<hr>\n<br>\n"
+                        }
+                    ]
+                }
+            }
+        },
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "type": "Object",
+                "defaultValue": {}
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "type": "Object",
+            "value": {
+                "office365-1": {
+                    "id": "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/providers/Microsoft.Web/locations/eastus2/managedApis/office365",
+                    "connectionId": "/subscriptions/c0d36e7b-027e-4956-94bf-6e17dbf5e791/resourceGroups/lab-rg-hub-eastus2/providers/Microsoft.Web/connections/office365-1",
+                    "connectionName": "office365-1"
+                }
+            }
+        }
+    }
+}
