@@ -1,5 +1,9 @@
 # Using Azure Automation Account to Operate Azure Arc–enabled SQL Server with Least Privilege
 
+> **Note**  
+> This document and script were created based on the official Microsoft guidance:  
+> [Configure least privilege for Azure Arc–enabled SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/configure-least-privilege?view=sql-server-ver17).
+
 ## Overview
 
 This repository contains a PowerShell Runbook that automates the activation of the **LeastPrivilege FeatureFlag** on Azure Arc SQL-enabled machines. It uses Azure Resource Graph to identify machines where the flag is missing or disabled and applies the change using Azure CLI.
