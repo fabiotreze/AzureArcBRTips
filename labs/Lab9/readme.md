@@ -59,18 +59,49 @@ The Managed Identity must have the following roles assigned:
 Below is a sample output from the Runbook execution. It demonstrates the structured logging format and the result of enabling the LeastPrivilege FeatureFlag on Azure Arc SQL-enabled machines:
 
 ```powershell
-[2025-09-18 22:36:56][INFO] Environment successfully validated.
-[2025-09-18 22:36:56][INFO] Authenticating to Azure using managed identity (PowerShell)...
-[2025-09-18 22:36:58][INFO] Authenticating to Azure CLI using managed identity...
-[2025-09-18 22:37:13][INFO] Authentication completed successfully.
-[2025-09-18 22:37:14][INFO] Installing 'arcdata' extension...
-[2025-09-18 22:37:48][INFO] 'arcdata' extension installed successfully.
-[2025-09-18 22:37:48][INFO] Setting context for subscription: ME-MngEnvMCAP385546-farodrig-1 (c0d36e7b-027e-4956-94bf-6e17dbf5e791)
-[2025-09-18 22:37:48][INFO] Querying machines in subscription c0d36e7b-027e-4956-94bf-6e17dbf5e791...
-[2025-09-18 22:37:49][INFO] Processing machine: app01 in resource group rg-azurearc-itpro-br...
-[2025-09-18 22:37:58][RESULT] "app01","rg-azurearc-itpro-br","c0d36e7b-027e-4956-94bf-6e17dbf5e791","leastprivilege","false","true","connected","9/18/2025 8:48:31 PM","Success"
-[2025-09-18 22:37:58][INFO] Setting context for subscription: ME-MngEnvMCAP385546-farodrig-2 (8e467ebb-7651-4c72-86ec-32f0e7359355)
-[2025-09-18 22:37:58][INFO] Querying machines in subscription 8e467ebb-7651-4c72-86ec-32f0e7359355...
-[2025-09-18 22:37:59][INFO] No machines with disabled/missing FeatureFlags and 'connected' status found in subscription 8e467ebb-7651-4c72-86ec-32f0e7359355.
-[2025-09-18 22:37:59][INFO] Execution completed successfully.
+[2025-09-19 12:57:56][INFO] Environment successfully validated.
+
+[2025-09-19 12:57:56][INFO] Authenticating to Azure using managed identity (PowerShell)...
+
+[2025-09-19 12:57:59][INFO] Authenticating to Azure CLI using managed identity...
+
+[2025-09-19 12:58:15][INFO] Authentication completed successfully.
+
+[2025-09-19 12:58:16][INFO] Installing 'arcdata' extension...
+
+[2025-09-19 12:58:45][INFO] 'arcdata' extension installed successfully.
+
+[2025-09-19 12:58:46][INFO] Setting context for subscription: ME-MngEnvMCAP385546-farodrig-1 (c0d36e7b-027e-4956-94bf-6e17dbf5e791)
+
+[2025-09-19 12:58:46][INFO] Querying machines in subscription c0d36e7b-027e-4956-94bf-6e17dbf5e791...
+
+[2025-09-19 12:58:47][INFO] Processing machine: app01 in resource group rg-azurearc-itpro-br...
+
+[2025-09-19 12:58:56][RESULT] "app01","rg-azurearc-itpro-br","c0d36e7b-027e-4956-94bf-6e17dbf5e791","leastprivilege","false","true","connected","9/19/2025 11:49:37 AM","Success"
+
+[2025-09-19 12:58:57][INFO] Processing machine: arcbox-win2k12 in resource group rg-azurearc-itpro-br...
+
+[2025-09-19 12:59:02][RESULT] "arcbox-win2k12","rg-azurearc-itpro-br","c0d36e7b-027e-4956-94bf-6e17dbf5e791","","","true","connected","9/19/2025 11:59:30 AM","Success"
+
+[2025-09-19 12:59:02][INFO] Processing machine: arcbox-win2k22 in resource group rg-azurearc-itpro-br...
+
+[2025-09-19 12:59:06][RESULT] "arcbox-win2k22","rg-azurearc-itpro-br","c0d36e7b-027e-4956-94bf-6e17dbf5e791","","","true","connected","9/19/2025 12:01:05 PM","Success"
+
+[2025-09-19 12:59:06][INFO] Processing machine: arcbox-win2k25 in resource group rg-azurearc-itpro-br...
+
+[2025-09-19 12:59:11][RESULT] "arcbox-win2k25","rg-azurearc-itpro-br","c0d36e7b-027e-4956-94bf-6e17dbf5e791","","","true","connected","9/19/2025 12:00:16 PM","Success"
+
+[2025-09-19 12:59:12][INFO] Processing machine: sccm in resource group rg-azurearc-itpro-br...
+
+[2025-09-19 12:59:16][RESULT] "sccm","rg-azurearc-itpro-br","c0d36e7b-027e-4956-94bf-6e17dbf5e791","leastprivilege","false","true","connected","9/19/2025 11:17:04 AM","Success"
+
+[2025-09-19 12:59:16][INFO] Setting context for subscription: ME-MngEnvMCAP385546-farodrig-2 (8e467ebb-7651-4c72-86ec-32f0e7359355)
+
+[2025-09-19 12:59:16][INFO] Querying machines in subscription 8e467ebb-7651-4c72-86ec-32f0e7359355...
+
+[2025-09-19 12:59:16][INFO] Processing machine: sql22-01 in resource group rg-azurearc-local-eus...
+
+[2025-09-19 12:59:18][RESULT] "sql22-01","rg-azurearc-local-eus","8e467ebb-7651-4c72-86ec-32f0e7359355","leastprivilege","false","true","connected","9/19/2025 11:10:46 AM","Success"
+
+[2025-09-19 12:59:19][INFO] Execution completed successfully.
 ```
