@@ -19,7 +19,7 @@ By default, some Azure Arc SQL machines may not have the LeastPrivilege FeatureF
 The script **`Lab9_RunBook_ArcSQLEnableLeastPrivilege.ps1`** is part of this repository and can be imported into an Azure Automation Runbook.
 
 You can access it directly at the following link:  
-[Lab9_RunBook_ArcSQLEnableLeastPrivilege.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/RunBook-ArcSQLEnableLeastPrivilege.ps1)
+[Lab9_RunBook_ArcSQLEnableLeastPrivilege.ps1](https://github.com/fabiotreze/AzureArcBRTips/blob/main/scripts/Lab9_RunBook_ArcSQLEnableLeastPrivilege.ps1)
 
 ## Prerequisites
 
