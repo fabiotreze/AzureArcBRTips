@@ -1,13 +1,20 @@
 ```workbook
+
 {
   "version": "Notebook/1.0",
   "items": [
     {
       "type": 1,
       "content": {
-        "json": "## 💼 Dashboard Executivo - SQL Server Azure Arc\n\n**Monitoramento de Custos, Licenciamento e Compliance**\n\nVisão executiva para acompanhamento de custos operacionais, otimização de licenças e conformidade regulatória das instâncias SQL Server gerenciadas pelo Azure Arc.\n\n---"
+        "json": "### Change Log\r\n\r\n| Version | Date | Description | Author |\r\n| ------- | ----- | ----------- | ------ |\r\n| v1.0.0 | Outubro 2025 | - Criação inicial do Workbook em **13/10/2025**. </br> - Info adicional. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |"
       },
-      "name": "header"
+      "conditionalVisibility": {
+        "parameterName": "isVisible",
+        "comparison": "isEqualTo",
+        "value": "Never",
+        "customWidth": "70"
+      },
+      "name": "Dashboard Executivo - SQL Server Azure Arc"
     },
     {
       "type": 1,
@@ -615,4 +622,5 @@
   ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
+
 ```
