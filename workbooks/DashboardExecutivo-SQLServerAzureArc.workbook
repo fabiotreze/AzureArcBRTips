@@ -1,0 +1,616 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 1,
+      "content": {
+        "json": "## 💼 Dashboard Executivo - SQL Server Azure Arc\n\n**Monitoramento de Custos, Licenciamento e Compliance**\n\nVisão executiva para acompanhamento de custos operacionais, otimização de licenças e conformidade regulatória das instâncias SQL Server gerenciadas pelo Azure Arc.\n\n---"
+      },
+      "name": "header"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## 📊 KPIs Executivos\n**Indicadores críticos para gestão de custos e recursos**"
+      },
+      "name": "metrics_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVcores)\n| summarize TotalVCores = sum(sqlVcores)",
+              "size": 4,
+              "title": "⚡ vCores Totais Alocados",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "TotalVCores",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "blue"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "16.66",
+            "name": "total_vcores"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVcores)\n| summarize TotalMachines = dcount(joinId)",
+              "size": 4,
+              "title": "🏢 Servidores no Inventário",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "TotalMachines",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "green"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "16.66",
+            "name": "total_machines"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVcores)\n| summarize ConnectedMachines = dcountif(joinId, status == 'Connected')",
+              "size": 4,
+              "title": "🟢 Servidores Operacionais",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "ConnectedMachines",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "greenBright"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "16.66",
+            "name": "connected_machines"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| summarize TotalInstances = count()",
+              "size": 4,
+              "title": "⚙️ Instâncias SQL Ativas",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "TotalInstances",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "orange"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "16.66",
+            "name": "total_instances"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize TotalEditions = dcount(sqlEdition)",
+              "size": 4,
+              "title": "📦 Edições SQL em Uso",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "TotalEditions",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "purple"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "16.66",
+            "name": "total_editions"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | project arcMachineId, sqlLicenseType\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlLicenseType)\n| summarize TotalLicenseTypes = dcount(sqlLicenseType)",
+              "size": 4,
+              "title": "📋 Modelos de Licença",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "TotalLicenseTypes",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "yellow"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "16.66",
+            "name": "total_license_types"
+          }
+        ]
+      },
+      "name": "metrics_group"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n## 💰 Análise de Custos por Licenciamento\n**Distribuição de vCores por edições SQL e modelos de pagamento**"
+      },
+      "name": "distribution_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize TotalVCores = sum(sqlVcores) by sqlEdition\n| order by TotalVCores desc",
+              "size": 4,
+              "title": "💻 Capacidade por Edição SQL",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "sqlEdition",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "TotalVCores",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "blue"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "50",
+            "name": "vcores_by_edition_tiles"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlLicenseType, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlLicenseType)\n| summarize TotalVCores = sum(sqlVcores) by sqlLicenseType\n| order by TotalVCores desc",
+              "size": 4,
+              "title": "💳 Capacidade por Modelo de Licença",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "titleContent": {
+                  "columnMatch": "sqlLicenseType",
+                  "formatter": 1
+                },
+                "leftContent": {
+                  "columnMatch": "TotalVCores",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "yellow"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "50",
+            "name": "vcores_by_license_tiles"
+          }
+        ]
+      },
+      "name": "charts_group"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n## 📈 Análise Visual de Compliance\n**Status operacional e distribuição de recursos críticos**"
+      },
+      "name": "pie_charts_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize Machines = dcount(joinId) by status",
+              "size": 1,
+              "title": "🔍 Status Operacional dos Servidores",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "piechart",
+              "chartSettings": {
+                "createOtherGroup": 0,
+                "showLegend": true,
+                "labelColumn": "status",
+                "valueColumn": "Machines",
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Connected",
+                    "color": "#28a745"
+                  },
+                  {
+                    "seriesName": "Offline",
+                    "color": "#dc3545"
+                  },
+                  {
+                    "seriesName": "Error",
+                    "color": "#ffc107"
+                  },
+                  {
+                    "seriesName": "Unknown",
+                    "color": "#6c757d"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "status_pie"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize TotalVCores = sum(sqlVcores) by sqlEdition\n| order by TotalVCores desc",
+              "size": 1,
+              "title": "📊 Distribuição de Investimento por Edição",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "piechart",
+              "chartSettings": {
+                "labelColumn": "sqlEdition",
+                "valueColumn": "TotalVCores",
+                "showLegend": true,
+                "createOtherGroup": 0,
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "Enterprise",
+                    "color": "#6f42c1"
+                  },
+                  {
+                    "seriesName": "Standard",
+                    "color": "#007bff"
+                  },
+                  {
+                    "seriesName": "Developer",
+                    "color": "#fd7e14"
+                  },
+                  {
+                    "seriesName": "Express",
+                    "color": "#6c757d"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "edition_pie"
+          }
+        ]
+      },
+      "name": "pie_charts_group"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n## 📋 Inventário Corporativo\n**Registro detalhado para auditoria e compliance**"
+      },
+      "name": "inventory_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlVersion = tostring(properties.version)\n    | extend vCores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | extend sqlInstanceName = name\n    | project arcMachineId, sqlInstanceName, sqlVersion, sqlEdition, sqlLicenseType, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVersion)\n| project \n    machineName = name,\n    status,\n    operatingSystem = tostring(properties.osSku),\n    sqlInstanceName,\n    sqlVersion,\n    sqlEdition,\n    sqlLicenseType,\n    sqlVcores\n| order by machineName asc",
+              "size": 0,
+              "title": "📋 Registro Oficial de Instâncias SQL Server",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "status",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Connected",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Offline",
+                          "representation": "failed",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "sqlVcores",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "blue"
+                    }
+                  },
+                  {
+                    "columnMatch": "sqlEdition",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Enterprise",
+                          "representation": "purple",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Standard",
+                          "representation": "blue",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Developer",
+                          "representation": "orange",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "gray",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "filter": true,
+                "sortBy": [
+                  {
+                    "itemKey": "machineName",
+                    "sortOrder": 1
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "machineName",
+                  "sortOrder": 1
+                }
+              ]
+            },
+            "customWidth": "65",
+            "name": "Tabela_Detalhes"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### 📝 Guia de Interpretação\n\n**Status Operacional:**\n- 🟢 **Operacional**: Servidor online e monitorado\n- 🔴 **Indisponível**: Servidor offline ou com falhas  \n- 🟡 **Atenção**: Requer investigação técnica\n\n**Edições SQL Server:**\n- 🟣 **Enterprise**: Máxima capacidade e recursos\n- 🔵 **Standard**: Padrão corporativo\n- 🟠 **Developer**: Ambiente de desenvolvimento\n- ⚪ **Express**: Edição gratuita limitada\n\n**Métricas de Negócio:**\n- **vCores**: Capacidade computacional licenciada\n- **Modelo de Licença**: PAYG (pague conforme uso) vs AHUB (benefício híbrido)\n- **Ambiente**: Versão do sistema operacional host\n\n**⚠️ Ações Recomendadas:**\n- Servidores offline: Verificar conectividade\n- Licenças PAYG: Avaliar migração para AHUB  \n- Edições Express: Considerar upgrade conforme crescimento"
+            },
+            "customWidth": "25",
+            "name": "legends_sidebar"
+          }
+        ]
+      },
+      "name": "inventory_group"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n## 📊 Relatório Executivo de Custos\n**Análise consolidada para otimização de gastos e planejamento**\n\n*Use estas tabelas para identificar oportunidades de economia e otimização de recursos.*"
+      },
+      "name": "stats_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize \n    Instancias = count(),\n    TotalVCores = sum(sqlVcores)\nby sqlEdition\n| extend VCoresPorInstancia = round(todouble(TotalVCores) / todouble(Instancias), 1)\n| project sqlEdition, Instancias, TotalVCores, VCoresPorInstancia\n| order by TotalVCores desc",
+              "size": 1,
+              "title": "💰 ROI por Edição SQL Server",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "sqlEdition",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "TotalVCores",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "blue"
+                    }
+                  },
+                  {
+                    "columnMatch": "Instancias",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "green"
+                    }
+                  },
+                  {
+                    "columnMatch": "VCoresPorInstancia",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "orange"
+                    }
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "edition_summary"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | project arcMachineId, sqlLicenseType, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlLicenseType)\n| summarize \n    Instancias = count(),\n    TotalVCores = sum(sqlVcores)\nby sqlLicenseType\n| extend VCoresPorInstancia = round(todouble(TotalVCores) / todouble(Instancias), 1)\n| project sqlLicenseType, Instancias, TotalVCores, VCoresPorInstancia\n| order by TotalVCores desc",
+              "size": 1,
+              "title": "📊 Análise de Economia por Licenciamento",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "value::all"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "sqlLicenseType",
+                    "formatter": 1
+                  },
+                  {
+                    "columnMatch": "TotalVCores",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "orange"
+                    }
+                  },
+                  {
+                    "columnMatch": "Instancias",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "green"
+                    }
+                  },
+                  {
+                    "columnMatch": "VCoresPorInstancia",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "yellow"
+                    }
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "license_summary"
+          }
+        ]
+      },
+      "name": "stats_group"
+    }
+  ],
+  "defaultResourceIds": [
+    "/subscriptions"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
