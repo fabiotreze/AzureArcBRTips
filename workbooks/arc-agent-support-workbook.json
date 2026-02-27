@@ -1,1010 +1,1023 @@
 {
-  "version": "Notebook/1.0",
-  "items": [
-    {
-      "type": 1,
-      "content": {
-        "json": "# Azure Arc – Agent Version Compliance\n\n> ⚠️ **Microsoft support policy ([Agent Release Notes](https://learn.microsoft.com/en-us/azure/azure-arc/servers/agent-release-notes)):**  \n> *Only Connected Machine agent versions released within the last year are officially supported by the product group. All customers should update to an agent version within this window or [enable automatic agent upgrades](https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-agent#automatic-agent-upgrade-preview). Microsoft recommends staying up to date with the latest agent version whenever possible.*\n\n**Latest known version:** 1.61 (February 2026) · **Last updated:** 2026-02-27"
-      },
-      "name": "header"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "## 🔄 Change Log\n\n|Version|Date|Description|\n|---|---|---|\n|v1.6| 2026-02-27 | - **UpgradeStatus column** added to Auto Upgrade table: detects Pending / Pending (Offline) / Completed via `desiredVersion` comparison<br>- Tile order changed: Supported → Out of Support → Auto Upgrade → Connected → Total (Total moved to right)|\n|v1.5| 2026-02-27 | - Parameter filtering applied to ALL 13 queries<br>- Consistent 4-category support status everywhere<br>- Empty version → \"Unknown\" instead of \".\"<br>- `OSType` replaced with `OSVersion`; `OS` enriched with `osSku`<br>- `AwaitingConnection` added to Connection Status filter<br>- `SupportStatus` column added to Auto Upgrade detail table|\n|v1.4| 2026-02-27 | - Tile KPIs replacing flat KPI table<br>- Server inventory title → \"Arc Server Details - Support Status\"<br>- Sort: Out of Support first; Changelog to beginning (hidden)|\n|v1.3| 2026-02-27 | - English localization; parameters `*` → `All`|\n|v1.2| 2026-02-27 | - Parser fix: `todatetime()` replacing `datetime()` for Resource Graph; removed `let` statements|\n|v1.1| 2026-02-27 | - 3 pie charts, 2 bar charts, subscription names, colour-coded formatters, export to Excel|\n|v1.0| 2026-02-27 | - Initial release: KPI, server inventory, auto upgrade, version reference, 24 mapped versions|"
-      },
-      "conditionalVisibility": {
-        "parameterName": "ShowChangelog",
-        "comparison": "isEqualTo",
-        "value": "Never"
-      },
-      "name": "text-changelog"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "### Change Log\r\n\r\n| Version | Date | Description | Author |\r\n| ------- | ----- | ----------- | ------ |\r\n| v1.0.0 | Novembro 2024 | - Criação inicial do Workbook em **11/11/2024**. </br> - Info adicional. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |"
-      },
-      "conditionalVisibility": {
-        "parameterName": "isVisible",
-        "comparison": "isEqualTo",
-        "value": "Never",
-        "customWidth": "70"
-      },
-      "name": "MICROSOFT - Activity Logs"
-    },
-    {
-      "type": 9,
-      "content": {
-        "version": "KqlParameterItem/1.0",
-        "parameters": [
-          {
-            "id": "p-sub",
-            "version": "KqlParameterItem/1.0",
-            "name": "Subscriptions",
-            "label": "Subscription",
-            "type": 6,
-            "isRequired": true,
-            "multiSelect": true,
-            "quote": "'",
-            "delimiter": ",",
-            "typeSettings": {
-              "additionalResourceOptions": [
-                "value::all"
-              ],
-              "includeAll": true
+    "version": "Notebook/1.0",
+    "items": [
+        {
+            "type": 1,
+            "content": {
+                "json": "# Azure Arc – Agent Version Compliance\n\n> ⚠️ **Microsoft support policy ([Agent Release Notes](https://learn.microsoft.com/en-us/azure/azure-arc/servers/agent-release-notes)):**  \n> *Only Connected Machine agent versions released within the last year are officially supported by the product group. All customers should update to an agent version within this window or [enable automatic agent upgrades](https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-agent#automatic-agent-upgrade-preview). Microsoft recommends staying up to date with the latest agent version whenever possible.*\n\n**Latest known version:** 1.61 (February 2026) · **Last updated:** 2026-02-27"
             },
-            "value": [
-              "value::all"
-            ]
-          },
-          {
-            "id": "p-status",
-            "version": "KqlParameterItem/1.0",
-            "name": "StatusFilter",
-            "label": "Connection Status",
-            "type": 2,
-            "isRequired": true,
-            "multiSelect": true,
-            "quote": "'",
-            "delimiter": ",",
-            "jsonData": "[\"Connected\",\"Disconnected\",\"Expired\",\"AwaitingConnection\",\"Error\"]",
-            "typeSettings": {
-              "additionalResourceOptions": [
-                "value::all"
-              ],
-              "selectAllValue": "All"
+            "name": "header"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "## 🔄 Change Log\n\n|Version|Date|Description|\n|---|---|---|\n|v1.6| 2026-02-27 | - **UpgradeStatus column** added to Auto Upgrade table: detects Pending / Pending (Offline) / Completed via `desiredVersion` comparison<br>- Tile order changed: Supported → Out of Support → Auto Upgrade → Connected → Total (Total moved to right)|\n|v1.5| 2026-02-27 | - Parameter filtering applied to ALL 13 queries<br>- Consistent 4-category support status everywhere<br>- Empty version → \"Unknown\" instead of \".\"<br>- `OSType` replaced with `OSVersion`; `OS` enriched with `osSku`<br>- `AwaitingConnection` added to Connection Status filter<br>- `SupportStatus` column added to Auto Upgrade detail table|\n|v1.4| 2026-02-27 | - Tile KPIs replacing flat KPI table<br>- Server inventory title → \"Arc Server Details - Support Status\"<br>- Sort: Out of Support first; Changelog to beginning (hidden)|\n|v1.3| 2026-02-27 | - English localization; parameters `*` → `All`|\n|v1.2| 2026-02-27 | - Parser fix: `todatetime()` replacing `datetime()` for Resource Graph; removed `let` statements|\n|v1.1| 2026-02-27 | - 3 pie charts, 2 bar charts, subscription names, colour-coded formatters, export to Excel|\n|v1.0| 2026-02-27 | - Initial release: KPI, server inventory, auto upgrade, version reference, 24 mapped versions|"
             },
-            "value": [
-              "value::all"
-            ]
-          },
-          {
-            "id": "p-support",
-            "version": "KqlParameterItem/1.0",
-            "name": "SupportFilter",
-            "label": "Support Status",
-            "type": 2,
-            "isRequired": true,
-            "multiSelect": true,
-            "quote": "'",
-            "delimiter": ",",
-            "jsonData": "[\"Latest version\",\"Supported\",\"Out of support\",\"Unknown\"]",
-            "typeSettings": {
-              "additionalResourceOptions": [
-                "value::all"
-              ],
-              "selectAllValue": "All"
+            "conditionalVisibility": {
+                "parameterName": "ShowChangelog",
+                "comparison": "isEqualTo",
+                "value": "Never"
             },
-            "value": [
-              "value::all"
-            ]
-          },
-          {
-            "id": "p-autoupgrade",
-            "version": "KqlParameterItem/1.0",
-            "name": "AutoUpgradeFilter",
-            "label": "Auto Upgrade",
-            "type": 2,
-            "isRequired": true,
-            "multiSelect": true,
-            "quote": "'",
-            "delimiter": ",",
-            "jsonData": "[\"Enabled\",\"Disabled\",\"N/A\"]",
-            "typeSettings": {
-              "additionalResourceOptions": [
-                "value::all"
-              ],
-              "selectAllValue": "All"
+            "name": "text-changelog"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "### Change Log\r\n\r\n| Version | Date | Description | Author |\r\n| ------- | ----- | ----------- | ------ |\r\n| v1.0.0 | Novembro 2024 | - Criação inicial do Workbook em **11/11/2024**. </br> - Info adicional. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |"
             },
-            "value": [
-              "value::all"
-            ]
-          }
-        ],
-        "style": "pills",
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces"
-      },
-      "name": "parameters"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n## Overview"
-      },
-      "name": "kpi-header"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(supportStatus == \"Latest version\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
-        "size": 4,
-        "showAnalytics": true,
-        "title": "Latest Version",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "tiles",
-        "tileSettings": {
-          "leftContent": {
-            "columnMatch": "Value",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "blue"
+            "conditionalVisibility": {
+                "parameterName": "isVisible",
+                "comparison": "isEqualTo",
+                "value": "Never",
+                "customWidth": "70"
             },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "style": "decimal",
-                "maximumFractionDigits": 0
-              }
-            }
-          },
-          "secondaryContent": {
-            "columnMatch": "Subtitle",
-            "formatter": 1
-          },
-          "showBorder": true,
-          "size": "auto"
-        }
-      },
-      "customWidth": "16",
-      "name": "tile-latest-version"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(supportStatus == \"Supported\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
-        "size": 4,
-        "showAnalytics": true,
-        "title": "Supported",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "tiles",
-        "tileSettings": {
-          "leftContent": {
-            "columnMatch": "Value",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "green"
+            "name": "MICROSOFT - Activity Logs"
+        },
+        {
+            "type": 9,
+            "content": {
+                "version": "KqlParameterItem/1.0",
+                "parameters": [
+                    {
+                        "id": "p-sub",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "Subscriptions",
+                        "label": "Subscription",
+                        "type": 6,
+                        "isRequired": true,
+                        "multiSelect": true,
+                        "quote": "'",
+                        "delimiter": ",",
+                        "typeSettings": {
+                            "additionalResourceOptions": [
+                                "value::all"
+                            ],
+                            "includeAll": true
+                        },
+                        "value": [
+                            "value::all"
+                        ]
+                    },
+                    {
+                        "id": "p-status",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "StatusFilter",
+                        "label": "Connection Status",
+                        "type": 2,
+                        "isRequired": true,
+                        "multiSelect": true,
+                        "quote": "'",
+                        "delimiter": ",",
+                        "jsonData": "[\"Connected\",\"Disconnected\",\"Expired\",\"AwaitingConnection\",\"Error\"]",
+                        "typeSettings": {
+                            "additionalResourceOptions": [
+                                "value::all"
+                            ],
+                            "selectAllValue": "All"
+                        },
+                        "value": [
+                            "value::all"
+                        ]
+                    },
+                    {
+                        "id": "p-support",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "SupportFilter",
+                        "label": "Support Status",
+                        "type": 2,
+                        "isRequired": true,
+                        "multiSelect": true,
+                        "quote": "'",
+                        "delimiter": ",",
+                        "jsonData": "[\"Latest version\",\"Supported\",\"Out of support\",\"Unknown\"]",
+                        "typeSettings": {
+                            "additionalResourceOptions": [
+                                "value::all"
+                            ],
+                            "selectAllValue": "All"
+                        },
+                        "value": [
+                            "value::all"
+                        ]
+                    },
+                    {
+                        "id": "p-autoupgrade",
+                        "version": "KqlParameterItem/1.0",
+                        "name": "AutoUpgradeFilter",
+                        "label": "Auto Upgrade",
+                        "type": 2,
+                        "isRequired": true,
+                        "multiSelect": true,
+                        "quote": "'",
+                        "delimiter": ",",
+                        "jsonData": "[\"Enabled\",\"Disabled\",\"N/A\"]",
+                        "typeSettings": {
+                            "additionalResourceOptions": [
+                                "value::all"
+                            ],
+                            "selectAllValue": "All"
+                        },
+                        "value": [
+                            "value::all"
+                        ]
+                    }
+                ],
+                "style": "pills",
+                "queryType": 0
             },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "style": "decimal",
-                "maximumFractionDigits": 0
-              }
-            }
-          },
-          "secondaryContent": {
-            "columnMatch": "Subtitle",
-            "formatter": 1
-          },
-          "showBorder": true,
-          "size": "auto"
-        }
-      },
-      "customWidth": "16",
-      "name": "tile-supported"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(supportStatus == \"Out of support\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
-        "size": 4,
-        "showAnalytics": true,
-        "title": "Out of Support",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "tiles",
-        "tileSettings": {
-          "leftContent": {
-            "columnMatch": "Value",
-            "formatter": 18,
-            "formatOptions": {
-              "thresholdsOptions": "colors",
-              "thresholdsGrid": [
-                {
-                  "operator": ">",
-                  "thresholdValue": "0",
-                  "representation": "redBright",
-                  "text": "{0}"
-                },
-                {
-                  "operator": "Default",
-                  "thresholdValue": null,
-                  "representation": "green",
-                  "text": "{0}"
+            "name": "parameters"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "---\n## Overview"
+            },
+            "name": "kpi-header"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(supportStatus == \"Latest version\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
+                "size": 4,
+                "title": "Latest Version",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "tiles",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "tileSettings": {
+                    "leftContent": {
+                        "columnMatch": "Value",
+                        "formatter": 12,
+                        "formatOptions": {
+                            "palette": "blue"
+                        },
+                        "numberFormat": {
+                            "unit": 17,
+                            "options": {
+                                "style": "decimal",
+                                "maximumFractionDigits": 0
+                            }
+                        }
+                    },
+                    "secondaryContent": {
+                        "columnMatch": "Subtitle",
+                        "formatter": 1
+                    },
+                    "showBorder": true,
+                    "size": "auto"
                 }
-              ]
-            }
-          },
-          "secondaryContent": {
-            "columnMatch": "Subtitle",
-            "formatter": 1
-          },
-          "showBorder": true,
-          "size": "auto"
+            },
+            "customWidth": "16",
+            "name": "tile-latest-version"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(supportStatus == \"Supported\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
+                "size": 4,
+                "title": "Supported",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "tiles",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "tileSettings": {
+                    "leftContent": {
+                        "columnMatch": "Value",
+                        "formatter": 12,
+                        "formatOptions": {
+                            "palette": "green"
+                        },
+                        "numberFormat": {
+                            "unit": 17,
+                            "options": {
+                                "style": "decimal",
+                                "maximumFractionDigits": 0
+                            }
+                        }
+                    },
+                    "secondaryContent": {
+                        "columnMatch": "Subtitle",
+                        "formatter": 1
+                    },
+                    "showBorder": true,
+                    "size": "auto"
+                }
+            },
+            "customWidth": "16",
+            "name": "tile-supported"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(supportStatus == \"Out of support\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
+                "size": 4,
+                "title": "Out of Support",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "tiles",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "tileSettings": {
+                    "leftContent": {
+                        "columnMatch": "Value",
+                        "formatter": 18,
+                        "formatOptions": {
+                            "thresholdsOptions": "colors",
+                            "thresholdsGrid": [
+                                {
+                                    "operator": ">",
+                                    "thresholdValue": "0",
+                                    "representation": "redBright",
+                                    "text": "{0}"
+                                },
+                                {
+                                    "operator": "Default",
+                                    "thresholdValue": null,
+                                    "representation": "green",
+                                    "text": "{0}"
+                                }
+                            ]
+                        }
+                    },
+                    "secondaryContent": {
+                        "columnMatch": "Subtitle",
+                        "formatter": 1
+                    },
+                    "showBorder": true,
+                    "size": "auto"
+                }
+            },
+            "customWidth": "16",
+            "name": "tile-out-of-support"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(autoUpgradeEnabled == true), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
+                "size": 4,
+                "title": "Auto Upgrade On",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "tiles",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "tileSettings": {
+                    "leftContent": {
+                        "columnMatch": "Value",
+                        "formatter": 12,
+                        "formatOptions": {
+                            "palette": "green"
+                        },
+                        "numberFormat": {
+                            "unit": 17,
+                            "options": {
+                                "style": "decimal",
+                                "maximumFractionDigits": 0
+                            }
+                        }
+                    },
+                    "secondaryContent": {
+                        "columnMatch": "Subtitle",
+                        "formatter": 1
+                    },
+                    "showBorder": true,
+                    "size": "auto"
+                }
+            },
+            "customWidth": "16",
+            "name": "tile-autoupgrade"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(status == \"Connected\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
+                "size": 4,
+                "title": "Connected",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "tiles",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "tileSettings": {
+                    "leftContent": {
+                        "columnMatch": "Value",
+                        "formatter": 12,
+                        "formatOptions": {
+                            "palette": "green"
+                        },
+                        "numberFormat": {
+                            "unit": 17,
+                            "options": {
+                                "style": "decimal",
+                                "maximumFractionDigits": 0
+                            }
+                        }
+                    },
+                    "secondaryContent": {
+                        "columnMatch": "Subtitle",
+                        "formatter": 1
+                    },
+                    "showBorder": true,
+                    "size": "auto"
+                }
+            },
+            "customWidth": "16",
+            "name": "tile-connected"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = count()\n| extend Subtitle = \"Arc servers\"",
+                "size": 4,
+                "title": "Total Servers",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "tiles",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "tileSettings": {
+                    "leftContent": {
+                        "columnMatch": "Value",
+                        "formatter": 12,
+                        "formatOptions": {
+                            "palette": "blue"
+                        },
+                        "numberFormat": {
+                            "unit": 17,
+                            "options": {
+                                "style": "decimal",
+                                "maximumFractionDigits": 0
+                            }
+                        }
+                    },
+                    "secondaryContent": {
+                        "columnMatch": "Subtitle",
+                        "formatter": 1
+                    },
+                    "showBorder": true,
+                    "size": "auto"
+                }
+            },
+            "customWidth": "16",
+            "name": "tile-total"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by SupportStatus = supportStatus",
+                "size": 3,
+                "title": "Support Compliance",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "piechart",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "chartSettings": {
+                    "seriesLabelSettings": [
+                        {
+                            "seriesName": "Latest version",
+                            "color": "blue"
+                        },
+                        {
+                            "seriesName": "Supported",
+                            "color": "green"
+                        },
+                        {
+                            "seriesName": "Out of support",
+                            "color": "redBright"
+                        },
+                        {
+                            "seriesName": "Unknown",
+                            "color": "gray"
+                        }
+                    ]
+                }
+            },
+            "customWidth": "33",
+            "name": "compliance-pie"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by ConnectionStatus = status",
+                "size": 3,
+                "title": "Connection Status",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "piechart",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "chartSettings": {
+                    "seriesLabelSettings": [
+                        {
+                            "seriesName": "Connected",
+                            "color": "green"
+                        },
+                        {
+                            "seriesName": "Disconnected",
+                            "color": "redBright"
+                        },
+                        {
+                            "seriesName": "Expired",
+                            "color": "orange"
+                        },
+                        {
+                            "seriesName": "AwaitingConnection",
+                            "color": "yellow"
+                        }
+                    ]
+                }
+            },
+            "customWidth": "33",
+            "name": "connection-status-pie"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by AutoUpgrade = autoUpgradeLabel",
+                "size": 3,
+                "title": "Auto Upgrade",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "piechart",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "chartSettings": {
+                    "seriesLabelSettings": [
+                        {
+                            "seriesName": "Enabled",
+                            "color": "green"
+                        },
+                        {
+                            "seriesName": "Disabled",
+                            "color": "orange"
+                        },
+                        {
+                            "seriesName": "N/A",
+                            "color": "gray"
+                        }
+                    ]
+                }
+            },
+            "customWidth": "33",
+            "name": "autoupgrade-pie"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "---\n## Version Distribution"
+            },
+            "name": "charts-header"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by Version = agentMajorMinor, SupportStatus = supportStatus\n| order by Version asc",
+                "size": 1,
+                "title": "Servers by Agent Version",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "barchart",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "chartSettings": {
+                    "xAxis": "Version",
+                    "yAxis": [
+                        "Servers"
+                    ],
+                    "group": "SupportStatus",
+                    "createOtherGroup": 0,
+                    "showLegend": true,
+                    "seriesLabelSettings": [
+                        {
+                            "seriesName": "Latest version",
+                            "color": "blue"
+                        },
+                        {
+                            "seriesName": "Supported",
+                            "color": "green"
+                        },
+                        {
+                            "seriesName": "Out of support",
+                            "color": "redBright"
+                        },
+                        {
+                            "seriesName": "Unknown",
+                            "color": "gray"
+                        }
+                    ]
+                }
+            },
+            "customWidth": "50",
+            "name": "version-bar-chart"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by SupportStatus = supportStatus, AutoUpgrade = autoUpgradeLabel\n| extend sortPriority = case(SupportStatus == \"Out of support\", 1, SupportStatus == \"Unknown\", 2, SupportStatus == \"Supported\", 3, SupportStatus == \"Latest version\", 4, 5)\n| order by sortPriority asc\n| project-away sortPriority",
+                "size": 1,
+                "title": "Support Status vs Auto Upgrade",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "barchart",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "chartSettings": {
+                    "xAxis": "SupportStatus",
+                    "yAxis": [
+                        "Servers"
+                    ],
+                    "group": "AutoUpgrade",
+                    "createOtherGroup": 0,
+                    "showLegend": true,
+                    "seriesLabelSettings": [
+                        {
+                            "seriesName": "Enabled",
+                            "color": "green"
+                        },
+                        {
+                            "seriesName": "Disabled",
+                            "color": "orange"
+                        },
+                        {
+                            "seriesName": "N/A",
+                            "color": "gray"
+                        }
+                    ]
+                }
+            },
+            "customWidth": "50",
+            "name": "support-autoupgrade-chart"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "---\n## Server Inventory"
+            },
+            "name": "detail-header"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| join kind=leftouter (\n    resourcecontainers\n    | where type =~ \"microsoft.resources/subscriptions\"\n    | project subscriptionId, SubscriptionName = name\n) on subscriptionId\n| extend\n    agentVersion = tostring(properties.agentVersion),\n    status = tostring(properties.status),\n    osName = tostring(properties.osName),\n    osSku = tostring(properties.osSku),\n    osVersion = tostring(properties.osVersion),\n    lastStatusChange = todatetime(properties.lastStatusChange),\n    machineFqdn = tostring(properties.machineFqdn),\n    autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade),\n    desiredVersion = tostring(properties.agentUpgrade.desiredVersion)\n| extend\n    agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1])),\n    autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend releaseLabel = case(agentMajorMinor == \"1.61\", \"Feb 2026\", agentMajorMinor == \"1.60\", \"Jan 2026\", agentMajorMinor == \"1.59\", \"Dec 2025\", agentMajorMinor == \"1.58\", \"Nov 2025\", agentMajorMinor == \"1.57\", \"Oct 2025\", agentMajorMinor == \"1.56\", \"Sep 2025\", agentMajorMinor == \"1.55\", \"Aug 2025\", agentMajorMinor == \"1.54\", \"Jul 2025\", agentMajorMinor == \"1.53\", \"Jun 2025\", agentMajorMinor == \"1.52\", \"May 2025\", agentMajorMinor == \"1.51\", \"Apr 2025\", agentMajorMinor == \"1.50\", \"Mar 2025\", agentMajorMinor == \"1.49\", \"Feb 2025\", agentMajorMinor == \"1.48\", \"Jan 2025\", agentMajorMinor == \"1.47\", \"Oct 2024\", agentMajorMinor == \"1.46\", \"Sep 2024\", agentMajorMinor == \"1.45\", \"Aug 2024\", agentMajorMinor == \"1.44\", \"Jul 2024\", agentMajorMinor == \"1.43\", \"Jun 2024\", agentMajorMinor == \"1.42\", \"May 2024\", agentMajorMinor == \"1.41\", \"May 2024\", agentMajorMinor == \"1.40\", \"Apr 2024\", agentMajorMinor == \"1.39\", \"Mar 2024\", agentMajorMinor == \"1.38\", \"Feb 2024\", agentMajorMinor == \"1.37\", \"Dec 2023\", agentMajorMinor == \"1.36\", \"Nov 2023\", agentMajorMinor == \"1.35\", \"Oct 2023\", agentMajorMinor == \"1.34\", \"Sep 2023\", agentMajorMinor == \"1.33\", \"Aug 2023\", agentMajorMinor == \"1.32\", \"Jul 2023\", agentMajorMinor == \"1.31\", \"Jun 2023\", agentMajorMinor == \"1.30\", \"May 2023\", agentMajorMinor == \"1.29\", \"Apr 2023\", agentMajorMinor == \"1.28\", \"Mar 2023\", agentMajorMinor == \"1.27\", \"Feb 2023\", agentMajorMinor == \"1.26\", \"Jan 2023\", agentMajorMinor == \"1.25\", \"Jan 2023\", agentMajorMinor == \"1.24\", \"Nov 2022\", agentMajorMinor == \"1.23\", \"Oct 2022\", agentMajorMinor == \"1.22\", \"Sep 2022\", agentMajorMinor == \"1.21\", \"Aug 2022\", agentMajorMinor == \"1.20\", \"Jul 2022\", agentMajorMinor == \"1.19\", \"Jun 2022\", agentMajorMinor == \"1.18\", \"May 2022\", agentMajorMinor == \"1.17\", \"Apr 2022\", agentMajorMinor == \"1.16\", \"Mar 2022\", agentMajorMinor == \"1.15\", \"Feb 2022\", agentMajorMinor == \"1.14\", \"Jan 2022\", agentMajorMinor == \"1.13\", \"Nov 2021\", agentMajorMinor == \"1.12\", \"Oct 2021\", agentMajorMinor == \"1.11\", \"Sep 2021\", agentMajorMinor == \"1.10\", \"Aug 2021\", agentMajorMinor == \"1.9\", \"Jul 2021\", agentMajorMinor == \"1.8\", \"Jul 2021\", agentMajorMinor == \"1.7\", \"Jun 2021\", agentMajorMinor == \"1.6\", \"May 2021\", agentMajorMinor == \"1.5\", \"Apr 2021\", agentMajorMinor == \"1.4\", \"Mar 2021\", agentMajorMinor == \"1.3\", \"Dec 2020\", agentMajorMinor == \"1.2\", \"Nov 2020\", agentMajorMinor == \"1.1\", \"Oct 2020\", agentMajorMinor == \"1.0\", \"Sep 2020\", \"Unknown\")\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| project\n    Server = name,\n    Subscription = SubscriptionName,\n    ResourceGroup = resourceGroup,\n    Location = location,\n    AgentVersion = agentVersion,\n    Release = releaseLabel,\n    SupportStatus = supportStatus,\n    ConnectionStatus = status,\n    AutoUpgrade = autoUpgradeLabel,\n    DesiredVersion = iff(isempty(desiredVersion), \"-\", desiredVersion),\n    OS = iff(isnotempty(osSku), osSku, iff(isnotempty(osName), osName, \"-\")),\n    OSVersion = iff(isnotempty(osVersion), osVersion, \"-\"),\n    LastUpdate = lastStatusChange,\n    FQDN = coalesce(machineFqdn, \"-\")\n| extend sortPriority = case(SupportStatus == \"Out of support\", 1, SupportStatus == \"Unknown\", 2, SupportStatus == \"Supported\", 3, SupportStatus == \"Latest version\", 4, 5)\n| order by sortPriority asc, AgentVersion asc, Server asc\n| project-away sortPriority",
+                "size": 0,
+                "title": "Arc Server Details - Support Status",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "table",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "gridSettings": {
+                    "formatters": [
+                        {
+                            "columnMatch": "SupportStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Latest version",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Supported",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Out of support",
+                                        "representation": "3",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "ConnectionStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Connected",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Disconnected",
+                                        "representation": "2",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Expired",
+                                        "representation": "4",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "AutoUpgrade",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Enabled",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Disabled",
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "unknown",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "LastUpdate",
+                            "formatter": 6,
+                            "formatOptions": {
+                                "showIcon": true
+                            }
+                        }
+                    ],
+                    "filter": true
+                }
+            },
+            "name": "server-detail-table"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "---\n## Auto Upgrade Details"
+            },
+            "name": "autoupgrade-detail-header"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| join kind=leftouter (\n    resourcecontainers\n    | where type =~ \"microsoft.resources/subscriptions\"\n    | project subscriptionId, SubscriptionName = name\n) on subscriptionId\n| extend\n    agentVersion = tostring(properties.agentVersion),\n    status = tostring(properties.status),\n    autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade),\n    desiredVersion = tostring(properties.agentUpgrade.desiredVersion),\n    lastAttemptTimestamp = tostring(properties.agentUpgrade.lastAttemptTimestamp),\n    lastAttemptStatus = tostring(properties.agentUpgrade.lastAttemptStatus),\n    lastAttemptMessage = tostring(properties.agentUpgrade.lastAttemptMessage)\n| extend\n    agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1])),\n    autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| extend desiredMM = iff(isnotempty(desiredVersion), strcat(split(desiredVersion, \".\")[0], \".\", split(desiredVersion, \".\")[1]), \"\")\n| extend upgradeStatus = case(isnotempty(desiredVersion) and agentMajorMinor != desiredMM and status != \"Connected\", \"Pending (Offline)\", isnotempty(desiredVersion) and agentMajorMinor != desiredMM, \"Pending\", isnotempty(desiredVersion) and agentMajorMinor == desiredMM, \"Completed\", \"-\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| project\n    Server = name,\n    Subscription = SubscriptionName,\n    ResourceGroup = resourceGroup,\n    AgentVersion = agentVersion,\n    SupportStatus = supportStatus,\n    DesiredVersion = iff(isempty(desiredVersion), \"-\", desiredVersion),\n    UpgradeStatus = upgradeStatus,\n    AutoUpgrade = autoUpgradeLabel,\n    ConnectionStatus = status,\n    LastStatus = iff(isempty(lastAttemptStatus), \"-\", lastAttemptStatus),\n    LastAttempt = iff(isempty(lastAttemptTimestamp), \"-\", lastAttemptTimestamp),\n    Message = iff(isempty(lastAttemptMessage), \"-\", lastAttemptMessage)\n| extend supportPriority = case(SupportStatus == \"Out of support\", 1, SupportStatus == \"Unknown\", 2, SupportStatus == \"Supported\", 3, SupportStatus == \"Latest version\", 4, 5)\n| extend upgradePriority = case(UpgradeStatus == \"Pending (Offline)\", 1, UpgradeStatus == \"Pending\", 2, UpgradeStatus == \"Completed\", 3, 4)\n| order by supportPriority asc, upgradePriority asc, AutoUpgrade asc, Server asc\n| project-away supportPriority, upgradePriority",
+                "size": 0,
+                "title": "Auto Upgrade – Server Details",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "table",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "gridSettings": {
+                    "formatters": [
+                        {
+                            "columnMatch": "SupportStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Latest version",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Supported",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Out of support",
+                                        "representation": "3",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "UpgradeStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Pending (Offline)",
+                                        "representation": "3",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Pending",
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Completed",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "Blank",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "AutoUpgrade",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Enabled",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Disabled",
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "unknown",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "ConnectionStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Connected",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Disconnected",
+                                        "representation": "2",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Expired",
+                                        "representation": "4",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "LastStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Success",
+                                        "representation": "success",
+                                        "text": "Success"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Failed",
+                                        "representation": "3",
+                                        "text": "Failed"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "-",
+                                        "representation": "Blank",
+                                        "text": "-"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "unknown",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "filter": true
+                }
+            },
+            "name": "autoupgrade-detail-table"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "---\n## Version Reference"
+            },
+            "name": "ref-table-header"
+        },
+        {
+            "type": 3,
+            "content": {
+                "version": "KqlItem/1.0",
+                "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), agentMajorMinor == \"1.37\", todatetime('2023-12-01'), agentMajorMinor == \"1.36\", todatetime('2023-11-01'), agentMajorMinor == \"1.35\", todatetime('2023-10-01'), agentMajorMinor == \"1.34\", todatetime('2023-09-01'), agentMajorMinor == \"1.33\", todatetime('2023-08-01'), agentMajorMinor == \"1.32\", todatetime('2023-07-01'), agentMajorMinor == \"1.31\", todatetime('2023-06-01'), agentMajorMinor == \"1.30\", todatetime('2023-05-01'), agentMajorMinor == \"1.29\", todatetime('2023-04-01'), agentMajorMinor == \"1.28\", todatetime('2023-03-01'), agentMajorMinor == \"1.27\", todatetime('2023-02-01'), agentMajorMinor == \"1.26\", todatetime('2023-01-15'), agentMajorMinor == \"1.25\", todatetime('2023-01-01'), agentMajorMinor == \"1.24\", todatetime('2022-11-01'), agentMajorMinor == \"1.23\", todatetime('2022-10-01'), agentMajorMinor == \"1.22\", todatetime('2022-09-01'), agentMajorMinor == \"1.21\", todatetime('2022-08-01'), agentMajorMinor == \"1.20\", todatetime('2022-07-01'), agentMajorMinor == \"1.19\", todatetime('2022-06-01'), agentMajorMinor == \"1.18\", todatetime('2022-05-01'), agentMajorMinor == \"1.17\", todatetime('2022-04-01'), agentMajorMinor == \"1.16\", todatetime('2022-03-01'), agentMajorMinor == \"1.15\", todatetime('2022-02-01'), agentMajorMinor == \"1.14\", todatetime('2022-01-01'), agentMajorMinor == \"1.13\", todatetime('2021-11-01'), agentMajorMinor == \"1.12\", todatetime('2021-10-01'), agentMajorMinor == \"1.11\", todatetime('2021-09-01'), agentMajorMinor == \"1.10\", todatetime('2021-08-01'), agentMajorMinor == \"1.9\", todatetime('2021-07-15'), agentMajorMinor == \"1.8\", todatetime('2021-07-01'), agentMajorMinor == \"1.7\", todatetime('2021-06-01'), agentMajorMinor == \"1.6\", todatetime('2021-05-01'), agentMajorMinor == \"1.5\", todatetime('2021-04-01'), agentMajorMinor == \"1.4\", todatetime('2021-03-01'), agentMajorMinor == \"1.3\", todatetime('2020-12-01'), agentMajorMinor == \"1.2\", todatetime('2020-11-01'), agentMajorMinor == \"1.1\", todatetime('2020-10-01'), agentMajorMinor == \"1.0\", todatetime('2020-09-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| extend releaseLabel = case(agentMajorMinor == \"1.61\", \"Feb 2026\", agentMajorMinor == \"1.60\", \"Jan 2026\", agentMajorMinor == \"1.59\", \"Dec 2025\", agentMajorMinor == \"1.58\", \"Nov 2025\", agentMajorMinor == \"1.57\", \"Oct 2025\", agentMajorMinor == \"1.56\", \"Sep 2025\", agentMajorMinor == \"1.55\", \"Aug 2025\", agentMajorMinor == \"1.54\", \"Jul 2025\", agentMajorMinor == \"1.53\", \"Jun 2025\", agentMajorMinor == \"1.52\", \"May 2025\", agentMajorMinor == \"1.51\", \"Apr 2025\", agentMajorMinor == \"1.50\", \"Mar 2025\", agentMajorMinor == \"1.49\", \"Feb 2025\", agentMajorMinor == \"1.48\", \"Jan 2025\", agentMajorMinor == \"1.47\", \"Oct 2024\", agentMajorMinor == \"1.46\", \"Sep 2024\", agentMajorMinor == \"1.45\", \"Aug 2024\", agentMajorMinor == \"1.44\", \"Jul 2024\", agentMajorMinor == \"1.43\", \"Jun 2024\", agentMajorMinor == \"1.42\", \"May 2024\", agentMajorMinor == \"1.41\", \"May 2024\", agentMajorMinor == \"1.40\", \"Apr 2024\", agentMajorMinor == \"1.39\", \"Mar 2024\", agentMajorMinor == \"1.38\", \"Feb 2024\", agentMajorMinor == \"1.37\", \"Dec 2023\", agentMajorMinor == \"1.36\", \"Nov 2023\", agentMajorMinor == \"1.35\", \"Oct 2023\", agentMajorMinor == \"1.34\", \"Sep 2023\", agentMajorMinor == \"1.33\", \"Aug 2023\", agentMajorMinor == \"1.32\", \"Jul 2023\", agentMajorMinor == \"1.31\", \"Jun 2023\", agentMajorMinor == \"1.30\", \"May 2023\", agentMajorMinor == \"1.29\", \"Apr 2023\", agentMajorMinor == \"1.28\", \"Mar 2023\", agentMajorMinor == \"1.27\", \"Feb 2023\", agentMajorMinor == \"1.26\", \"Jan 2023\", agentMajorMinor == \"1.25\", \"Jan 2023\", agentMajorMinor == \"1.24\", \"Nov 2022\", agentMajorMinor == \"1.23\", \"Oct 2022\", agentMajorMinor == \"1.22\", \"Sep 2022\", agentMajorMinor == \"1.21\", \"Aug 2022\", agentMajorMinor == \"1.20\", \"Jul 2022\", agentMajorMinor == \"1.19\", \"Jun 2022\", agentMajorMinor == \"1.18\", \"May 2022\", agentMajorMinor == \"1.17\", \"Apr 2022\", agentMajorMinor == \"1.16\", \"Mar 2022\", agentMajorMinor == \"1.15\", \"Feb 2022\", agentMajorMinor == \"1.14\", \"Jan 2022\", agentMajorMinor == \"1.13\", \"Nov 2021\", agentMajorMinor == \"1.12\", \"Oct 2021\", agentMajorMinor == \"1.11\", \"Sep 2021\", agentMajorMinor == \"1.10\", \"Aug 2021\", agentMajorMinor == \"1.9\", \"Jul 2021\", agentMajorMinor == \"1.8\", \"Jul 2021\", agentMajorMinor == \"1.7\", \"Jun 2021\", agentMajorMinor == \"1.6\", \"May 2021\", agentMajorMinor == \"1.5\", \"Apr 2021\", agentMajorMinor == \"1.4\", \"Mar 2021\", agentMajorMinor == \"1.3\", \"Dec 2020\", agentMajorMinor == \"1.2\", \"Nov 2020\", agentMajorMinor == \"1.1\", \"Oct 2020\", agentMajorMinor == \"1.0\", \"Sep 2020\", \"Unknown\")\n| summarize Servers = count() by agentMajorMinor, releaseDate, releaseLabel, supportStatus\n| extend eosDate = datetime_add('day', 365, releaseDate)\n| extend eosMonthName = case(datetime_part('month', eosDate) == 1, \"Jan\", datetime_part('month', eosDate) == 2, \"Feb\", datetime_part('month', eosDate) == 3, \"Mar\", datetime_part('month', eosDate) == 4, \"Apr\", datetime_part('month', eosDate) == 5, \"May\", datetime_part('month', eosDate) == 6, \"Jun\", datetime_part('month', eosDate) == 7, \"Jul\", datetime_part('month', eosDate) == 8, \"Aug\", datetime_part('month', eosDate) == 9, \"Sep\", datetime_part('month', eosDate) == 10, \"Oct\", datetime_part('month', eosDate) == 11, \"Nov\", \"Dec\")\n| extend EndOfSupport = iff(supportStatus == \"Unknown\", \"-\", strcat(eosMonthName, \" \", tostring(datetime_part('year', eosDate))))\n| extend DaysRemaining = iff(supportStatus == \"Unknown\", \"-\", tostring(iff(releaseDate >= ago(365d), datetime_diff('day', datetime_add('day', 365, releaseDate), now()), toint(0))))\n| project Version = agentMajorMinor, Release = releaseLabel, SupportStatus = supportStatus, EndOfSupport, DaysRemaining, Servers, releaseDate\n| extend sortKey = iff(Version == \"Unknown\", -1.0, toreal(Version))\n| order by sortKey desc\n| project-away releaseDate, sortKey",
+                "size": 0,
+                "title": "Versions Found in Your Environment",
+                "queryType": 1,
+                "resourceType": "microsoft.resourcegraph/resources",
+                "crossComponentResources": [
+                    "{Subscriptions}"
+                ],
+                "visualization": "table",
+                "showExportToExcel": true,
+                "exportToExcelOptions": "visible",
+                "showAnalytics": true,
+                "gridSettings": {
+                    "formatters": [
+                        {
+                            "columnMatch": "SupportStatus",
+                            "formatter": 18,
+                            "formatOptions": {
+                                "thresholdsOptions": "icons",
+                                "thresholdsGrid": [
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Latest version",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Supported",
+                                        "representation": "success",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "==",
+                                        "thresholdValue": "Out of support",
+                                        "representation": "3",
+                                        "text": "{0}{1}"
+                                    },
+                                    {
+                                        "operator": "Default",
+                                        "thresholdValue": null,
+                                        "representation": "warning",
+                                        "text": "{0}{1}"
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "columnMatch": "DaysRemaining",
+                            "formatter": 8,
+                            "formatOptions": {
+                                "min": 0,
+                                "max": 365,
+                                "palette": "redGreen",
+                                "showIcon": true
+                            }
+                        },
+                        {
+                            "columnMatch": "EndOfSupport",
+                            "formatter": 0,
+                            "formatOptions": {
+                                "showIcon": true
+                            }
+                        }
+                    ]
+                }
+            },
+            "name": "version-reference-table"
+        },
+        {
+            "type": 1,
+            "content": {
+                "json": "---\n### Notes & Links\n\n| Item | Detail |\n|------|--------|\n| **Support policy** | [Agent Release Notes](https://learn.microsoft.com/en-us/azure/azure-arc/servers/agent-release-notes) — versions released more than 365 days ago lose official support |\n| **Agent overview** | [Connected Machine agent overview](https://learn.microsoft.com/en-us/azure/azure-arc/servers/agent-overview) |\n| **Enable Auto Upgrade** | [Automatic agent upgrade](https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-agent#automatic-agent-upgrade-preview) |\n| **Enable Auto Upgrade (CLI)** | `az connectedmachine upgrade-extension --machine-name <name> -g <rg>` |\n| **Resource Graph Explorer** | [Open in Portal](https://portal.azure.com/#view/HubsExtension/ArgQueryBlade) – click **⋯** on any panel → *Open query in Resource Graph Explorer* |\n| **Mapped versions** | 1.0 (Sep 2020) through 1.61 (Feb 2026) — 62 versions — any unrecognized version shows as \"Unknown\" |\n| **⚙️ Maintenance** | When a new agent version is released, add it to the `case()` blocks in each query and update `1.61` (latestVersion) |"
+            },
+            "name": "footer-notes"
         }
-      },
-      "customWidth": "16",
-      "name": "tile-out-of-support"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(autoUpgradeEnabled == true), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
-        "size": 4,
-        "showAnalytics": true,
-        "title": "Auto Upgrade On",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "tiles",
-        "tileSettings": {
-          "leftContent": {
-            "columnMatch": "Value",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "green"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "style": "decimal",
-                "maximumFractionDigits": 0
-              }
-            }
-          },
-          "secondaryContent": {
-            "columnMatch": "Subtitle",
-            "formatter": 1
-          },
-          "showBorder": true,
-          "size": "auto"
-        }
-      },
-      "customWidth": "16",
-      "name": "tile-autoupgrade"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = countif(status == \"Connected\"), Total = count()\n| extend Pct = iff(Total > 0, round(100.0 * Value / Total, 1), 0.0)\n| extend Subtitle = strcat(Pct, \"% of \", Total, \" servers\")",
-        "size": 4,
-        "showAnalytics": true,
-        "title": "Connected",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "tiles",
-        "tileSettings": {
-          "leftContent": {
-            "columnMatch": "Value",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "green"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "style": "decimal",
-                "maximumFractionDigits": 0
-              }
-            }
-          },
-          "secondaryContent": {
-            "columnMatch": "Subtitle",
-            "formatter": 1
-          },
-          "showBorder": true,
-          "size": "auto"
-        }
-      },
-      "customWidth": "16",
-      "name": "tile-connected"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Value = count()\n| extend Subtitle = \"Arc servers\"",
-        "size": 4,
-        "showAnalytics": true,
-        "title": "Total Servers",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "tiles",
-        "tileSettings": {
-          "leftContent": {
-            "columnMatch": "Value",
-            "formatter": 12,
-            "formatOptions": {
-              "palette": "blue"
-            },
-            "numberFormat": {
-              "unit": 17,
-              "options": {
-                "style": "decimal",
-                "maximumFractionDigits": 0
-              }
-            }
-          },
-          "secondaryContent": {
-            "columnMatch": "Subtitle",
-            "formatter": 1
-          },
-          "showBorder": true,
-          "size": "auto"
-        }
-      },
-      "customWidth": "16",
-      "name": "tile-total"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by SupportStatus = supportStatus",
-        "size": 3,
-        "showAnalytics": true,
-        "title": "Support Compliance",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "piechart",
-        "chartSettings": {
-          "seriesLabelSettings": [
-            {
-              "seriesName": "Latest version",
-              "color": "blue"
-            },
-            {
-              "seriesName": "Supported",
-              "color": "green"
-            },
-            {
-              "seriesName": "Out of support",
-              "color": "redBright"
-            },
-            {
-              "seriesName": "Unknown",
-              "color": "gray"
-            }
-          ]
-        }
-      },
-      "customWidth": "33",
-      "name": "compliance-pie"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by ConnectionStatus = status",
-        "size": 3,
-        "showAnalytics": true,
-        "title": "Connection Status",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "piechart",
-        "chartSettings": {
-          "seriesLabelSettings": [
-            {
-              "seriesName": "Connected",
-              "color": "green"
-            },
-            {
-              "seriesName": "Disconnected",
-              "color": "redBright"
-            },
-            {
-              "seriesName": "Expired",
-              "color": "orange"
-            },
-            {
-              "seriesName": "AwaitingConnection",
-              "color": "yellow"
-            }
-          ]
-        }
-      },
-      "customWidth": "33",
-      "name": "connection-status-pie"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by AutoUpgrade = autoUpgradeLabel",
-        "size": 3,
-        "showAnalytics": true,
-        "title": "Auto Upgrade",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "piechart",
-        "chartSettings": {
-          "seriesLabelSettings": [
-            {
-              "seriesName": "Enabled",
-              "color": "green"
-            },
-            {
-              "seriesName": "Disabled",
-              "color": "orange"
-            },
-            {
-              "seriesName": "N/A",
-              "color": "gray"
-            }
-          ]
-        }
-      },
-      "customWidth": "33",
-      "name": "autoupgrade-pie"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n## Version Distribution"
-      },
-      "name": "charts-header"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by Version = agentMajorMinor, SupportStatus = supportStatus\n| order by Version asc",
-        "size": 1,
-        "showAnalytics": true,
-        "title": "Servers by Agent Version",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "barchart",
-        "chartSettings": {
-          "xAxis": "Version",
-          "yAxis": [
-            "Servers"
-          ],
-          "group": "SupportStatus",
-          "createOtherGroup": 0,
-          "showLegend": true,
-          "seriesLabelSettings": [
-            {
-              "seriesName": "Latest version",
-              "color": "blue"
-            },
-            {
-              "seriesName": "Supported",
-              "color": "green"
-            },
-            {
-              "seriesName": "Out of support",
-              "color": "redBright"
-            },
-            {
-              "seriesName": "Unknown",
-              "color": "gray"
-            }
-          ]
-        }
-      },
-      "customWidth": "50",
-      "name": "version-bar-chart"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| summarize Servers = count() by SupportStatus = supportStatus, AutoUpgrade = autoUpgradeLabel\n| extend sortPriority = case(SupportStatus == \"Out of support\", 1, SupportStatus == \"Unknown\", 2, SupportStatus == \"Supported\", 3, SupportStatus == \"Latest version\", 4, 5)\n| order by sortPriority asc\n| project-away sortPriority",
-        "size": 1,
-        "showAnalytics": true,
-        "title": "Support Status vs Auto Upgrade",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "barchart",
-        "chartSettings": {
-          "xAxis": "SupportStatus",
-          "yAxis": [
-            "Servers"
-          ],
-          "group": "AutoUpgrade",
-          "createOtherGroup": 0,
-          "showLegend": true,
-          "seriesLabelSettings": [
-            {
-              "seriesName": "Enabled",
-              "color": "green"
-            },
-            {
-              "seriesName": "Disabled",
-              "color": "orange"
-            },
-            {
-              "seriesName": "N/A",
-              "color": "gray"
-            }
-          ]
-        }
-      },
-      "customWidth": "50",
-      "name": "support-autoupgrade-chart"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n## Server Inventory"
-      },
-      "name": "detail-header"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| join kind=leftouter (\n    resourcecontainers\n    | where type =~ \"microsoft.resources/subscriptions\"\n    | project subscriptionId, SubscriptionName = name\n) on subscriptionId\n| extend\n    agentVersion = tostring(properties.agentVersion),\n    status = tostring(properties.status),\n    osName = tostring(properties.osName),\n    osSku = tostring(properties.osSku),\n    osVersion = tostring(properties.osVersion),\n    lastStatusChange = todatetime(properties.lastStatusChange),\n    machineFqdn = tostring(properties.machineFqdn),\n    autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade),\n    desiredVersion = tostring(properties.agentUpgrade.desiredVersion)\n| extend\n    agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1])),\n    autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend releaseLabel = case(agentMajorMinor == \"1.61\", \"Feb 2026\", agentMajorMinor == \"1.60\", \"Jan 2026\", agentMajorMinor == \"1.59\", \"Dec 2025\", agentMajorMinor == \"1.58\", \"Nov 2025\", agentMajorMinor == \"1.57\", \"Oct 2025\", agentMajorMinor == \"1.56\", \"Sep 2025\", agentMajorMinor == \"1.55\", \"Aug 2025\", agentMajorMinor == \"1.54\", \"Jul 2025\", agentMajorMinor == \"1.53\", \"Jun 2025\", agentMajorMinor == \"1.52\", \"May 2025\", agentMajorMinor == \"1.51\", \"Apr 2025\", agentMajorMinor == \"1.50\", \"Mar 2025\", agentMajorMinor == \"1.49\", \"Feb 2025\", agentMajorMinor == \"1.48\", \"Jan 2025\", agentMajorMinor == \"1.47\", \"Oct 2024\", agentMajorMinor == \"1.46\", \"Sep 2024\", agentMajorMinor == \"1.45\", \"Aug 2024\", agentMajorMinor == \"1.44\", \"Jul 2024\", agentMajorMinor == \"1.43\", \"Jun 2024\", agentMajorMinor == \"1.42\", \"May 2024\", agentMajorMinor == \"1.41\", \"May 2024\", agentMajorMinor == \"1.40\", \"Apr 2024\", agentMajorMinor == \"1.39\", \"Mar 2024\", agentMajorMinor == \"1.38\", \"Feb 2024\", \"Unknown\")\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| project\n    Server = name,\n    Subscription = SubscriptionName,\n    ResourceGroup = resourceGroup,\n    Location = location,\n    AgentVersion = agentVersion,\n    Release = releaseLabel,\n    SupportStatus = supportStatus,\n    ConnectionStatus = status,\n    AutoUpgrade = autoUpgradeLabel,\n    DesiredVersion = iff(isempty(desiredVersion), \"-\", desiredVersion),\n    OS = iff(isnotempty(osSku), osSku, iff(isnotempty(osName), osName, \"-\")),\n    OSVersion = iff(isnotempty(osVersion), osVersion, \"-\"),\n    LastUpdate = lastStatusChange,\n    FQDN = coalesce(machineFqdn, \"-\")\n| extend sortPriority = case(SupportStatus == \"Out of support\", 1, SupportStatus == \"Unknown\", 2, SupportStatus == \"Supported\", 3, SupportStatus == \"Latest version\", 4, 5)\n| order by sortPriority asc, AgentVersion asc, Server asc\n| project-away sortPriority",
-        "size": 0,
-        "showAnalytics": true,
-        "title": "Arc Server Details - Support Status",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "table",
-        "gridSettings": {
-          "formatters": [
-            {
-              "columnMatch": "SupportStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Latest version",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Supported",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Out of support",
-                    "representation": "3",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "ConnectionStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Connected",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Disconnected",
-                    "representation": "2",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Expired",
-                    "representation": "4",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "AutoUpgrade",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Enabled",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Disabled",
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "unknown",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "LastUpdate",
-              "formatter": 6,
-              "formatOptions": {
-                "showIcon": true
-              }
-            }
-          ],
-          "filter": true
-        }
-      },
-      "name": "server-detail-table"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n## Auto Upgrade Details"
-      },
-      "name": "autoupgrade-detail-header"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| join kind=leftouter (\n    resourcecontainers\n    | where type =~ \"microsoft.resources/subscriptions\"\n    | project subscriptionId, SubscriptionName = name\n) on subscriptionId\n| extend\n    agentVersion = tostring(properties.agentVersion),\n    status = tostring(properties.status),\n    autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade),\n    desiredVersion = tostring(properties.agentUpgrade.desiredVersion),\n    lastAttemptTimestamp = tostring(properties.agentUpgrade.lastAttemptTimestamp),\n    lastAttemptStatus = tostring(properties.agentUpgrade.lastAttemptStatus),\n    lastAttemptMessage = tostring(properties.agentUpgrade.lastAttemptMessage)\n| extend\n    agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1])),\n    autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| extend desiredMM = iff(isnotempty(desiredVersion), strcat(split(desiredVersion, \".\")[0], \".\", split(desiredVersion, \".\")[1]), \"\")\n| extend upgradeStatus = case(isnotempty(desiredVersion) and agentMajorMinor != desiredMM and status != \"Connected\", \"Pending (Offline)\", isnotempty(desiredVersion) and agentMajorMinor != desiredMM, \"Pending\", isnotempty(desiredVersion) and agentMajorMinor == desiredMM, \"Completed\", \"-\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| project\n    Server = name,\n    Subscription = SubscriptionName,\n    ResourceGroup = resourceGroup,\n    AgentVersion = agentVersion,\n    SupportStatus = supportStatus,\n    DesiredVersion = iff(isempty(desiredVersion), \"-\", desiredVersion),\n    UpgradeStatus = upgradeStatus,\n    AutoUpgrade = autoUpgradeLabel,\n    ConnectionStatus = status,\n    LastStatus = iff(isempty(lastAttemptStatus), \"-\", lastAttemptStatus),\n    LastAttempt = iff(isempty(lastAttemptTimestamp), \"-\", lastAttemptTimestamp),\n    Message = iff(isempty(lastAttemptMessage), \"-\", lastAttemptMessage)\n| extend sortPriority = case(UpgradeStatus == \"Pending (Offline)\", 1, UpgradeStatus == \"Pending\", 2, UpgradeStatus == \"Completed\", 3, 4)\n| order by sortPriority asc, AutoUpgrade asc, Server asc\n| project-away sortPriority",
-        "size": 0,
-        "showAnalytics": true,
-        "title": "Auto Upgrade – Server Details",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "table",
-        "gridSettings": {
-          "formatters": [
-            {
-              "columnMatch": "SupportStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Latest version",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Supported",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Out of support",
-                    "representation": "3",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "UpgradeStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Pending (Offline)",
-                    "representation": "3",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Pending",
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Completed",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "Blank",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "AutoUpgrade",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Enabled",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Disabled",
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "unknown",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "ConnectionStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Connected",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Disconnected",
-                    "representation": "2",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Expired",
-                    "representation": "4",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "LastStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Success",
-                    "representation": "success",
-                    "text": "Success"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Failed",
-                    "representation": "3",
-                    "text": "Failed"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "-",
-                    "representation": "Blank",
-                    "text": "-"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "unknown",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            }
-          ],
-          "filter": true
-        }
-      },
-      "name": "autoupgrade-detail-table"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n## Version Reference"
-      },
-      "name": "ref-table-header"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\n| where type =~ \"microsoft.hybridcompute/machines\"\n| extend agentVersion = tostring(properties.agentVersion), status = tostring(properties.status), autoUpgradeEnabled = tobool(properties.agentUpgrade.enableAutomaticUpgrade)\n| extend autoUpgradeLabel = case(autoUpgradeEnabled == true, \"Enabled\", autoUpgradeEnabled == false, \"Disabled\", \"N/A\")\n| extend agentMajorMinor = iff(isempty(agentVersion), \"Unknown\", strcat(split(agentVersion, \".\")[0], \".\", split(agentVersion, \".\")[1]))\n| extend releaseDate = case(agentMajorMinor == \"1.61\", todatetime('2026-02-01'), agentMajorMinor == \"1.60\", todatetime('2026-01-01'), agentMajorMinor == \"1.59\", todatetime('2025-12-01'), agentMajorMinor == \"1.58\", todatetime('2025-11-01'), agentMajorMinor == \"1.57\", todatetime('2025-10-01'), agentMajorMinor == \"1.56\", todatetime('2025-09-01'), agentMajorMinor == \"1.55\", todatetime('2025-08-01'), agentMajorMinor == \"1.54\", todatetime('2025-07-01'), agentMajorMinor == \"1.53\", todatetime('2025-06-01'), agentMajorMinor == \"1.52\", todatetime('2025-05-01'), agentMajorMinor == \"1.51\", todatetime('2025-04-01'), agentMajorMinor == \"1.50\", todatetime('2025-03-01'), agentMajorMinor == \"1.49\", todatetime('2025-02-01'), agentMajorMinor == \"1.48\", todatetime('2025-01-01'), agentMajorMinor == \"1.47\", todatetime('2024-10-01'), agentMajorMinor == \"1.46\", todatetime('2024-09-01'), agentMajorMinor == \"1.45\", todatetime('2024-08-01'), agentMajorMinor == \"1.44\", todatetime('2024-07-01'), agentMajorMinor == \"1.43\", todatetime('2024-06-01'), agentMajorMinor == \"1.42\", todatetime('2024-05-15'), agentMajorMinor == \"1.41\", todatetime('2024-05-01'), agentMajorMinor == \"1.40\", todatetime('2024-04-01'), agentMajorMinor == \"1.39\", todatetime('2024-03-01'), agentMajorMinor == \"1.38\", todatetime('2024-02-01'), todatetime('1900-01-01'))\n| extend supportStatus = case(releaseDate >= ago(365d) and agentMajorMinor == \"1.61\", \"Latest version\", releaseDate >= ago(365d), \"Supported\", releaseDate == todatetime('1900-01-01'), \"Unknown\", \"Out of support\")\n| where supportStatus in ({SupportFilter}) or 'All' in ({SupportFilter})\n| where status in ({StatusFilter}) or 'All' in ({StatusFilter})\n| where autoUpgradeLabel in ({AutoUpgradeFilter}) or 'All' in ({AutoUpgradeFilter})\n| extend releaseLabel = case(agentMajorMinor == \"1.61\", \"Feb 2026\", agentMajorMinor == \"1.60\", \"Jan 2026\", agentMajorMinor == \"1.59\", \"Dec 2025\", agentMajorMinor == \"1.58\", \"Nov 2025\", agentMajorMinor == \"1.57\", \"Oct 2025\", agentMajorMinor == \"1.56\", \"Sep 2025\", agentMajorMinor == \"1.55\", \"Aug 2025\", agentMajorMinor == \"1.54\", \"Jul 2025\", agentMajorMinor == \"1.53\", \"Jun 2025\", agentMajorMinor == \"1.52\", \"May 2025\", agentMajorMinor == \"1.51\", \"Apr 2025\", agentMajorMinor == \"1.50\", \"Mar 2025\", agentMajorMinor == \"1.49\", \"Feb 2025\", agentMajorMinor == \"1.48\", \"Jan 2025\", agentMajorMinor == \"1.47\", \"Oct 2024\", agentMajorMinor == \"1.46\", \"Sep 2024\", agentMajorMinor == \"1.45\", \"Aug 2024\", agentMajorMinor == \"1.44\", \"Jul 2024\", agentMajorMinor == \"1.43\", \"Jun 2024\", agentMajorMinor == \"1.42\", \"May 2024\", agentMajorMinor == \"1.41\", \"May 2024\", agentMajorMinor == \"1.40\", \"Apr 2024\", agentMajorMinor == \"1.39\", \"Mar 2024\", agentMajorMinor == \"1.38\", \"Feb 2024\", \"Unknown\")\n| summarize Servers = count() by agentMajorMinor, releaseDate, releaseLabel, supportStatus\n| extend EndOfSupport = iff(supportStatus == \"Unknown\", \"-\", tostring(datetime_add('day', 365, releaseDate)))\n| extend DaysRemaining = iff(supportStatus == \"Unknown\", \"-\", tostring(iff(releaseDate >= ago(365d), datetime_diff('day', datetime_add('day', 365, releaseDate), now()), toint(0))))\n| project Version = agentMajorMinor, Release = releaseLabel, SupportStatus = supportStatus, EndOfSupport, DaysRemaining, Servers, releaseDate\n| order by releaseDate desc\n| project-away releaseDate",
-        "size": 0,
-        "showAnalytics": true,
-        "title": "Versions Found in Your Environment",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Subscriptions}"
-        ],
-        "visualization": "table",
-        "gridSettings": {
-          "formatters": [
-            {
-              "columnMatch": "SupportStatus",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Latest version",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Supported",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Out of support",
-                    "representation": "3",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "warning",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "DaysRemaining",
-              "formatter": 8,
-              "formatOptions": {
-                "min": 0,
-                "max": 365,
-                "palette": "redGreen",
-                "showIcon": true
-              }
-            },
-            {
-              "columnMatch": "EndOfSupport",
-              "formatter": 6,
-              "formatOptions": {
-                "showIcon": true
-              }
-            }
-          ]
-        }
-      },
-      "name": "version-reference-table"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n### Notes & Links\n\n| Item | Detail |\n|------|--------|\n| **Support policy** | [Agent Release Notes](https://learn.microsoft.com/en-us/azure/azure-arc/servers/agent-release-notes) — versions released more than 365 days ago lose official support |\n| **Agent overview** | [Connected Machine agent overview](https://learn.microsoft.com/en-us/azure/azure-arc/servers/agent-overview) |\n| **Enable Auto Upgrade** | [Automatic agent upgrade](https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-agent#automatic-agent-upgrade-preview) |\n| **Enable Auto Upgrade (CLI)** | `az connectedmachine upgrade-extension --machine-name <name> -g <rg>` |\n| **Resource Graph Explorer** | [Open in Portal](https://portal.azure.com/#view/HubsExtension/ArgQueryBlade) – click **⋯** on any panel → *Open query in Resource Graph Explorer* |\n| **Mapped versions** | 1.38 (Feb 2024) through 1.61 (Feb 2026) — older versions show as \"Unknown\" |\n| **⚙️ Maintenance** | When a new agent version is released, add it to the `case()` blocks in each query and update `1.61` (latestVersion) |"
-      },
-      "name": "footer-notes"
-    }
-  ],
-  "fallbackResourceIds": [
-    "azure monitor"
-  ],
-  "fromTemplateId": "azure-arc-agent-compliance",
-  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+    ],
+    "fallbackResourceIds": [
+        "Azure Monitor"
+    ],
+    "fromTemplateId": "custom-arc-agent-support",
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
