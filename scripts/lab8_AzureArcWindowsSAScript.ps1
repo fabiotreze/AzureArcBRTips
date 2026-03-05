@@ -1,48 +1,88 @@
-# Required versions of Az.Accounts and Az.ResourceGraph modules are installed
+<#
+.SYNOPSIS
+    Activates Software Assurance benefits on Azure Arc Windows machines.
 
-# Define the required parameters
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$subscriptionId,  # Enter your Subscription ID
+.DESCRIPTION
+    Queries all subscriptions for Azure Arc Windows machines where Software Assurance
+    benefits are not activated, and enables them via REST API.
 
-    [Parameter(Mandatory=$true)]
-    [string]$resourceGroupName, # Enter your Resource Group for Azure Arc resources
+    Uses ONLY Azure CLI — no Az PowerShell modules required.
 
-    [Parameter(Mandatory=$true)]
-    [string]$location         # Enter your Location for Azure Arc resources
-)
+.NOTES
+    Reference: https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-license-and-billing-for-extended-security-updates
 
-# Authenticate to Azure using Managed Identity - RBAC required Azure Connected Machine Resource Administrator and Reader in Subscription Level
-try {
-    Write-Host "Logging in to Azure..."
-    Connect-AzAccount -Identity -ErrorAction Stop
+.PREREQUISITES
+    - PowerShell 7.2+ Runtime Environment
+    - Azure CLI (pre-installed in Azure Automation)
+    - Managed Identity with Reader + Azure Connected Machine Resource Administrator
+#>
+
+#Requires -Version 7.2
+
+$ErrorActionPreference = "Stop"
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+function Write-Log {
+    param (
+        [ValidateSet("INFO", "WARN", "ERROR", "FATAL", "RESULT")]
+        [string] $Level,
+        [string] $Message
+    )
+    Write-Output "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')][$Level] $Message"
 }
-catch {
-    Write-Error -Message $_.Exception
-    throw $_.Exception
+
+# =============================================================================
+# PREREQUISITES
+# =============================================================================
+function Test-Prerequisites {
+    if (-not (Get-Command az -ErrorAction SilentlyContinue)) { throw "Azure CLI not found." }
+    $v = (az version --output json 2>$null | ConvertFrom-Json).'azure-cli'
+    Write-Log INFO "Azure CLI $v | PowerShell $($PSVersionTable.PSVersion)"
 }
 
-# Validate the provided subscription
-$subscription = Get-AzSubscription -SubscriptionId $subscriptionId -ErrorAction SilentlyContinue
-if (-not $subscription) {
-    Write-Host "Subscription ID $subscriptionId not found! Ensure you have access."
-    exit
+function Install-RequiredExtensions {
+    $installed = (az extension list --output json 2>$null | ConvertFrom-Json).name
+    foreach ($ext in @("resource-graph")) {
+        if ($ext -notin $installed) {
+            Write-Log INFO "Installing extension '$ext'..."
+            az extension add --name $ext --yes 2>$null | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to install extension '$ext'." }
+        }
+    }
 }
 
-# Set the execution context to the provided Subscription ID
-Write-Host "Setting execution context to Subscription ID: $subscriptionId"
-Set-AzContext -SubscriptionId $subscriptionId | Out-Null
+# =============================================================================
+# AUTHENTICATION
+# =============================================================================
+function Connect-Azure {
+    Write-Log INFO "Authenticating with managed identity..."
+    $out = az login --identity --allow-no-subscriptions 2>&1
+    if ($LASTEXITCODE -ne 0) { throw "az login failed: $($out -join ' ')" }
+    Write-Log INFO "Authenticated."
+}
 
-# Query Azure Resource Graph to get the list of machines
-$query = @"
+# =============================================================================
+# RESOURCE GRAPH QUERY
+# =============================================================================
+function Get-TargetMachines {
+    param ([string] $SubscriptionId)
+
+    $queryFile = Join-Path ([IO.Path]::GetTempPath()) "arg_$([guid]::NewGuid().ToString('N')).kql"
+
+    # KQL: Find eligible Windows Server Arc machines where Software Assurance is NOT activated
+    # Eligible = Connected + Licensed. Pre-filtering removes "Not eligible" machines.
+    $kql = @'
 resources
 | where type =~ "microsoft.hybridcompute/machines"
-| extend status = properties.status
-| extend operatingSystem = properties.osSku
-| extend locationDisplayName = location
-| where properties.osType =~ 'windows'
+| where properties.osType =~ "windows"
+| where tolower(tostring(properties.status)) == "connected"
+| extend operatingSystem = tostring(properties.osSku)
+| where operatingSystem has "Server"
 | extend licenseProfile = coalesce(properties.licenseProfile, properties.licenseProfileStorage.properties)
 | extend licenseStatus = tostring(licenseProfile.licenseStatus)
+| where licenseStatus =~ "Licensed"
 | extend licenseChannel = tostring(licenseProfile.licenseChannel)
 | extend productSubscriptionStatus = tostring(licenseProfile.productProfile.subscriptionStatus)
 | extend softwareAssurance = licenseProfile.softwareAssurance
@@ -52,78 +92,175 @@ resources
     (licenseStatus =~ "Licensed" and licenseChannel =~ "PGS:TB") or productSubscriptionStatus =~ "Enabled", "Activated via Pay-as-you-go",
     isnull(softwareAssurance) or isnull(softwareAssuranceCustomer) or softwareAssuranceCustomer == false, "Not activated",
     "Not activated")
-| where (benefitsStatus =~ 'Not activated')
-| where (operatingSystem !~ ('windows 11 enterprise'))
-| where (type in~ ('Microsoft.HybridCompute/machinesSoftwareAssurance','Microsoft.HybridCompute/machines'))
-| where subscriptionId == "$subscriptionId"  // Filter by provided subscriptionId
-| where resourceGroup =~ "$resourceGroupName"  // Filter by provided resourceGroupName
-| where location =~ "$location"  // Filter by provided location
-| project name, resourceGroup, subscriptionId, operatingSystem, location
-"@
+| where benefitsStatus =~ "Not activated"
+| project machineName = name, resourceGroup, subscriptionId, operatingSystem, location, benefitsStatus
+| where isnotempty(machineName) and isnotempty(resourceGroup)
+'@
 
-$query
+    try {
+        Set-Content -Path $queryFile -Value $kql -Encoding UTF8 -Force
 
-Write-Host "Executing query in Azure Resource Graph..."
-$result = Search-AzGraph -Query $query
+        $pageSize = 1000
+        $skip = 0
+        $allData = @()
 
-# Ensure the results are stored as an array
-$machines = @()
-if ($result) {
-    $machines = $result
-}
+        do {
+            $json = az graph query -q "@$queryFile" --subscriptions $SubscriptionId `
+                --first $pageSize --skip $skip --output json 2>&1
+            if ($LASTEXITCODE -ne 0) { throw "Resource Graph query failed: $($json -join ' ')" }
 
-# Check if any machines were returned
-if ($machines.Count -eq 0) {
-    Write-Host "No unactivated machines found!"
-    exit
-}
+            $result = $json | ConvertFrom-Json
+            $pageData = $result.data
+            $pageCount = $pageData.Count
 
-$machines.name
+            if ($pageCount -gt 0) {
+                $allData += $pageData
+                $skip += $pageCount
+            }
 
-# Loop through each machine to process
-foreach ($machine in $machines) {
-    $machineName = $machine.name
-    $resourceGroupName = $machine.resourceGroup
-    $machineSubscriptionId = $machine.subscriptionId
+            if ($skip -gt $pageSize) {
+                Write-Log INFO "Paginating Resource Graph: $($allData.Count) rows fetched so far..."
+            }
+        } while ($pageCount -eq $pageSize)
 
-    Write-Host "`n🔹 Processing machine: $machineName (RG: $resourceGroupName, Subscription: $machineSubscriptionId)"
-
-    # Define URI for the REST API
-    $uri = "https://management.azure.com/subscriptions/$machineSubscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.HybridCompute/machines/$machineName/licenseProfiles/default?api-version=2023-10-03-preview"
-
-    # Get the authentication token using Managed Identity
-    $secureToken = (Get-AzAccessToken -ResourceUrl "https://management.azure.com" -AsSecureString).Token
-    $tokenString = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureToken))
-
-    $header = @{
-        'Content-Type'  = 'application/json'
-        'Authorization' = 'Bearer ' + $tokenString
+        return $allData
     }
+    finally {
+        if (Test-Path $queryFile) { Remove-Item $queryFile -Force -ErrorAction SilentlyContinue }
+    }
+}
 
-    # Create the JSON payload
-    $data = @{
-        location = $machine.location
+# =============================================================================
+# ENABLE SOFTWARE ASSURANCE
+# PUT /subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.HybridCompute/machines/{machine}/licenseProfiles/default
+# =============================================================================
+function Enable-SoftwareAssurance {
+    param (
+        [string] $SubscriptionId,
+        [string] $ResourceGroup,
+        [string] $MachineName,
+        [string] $Location,
+        [int]    $MaxRetries = 2
+    )
+
+    $uri = "https://management.azure.com/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroup/providers/Microsoft.HybridCompute/machines/$MachineName/licenseProfiles/default?api-version=2023-10-03-preview"
+
+    $body = @{
+        location   = $Location
         properties = @{
             softwareAssurance = @{
                 softwareAssuranceCustomer = $true
             }
         }
-    }
+    } | ConvertTo-Json -Depth 3
 
-    $json = $data | ConvertTo-Json -Depth 3
+    $bodyFile = Join-Path ([IO.Path]::GetTempPath()) "body_$([guid]::NewGuid().ToString('N')).json"
 
-    $json
-
-    # Execute the REST API call
     try {
-        $response = Invoke-RestMethod -Method PUT -Uri $uri -ContentType "application/json" -Headers $header -Body $json
-        Write-Host "Machine $machineName processed successfully!"
-        Write-Host "API Response: $($response.properties | ConvertTo-Json -Depth 3)"
+        Set-Content -Path $bodyFile -Value $body -Encoding UTF8 -Force
+
+        for ($i = 1; $i -le $MaxRetries; $i++) {
+            $out = az rest --method PUT --uri $uri --body "@$bodyFile" 2>&1
+
+            if ($LASTEXITCODE -eq 0) { return "Success" }
+
+            $errMsg = $out -join ' '
+            if ($i -lt $MaxRetries) {
+                Write-Log WARN "Attempt $i failed for '$MachineName': $errMsg — retrying in 10s..."
+                Start-Sleep -Seconds 10
+            }
+        }
     }
-    catch {
-        Write-Host "Error processing machine ${machineName}: $_"
+    finally {
+        if (Test-Path $bodyFile) { Remove-Item $bodyFile -Force -ErrorAction SilentlyContinue }
+    }
+
+    Write-Log ERROR "Failed after $MaxRetries attempts: '$MachineName' (RG: $ResourceGroup) — $errMsg"
+    return "Failure"
+}
+
+# =============================================================================
+# PROCESS SUBSCRIPTION
+# =============================================================================
+function Invoke-Subscription {
+    param (
+        [string] $SubscriptionId,
+        [string] $SubscriptionName,
+        [hashtable] $Stats
+    )
+
+    Write-Log INFO "--- Subscription: $SubscriptionName ($SubscriptionId)"
+
+    az account set --subscription $SubscriptionId 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log WARN "Could not set context. Skipping."
+        $Stats.Skipped++
+        return
+    }
+
+    $machines = Get-TargetMachines -SubscriptionId $SubscriptionId
+
+    if (-not $machines -or $machines.Count -eq 0) {
+        Write-Log INFO "All machines activated (or none exist)."
+        $Stats.Compliant++
+        return
+    }
+
+    Write-Log INFO "Found $($machines.Count) machine(s) without Software Assurance benefits."
+
+    foreach ($m in $machines) {
+        Write-Log INFO "  -> $($m.machineName) | RG: $($m.resourceGroup) | OS: $($m.operatingSystem) | Location: $($m.location)"
+
+        $result = Enable-SoftwareAssurance `
+            -SubscriptionId $SubscriptionId `
+            -ResourceGroup $m.resourceGroup `
+            -MachineName $m.machineName `
+            -Location $m.location
+
+        if ($result -eq "Success") { $Stats.Success++ } else { $Stats.Failure++ }
+        $Stats.Total++
+
+        Write-Log RESULT "$($m.machineName),$($m.resourceGroup),$SubscriptionId,$($m.operatingSystem),$($m.location),$result"
     }
 }
 
-Write-Host "`nScript completed!"
- 
+# =============================================================================
+# MAIN
+# =============================================================================
+try {
+    Write-Log INFO "=== Azure Arc Software Assurance Activation Runbook ==="
+
+    Test-Prerequisites
+    Connect-Azure
+    Install-RequiredExtensions
+
+    $subsJson = az account list --all --output json 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Failed to list subscriptions." }
+    $subs = $subsJson | ConvertFrom-Json | Where-Object { $_.state -eq "Enabled" }
+
+    Write-Log INFO "Found $($subs.Count) enabled subscription(s)."
+
+    $stats = @{ Total = 0; Success = 0; Failure = 0; Compliant = 0; Skipped = 0 }
+
+    Write-Log RESULT "MachineName,ResourceGroup,SubscriptionId,OperatingSystem,Location,UpdateResult"
+
+    foreach ($sub in $subs) {
+        Invoke-Subscription -SubscriptionId $sub.id -SubscriptionName $sub.name -Stats $stats
+    }
+
+    $subsProcessed = $subs.Count - $stats.Compliant - $stats.Skipped
+
+    Write-Log INFO "=== SUMMARY ==="
+    Write-Log INFO "Subscriptions: $($subs.Count) total | $subsProcessed with non-activated machines | $($stats.Compliant) fully activated | $($stats.Skipped) skipped"
+    Write-Log INFO "Machines: $($stats.Total) processed | $($stats.Success) success | $($stats.Failure) failure"
+
+    if ($stats.Failure -gt 0) {
+        Write-Log WARN "$($stats.Failure) machine(s) failed — review RESULT lines above."
+    }
+
+    Write-Log INFO "=== Done ==="
+}
+catch {
+    Write-Log FATAL "Execution failed: $($_.Exception.Message)"
+    throw
+}
