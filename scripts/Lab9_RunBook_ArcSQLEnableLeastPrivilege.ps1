@@ -1,193 +1,241 @@
 <#
-Prerequisites:
-- PowerShell 7.2+ (Runbook)
-- Azure CLI must be available in the environment
-- Modules Az.Accounts >= 2.7.5 and Az.ResourceGraph must be installed in the Automation Account
-- Managed Identity must be enabled for the Automation Account
-- The Managed Identity must have permissions to modify Azure Arc machines
+.SYNOPSIS
+    Enables LeastPrivilege FeatureFlag on Azure Arc machines with SQL Server extension.
+
+.DESCRIPTION
+    Queries all subscriptions for Azure Arc machines with WindowsAgent.SqlServer
+    extension where LeastPrivilege feature flag is disabled or missing, and enables it.
+
+    Uses ONLY Azure CLI — no Az PowerShell modules required.
+
+.NOTES
+    Reference: https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/configure-least-privilege?view=sql-server-ver17
+
+.PREREQUISITES
+    - PowerShell 7.2+ Runtime Environment
+    - Azure CLI (pre-installed in Azure Automation)
+    - Managed Identity with permissions on Azure Arc machines
 #>
 
-# --- Structured logging function ---
+#Requires -Version 7.2
+
+$ErrorActionPreference = "Stop"
+
+# =============================================================================
+# LOGGING
+# =============================================================================
 function Write-Log {
     param (
+        [ValidateSet("INFO", "WARN", "ERROR", "FATAL", "RESULT")]
         [string] $Level,
         [string] $Message
     )
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    Write-Output "[$timestamp][$Level] $Message"
+    Write-Output "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')][$Level] $Message"
 }
 
-# --- Environment validation ---
-function Validate-Environment {
-    if ($PSVersionTable.PSVersion -lt [Version]"7.2") {
-        Write-Log -Level "ERROR" -Message "PowerShell 7.2 or higher is required."
-        throw
-    }
+# =============================================================================
+# PREREQUISITES
+# =============================================================================
+function Test-Prerequisites {
+    if (-not (Get-Command az -ErrorAction SilentlyContinue)) { throw "Azure CLI not found." }
+    $v = (az version --output json 2>$null | ConvertFrom-Json).'azure-cli'
+    Write-Log INFO "Azure CLI $v | PowerShell $($PSVersionTable.PSVersion)"
+}
 
-    if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
-        Write-Log -Level "ERROR" -Message "Azure CLI is not available in the environment."
-        throw
-    }
-
-    $requiredModules = @("Az.Accounts", "Az.ResourceGraph")
-    foreach ($module in $requiredModules) {
-        if (-not (Get-Module -ListAvailable -Name $module)) {
-            Write-Log -Level "ERROR" -Message "Required module '$module' is not installed."
-            throw
+function Install-RequiredExtensions {
+    $installed = (az extension list --output json 2>$null | ConvertFrom-Json).name
+    foreach ($ext in @("resource-graph", "arcdata")) {
+        if ($ext -notin $installed) {
+            Write-Log INFO "Installing extension '$ext'..."
+            az extension add --name $ext --yes 2>$null | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Failed to install extension '$ext'." }
         }
     }
-
-    Write-Log -Level "INFO" -Message "Environment successfully validated."
 }
 
-# --- Authentication ---
-function Authenticate-Azure {
-    try {
-        Write-Log -Level "INFO" -Message "Authenticating to Azure using managed identity (PowerShell)..."
-        Connect-AzAccount -Identity | Out-Null
-
-        Write-Log -Level "INFO" -Message "Authenticating to Azure CLI using managed identity..."
-        az login --identity --allow-no-subscriptions | Out-Null
-
-        Write-Log -Level "INFO" -Message "Authentication completed successfully."
-    }
-    catch {
-        Write-Log -Level "ERROR" -Message "Authentication error: $($_.Exception.Message)"
-        throw
-    }
+# =============================================================================
+# AUTHENTICATION
+# =============================================================================
+function Connect-Azure {
+    Write-Log INFO "Authenticating with managed identity..."
+    $out = az login --identity --allow-no-subscriptions 2>&1
+    if ($LASTEXITCODE -ne 0) { throw "az login failed: $($out -join ' ')" }
+    Write-Log INFO "Authenticated."
 }
 
-# --- Ensure arcdata extension is installed ---
-function Ensure-ArcDataExtension {
-    try {
-        $extensions = az extension list --output json | ConvertFrom-Json
-        if (-not ($extensions | Where-Object { $_.name -eq "arcdata" })) {
-            Write-Log -Level "INFO" -Message "Installing 'arcdata' extension..."
-            az extension add --name arcdata --yes --allow-preview true | Out-Null
-            Write-Log -Level "INFO" -Message "'arcdata' extension installed successfully."
-        }
-        else {
-            Write-Log -Level "INFO" -Message "'arcdata' extension is already installed."
-        }
-    }
-    catch {
-        Write-Log -Level "ERROR" -Message "Error checking/installing arcdata extension: $($_.Exception.Message)"
-        throw
-    }
-}
+# =============================================================================
+# RESOURCE GRAPH QUERY
+# =============================================================================
+function Get-TargetMachines {
+    param ([string] $SubscriptionId)
 
-# --- Enable LeastPrivilege FeatureFlag ---
-function Enable-FeatureFlag {
-    param (
-        [string] $ResourceGroup,
-        [string] $MachineName
-    )
+    $queryFile = Join-Path ([IO.Path]::GetTempPath()) "arg_$([guid]::NewGuid().ToString('N')).kql"
 
-    try {
-        az sql server-arc extension feature-flag set `
-            --name LeastPrivilege `
-            --enable true `
-            --resource-group $ResourceGroup `
-            --machine-name $MachineName `
-            --verbose | Out-Null
-
-        return "Success"
-    }
-    catch {
-        return "Failure: $($_.Exception.Message)"
-    }
-}
-
-# --- Query Resource Graph ---
-function Query-Machines {
-    param (
-        [string] $SubscriptionId
-    )
-
-    $query = @"
+    # KQL: Find Arc machines where LeastPrivilege is NOT enabled
+    # Uses string match on serialized FeatureFlags — no mv-expand needed
+    $kql = @'
 resources
 | where type == "microsoft.hybridcompute/machines/extensions"
 | where name == "WindowsAgent.SqlServer"
-| extend props = parse_json(properties)
-| extend settings = props.settings
-| extend sqlDiscovered = tostring(settings.SqlManagement.IsEnabled)
-| where sqlDiscovered == "true"
-| extend machineName = tolower(extract(@"machines/([^/]+)/extensions", 1, id))
+| extend settings = parse_json(properties).settings
+| where tostring(settings.SqlManagement.IsEnabled) == "true"
+| extend machineName = tolower(extract("machines/([^/]+)/extensions", 1, id))
+| where isnotempty(machineName)
 | join kind=inner (
     resources
     | where type == "microsoft.hybridcompute/machines"
-    | extend machineId = id,
+    | where tolower(tostring(properties.status)) == "connected"
+    | project machineId = id,
              machineName = tolower(name),
-             machineStatus = tolower(tostring(properties.status)),
-             lastStatusChange = properties.lastStatusChange
-    | where machineStatus == "connected"
-    | project machineId, machineName, machineStatus, lastStatusChange
+             lastStatusChange = tostring(properties.lastStatusChange)
 ) on machineName
-| extend featureFlagsArray = iif(isnull(settings.FeatureFlags) or array_length(settings.FeatureFlags) == 0, dynamic([{"Name":null,"Enable":null}]), settings.FeatureFlags)
-| mv-expand featureFlags = featureFlagsArray to typeof(dynamic)
-| extend featureName = tostring(featureFlags.Name), featureEnabled = tostring(featureFlags.Enable)
-| where isempty(featureEnabled) or featureEnabled == "false"
-| project machineName, resourceGroup, subscriptionId, featureName, featureEnabled, sqlDiscovered, machineStatus, lastStatusChange, id, machineId
-"@
+| extend ffLower = tolower(tostring(settings.FeatureFlags))
+| where not(ffLower matches regex '("name":"leastprivilege"[^}]*"enable":(true|"true"))|("enable":(true|"true")[^}]*"name":"leastprivilege")')
+| extend lpEnabled = iff(ffLower has "leastprivilege", "false", "notset")
+| project machineName, resourceGroup, subscriptionId, lpEnabled, lastStatusChange, machineId
+| where isnotempty(machineName) and isnotempty(resourceGroup)
+'@
 
-    return Search-AzGraph -Query $query -Subscription $SubscriptionId
+    try {
+        Set-Content -Path $queryFile -Value $kql -Encoding UTF8 -Force
+
+        $pageSize = 1000
+        $skip = 0
+        $allData = @()
+
+        do {
+            $json = az graph query -q "@$queryFile" --subscriptions $SubscriptionId `
+                --first $pageSize --skip $skip --output json 2>&1
+            if ($LASTEXITCODE -ne 0) { throw "Resource Graph query failed: $($json -join ' ')" }
+
+            $result = $json | ConvertFrom-Json
+            $pageData = $result.data
+            $pageCount = $pageData.Count
+
+            if ($pageCount -gt 0) {
+                $allData += $pageData
+                $skip += $pageCount
+            }
+
+            if ($skip -gt $pageSize) {
+                Write-Log INFO "Paginating Resource Graph: $($allData.Count) rows fetched so far..."
+            }
+        } while ($pageCount -eq $pageSize)
+
+        return $allData
+    }
+    finally {
+        if (Test-Path $queryFile) { Remove-Item $queryFile -Force -ErrorAction SilentlyContinue }
+    }
 }
 
-# --- Process machines in a subscription ---
-function Process-MachinesInSubscription {
+# =============================================================================
+# ENABLE FEATURE FLAG
+# Ref: https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/configure-least-privilege
+# =============================================================================
+function Enable-LeastPrivilegeFlag {
     param (
-        [string] $SubscriptionId
+        [string] $ResourceGroup,
+        [string] $MachineName,
+        [int]    $MaxRetries = 2
     )
 
-    Write-Log -Level "INFO" -Message "Querying machines in subscription ${SubscriptionId}..."
-    $machines = Query-Machines -SubscriptionId $SubscriptionId
+    for ($i = 1; $i -le $MaxRetries; $i++) {
+        $out = az sql server-arc extension feature-flag set `
+            --name LeastPrivilege --enable true `
+            --resource-group $ResourceGroup --machine-name $MachineName 2>&1
 
-    if (-not $machines -or $machines.Count -eq 0) {
-        Write-Log -Level "INFO" -Message "No machines with disabled/missing FeatureFlags and 'connected' status found in subscription ${SubscriptionId}."
+        if ($LASTEXITCODE -eq 0) { return "Success" }
+
+        $errMsg = $out -join ' '
+        if ($i -lt $MaxRetries) {
+            Write-Log WARN "Attempt $i failed for '$MachineName': $errMsg — retrying in 10s..."
+            Start-Sleep -Seconds 10
+        }
+    }
+
+    Write-Log ERROR "Failed after $MaxRetries attempts: '$MachineName' (RG: $ResourceGroup) — $errMsg"
+    return "Failure"
+}
+
+# =============================================================================
+# PROCESS SUBSCRIPTION
+# =============================================================================
+function Invoke-Subscription {
+    param (
+        [string] $SubscriptionId,
+        [string] $SubscriptionName,
+        [hashtable] $Stats
+    )
+
+    Write-Log INFO "--- Subscription: $SubscriptionName ($SubscriptionId)"
+
+    az account set --subscription $SubscriptionId 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Log WARN "Could not set context. Skipping."
+        $Stats.Skipped++
         return
     }
 
-    foreach ($item in $machines) {
-        Write-Log -Level "INFO" -Message "Processing machine: $($item.machineName) in resource group $($item.resourceGroup)..."
+    $machines = Get-TargetMachines -SubscriptionId $SubscriptionId
 
-        $updateStatus = Enable-FeatureFlag -ResourceGroup $item.resourceGroup -MachineName $item.machineName
+    if (-not $machines -or $machines.Count -eq 0) {
+        Write-Log INFO "All machines compliant (or none exist)."
+        $Stats.Compliant++
+        return
+    }
 
-        $output = [PSCustomObject]@{
-            Name           = $item.machineName
-            ResourceGroup  = $item.resourceGroup
-            SubscriptionId = $item.subscriptionId
-            FeatureName    = $item.featureName
-            FeatureEnabled = $item.featureEnabled
-            SqlDiscovered  = $item.sqlDiscovered
-            Status         = $item.machineStatus
-            LastChange     = $item.lastStatusChange
-            UpdateStatus   = $updateStatus
-        }
+    Write-Log INFO "Found $($machines.Count) non-compliant machine(s)."
 
-        # Single-line CSV-style output
-        $csvLine = ($output | ConvertTo-Csv -NoTypeInformation)[1]
-        Write-Log -Level "RESULT" -Message $csvLine
+    foreach ($m in $machines) {
+        Write-Log INFO "  -> $($m.machineName) | RG: $($m.resourceGroup) | LP: $($m.lpEnabled)"
+
+        $result = Enable-LeastPrivilegeFlag -ResourceGroup $m.resourceGroup -MachineName $m.machineName
+
+        if ($result -eq "Success") { $Stats.Success++ } else { $Stats.Failure++ }
+        $Stats.Total++
+
+        Write-Log RESULT "$($m.machineName),$($m.resourceGroup),$SubscriptionId,$($m.lpEnabled),$result"
     }
 }
 
-# --- Main execution ---
+# =============================================================================
+# MAIN
+# =============================================================================
 try {
-    Validate-Environment
-    Authenticate-Azure
-    Ensure-ArcDataExtension
+    Write-Log INFO "=== Azure Arc SQL LeastPrivilege Runbook ==="
 
-    $subscriptions = Get-AzSubscription
+    Test-Prerequisites
+    Connect-Azure
+    Install-RequiredExtensions
 
-    foreach ($sub in $subscriptions) {
-        Write-Log -Level "INFO" -Message "Setting context for subscription: $($sub.Name) ($($sub.Id))"
-        Set-AzContext -SubscriptionId $sub.Id | Out-Null
+    $subsJson = az account list --all --output json 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Failed to list subscriptions." }
+    $subs = $subsJson | ConvertFrom-Json | Where-Object { $_.state -eq "Enabled" }
 
-        Process-MachinesInSubscription -SubscriptionId $sub.Id
+    Write-Log INFO "Found $($subs.Count) enabled subscription(s)."
+
+    $stats = @{ Total = 0; Success = 0; Failure = 0; Compliant = 0; Skipped = 0 }
+
+    Write-Log RESULT "MachineName,ResourceGroup,SubscriptionId,LPStatusBefore,UpdateResult"
+
+    foreach ($sub in $subs) {
+        Invoke-Subscription -SubscriptionId $sub.id -SubscriptionName $sub.name -Stats $stats
     }
 
-    Write-Log -Level "INFO" -Message "Execution completed successfully."
+    $subsProcessed = $subs.Count - $stats.Compliant - $stats.Skipped
+
+    Write-Log INFO "=== SUMMARY ==="
+    Write-Log INFO "Subscriptions: $($subs.Count) total | $subsProcessed with non-compliant machines | $($stats.Compliant) fully compliant | $($stats.Skipped) skipped"
+    Write-Log INFO "Machines: $($stats.Total) processed | $($stats.Success) success | $($stats.Failure) failure"
+
+    if ($stats.Failure -gt 0) {
+        Write-Log WARN "$($stats.Failure) machine(s) failed — review RESULT lines above."
+    }
+
+    Write-Log INFO "=== Done ==="
 }
 catch {
-    Write-Log -Level "FATAL" -Message "Execution failed: $($_.Exception.Message)"
+    Write-Log FATAL "Execution failed: $($_.Exception.Message)"
     throw
 }
