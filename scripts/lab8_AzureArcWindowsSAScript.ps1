@@ -1,3 +1,15 @@
+# =============================================================================
+# DISCLAIMER:
+#   This script is provided "AS IS" without warranty of any kind, express or
+#   implied. Use at your own risk. Always test in a non-production environment
+#   before deploying to production. The author is not responsible for any
+#   damage or data loss caused by the use of this script.
+#
+#   Contributions and feedback are welcome via GitHub Issues and Pull Requests.
+# =============================================================================
+
+#Requires -Version 7.2
+
 <#
 .SYNOPSIS
     Activates Software Assurance benefits on Azure Arc Windows machines.
@@ -6,7 +18,24 @@
     Queries all subscriptions for Azure Arc Windows machines where Software Assurance
     benefits are not activated, and enables them via REST API.
 
+    Modes:
+    - Report: Lists machines without SA benefits — no changes applied.
+    - Activate: Enables Software Assurance on eligible machines.
+
     Uses ONLY Azure CLI — no Az PowerShell modules required.
+
+.PARAMETER Mode
+    Operation mode. Activate (default for scheduled execution) applies changes;
+    Report only lists.
+
+.EXAMPLE
+    .\AzArcEnableWindowsSA.ps1 -Mode Report
+
+.EXAMPLE
+    .\AzArcEnableWindowsSA.ps1 -Mode Activate
+
+.EXAMPLE
+    .\AzArcEnableWindowsSA.ps1 -Mode Activate -WhatIf
 
 .NOTES
     Reference: https://learn.microsoft.com/en-us/azure/azure-arc/servers/manage-license-and-billing-for-extended-security-updates
@@ -14,10 +43,21 @@
 .PREREQUISITES
     - PowerShell 7.2+ Runtime Environment
     - Azure CLI (pre-installed in Azure Automation)
-    - Managed Identity with Reader + Azure Connected Machine Resource Administrator
+    - Managed Identity with the following MINIMUM RBAC roles:
+      1. Reader (subscription scope) - required for Azure Resource Graph queries
+      2. Azure Connected Machine Resource Administrator (subscription or RG scope)
+         - required for Microsoft.HybridCompute/machines/licenseProfiles/write
+    - Assignment commands:
+      az role assignment create --assignee <MI-ObjectId> --role 'Reader' --scope /subscriptions/<sub-id>
+      az role assignment create --assignee <MI-ObjectId> --role 'Azure Connected Machine Resource Administrator' --scope /subscriptions/<sub-id>
 #>
 
-#Requires -Version 7.2
+[CmdletBinding(PositionalBinding = $false, SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+param(
+    [Parameter()]
+    [ValidateSet('Report', 'Activate')]
+    [string]$Mode = 'Activate'
+)
 
 $ErrorActionPreference = "Stop"
 
@@ -31,6 +71,13 @@ function Write-Log {
         [string] $Message
     )
     Write-Output "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')][$Level] $Message"
+}
+
+function Format-CsvField {
+    param([string]$Value)
+    $field = if ($null -eq $Value) { '' } else { $Value }
+    if ($field -match '[,"\r\n]') { return '"{0}"' -f $field.Replace('"', '""') }
+    return $field
 }
 
 # =============================================================================
@@ -71,8 +118,6 @@ function Get-TargetMachines {
 
     $queryFile = Join-Path ([IO.Path]::GetTempPath()) "arg_$([guid]::NewGuid().ToString('N')).kql"
 
-    # KQL: Find eligible Windows Server Arc machines where Software Assurance is NOT activated
-    # Eligible = Connected + Licensed. Pre-filtering removes "Not eligible" machines.
     $kql = @'
 resources
 | where type =~ "microsoft.hybridcompute/machines"
@@ -132,7 +177,6 @@ resources
 
 # =============================================================================
 # ENABLE SOFTWARE ASSURANCE
-# PUT /subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.HybridCompute/machines/{machine}/licenseProfiles/default
 # =============================================================================
 function Enable-SoftwareAssurance {
     param (
@@ -140,8 +184,10 @@ function Enable-SoftwareAssurance {
         [string] $ResourceGroup,
         [string] $MachineName,
         [string] $Location,
-        [int]    $MaxRetries = 2
+        [int]    $MaxRetries = 3
     )
+
+    $transientPatterns = @('RequestTimeout', 'TooManyRequests', '429', '503', 'ServiceUnavailable', 'GatewayTimeout', 'ConnectionReset')
 
     $uri = "https://management.azure.com/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroup/providers/Microsoft.HybridCompute/machines/$MachineName/licenseProfiles/default?api-version=2023-10-03-preview"
 
@@ -165,9 +211,17 @@ function Enable-SoftwareAssurance {
             if ($LASTEXITCODE -eq 0) { return "Success" }
 
             $errMsg = $out -join ' '
+            $isTransient = $transientPatterns | Where-Object { $errMsg -match $_ }
+
+            if (-not $isTransient) {
+                Write-Log ERROR "Non-transient error for '$MachineName': $errMsg"
+                return "Failure"
+            }
+
             if ($i -lt $MaxRetries) {
-                Write-Log WARN "Attempt $i failed for '$MachineName': $errMsg — retrying in 10s..."
-                Start-Sleep -Seconds 10
+                $delay = [math]::Pow(2, $i) * 5
+                Write-Log WARN "Transient error (attempt $i/$MaxRetries) for '$MachineName' — retrying in ${delay}s..."
+                Start-Sleep -Seconds $delay
             }
         }
     }
@@ -175,7 +229,7 @@ function Enable-SoftwareAssurance {
         if (Test-Path $bodyFile) { Remove-Item $bodyFile -Force -ErrorAction SilentlyContinue }
     }
 
-    Write-Log ERROR "Failed after $MaxRetries attempts: '$MachineName' (RG: $ResourceGroup) — $errMsg"
+    Write-Log ERROR "Exhausted $MaxRetries retries for '$MachineName' (RG: $ResourceGroup)."
     return "Failure"
 }
 
@@ -211,16 +265,32 @@ function Invoke-Subscription {
     foreach ($m in $machines) {
         Write-Log INFO "  -> $($m.machineName) | RG: $($m.resourceGroup) | OS: $($m.operatingSystem) | Location: $($m.location)"
 
-        $result = Enable-SoftwareAssurance `
-            -SubscriptionId $SubscriptionId `
-            -ResourceGroup $m.resourceGroup `
-            -MachineName $m.machineName `
-            -Location $m.location
+        $csvFields = @($m.machineName, $m.resourceGroup, $SubscriptionId, $m.operatingSystem, $m.location) | ForEach-Object { Format-CsvField $_ }
 
-        if ($result -eq "Success") { $Stats.Success++ } else { $Stats.Failure++ }
-        $Stats.Total++
+        switch ($Mode) {
+            'Report' {
+                Write-Log RESULT (($csvFields + (Format-CsvField 'PendingActivation')) -join ',')
+                $Stats.Total++
+                continue
+            }
 
-        Write-Log RESULT "$($m.machineName),$($m.resourceGroup),$SubscriptionId,$($m.operatingSystem),$($m.location),$result"
+            'Activate' {
+                if (-not $PSCmdlet.ShouldProcess("$($m.machineName) (RG: $($m.resourceGroup))", "Enable Software Assurance")) {
+                    continue
+                }
+
+                $result = Enable-SoftwareAssurance `
+                    -SubscriptionId $SubscriptionId `
+                    -ResourceGroup $m.resourceGroup `
+                    -MachineName $m.machineName `
+                    -Location $m.location
+
+                if ($result -eq "Success") { $Stats.Success++ } else { $Stats.Failure++ }
+                $Stats.Total++
+
+                Write-Log RESULT (($csvFields + (Format-CsvField $result)) -join ',')
+            }
+        }
     }
 }
 
@@ -228,7 +298,10 @@ function Invoke-Subscription {
 # MAIN
 # =============================================================================
 try {
+    $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
     Write-Log INFO "=== Azure Arc Software Assurance Activation Runbook ==="
+    Write-Log INFO "Mode=$Mode"
 
     Test-Prerequisites
     Connect-Azure
@@ -252,12 +325,21 @@ try {
 
     Write-Log INFO "=== SUMMARY ==="
     Write-Log INFO "Subscriptions: $($subs.Count) total | $subsProcessed with non-activated machines | $($stats.Compliant) fully activated | $($stats.Skipped) skipped"
-    Write-Log INFO "Machines: $($stats.Total) processed | $($stats.Success) success | $($stats.Failure) failure"
 
-    if ($stats.Failure -gt 0) {
-        Write-Log WARN "$($stats.Failure) machine(s) failed — review RESULT lines above."
+    switch ($Mode) {
+        'Report' {
+            Write-Log INFO "Machines pending activation: $($stats.Total)"
+        }
+        'Activate' {
+            Write-Log INFO "Machines: $($stats.Total) processed | $($stats.Success) success | $($stats.Failure) failure"
+            if ($stats.Failure -gt 0) {
+                Write-Log WARN "$($stats.Failure) machine(s) failed — review RESULT lines above."
+            }
+        }
     }
 
+    $stopwatch.Stop()
+    Write-Log INFO "Elapsed: $($stopwatch.Elapsed.ToString('hh\:mm\:ss'))"
     Write-Log INFO "=== Done ==="
 }
 catch {
