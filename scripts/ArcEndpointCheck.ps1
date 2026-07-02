@@ -1,90 +1,104 @@
-# =============================================================================
-# AzureArcBRTips - Community Tools for Azure Arc
-# Repository : https://github.com/fabiotreze/AzureArcBRTips
-# Author     : Fabio Treze
-# License    : MIT
-#
-# DISCLAIMER:
-#   This script is provided "AS IS" without warranty of any kind, express or
-#   implied. Use at your own risk. Always test in a non-production environment
-#   before deploying to production. The author is not responsible for any
-#   damage or data loss caused by the use of this script.
-#
-#   Contributions and feedback are welcome via GitHub Issues and Pull Requests.
-# =============================================================================
+#Requires -Version 5.1
 
 <#
 .SYNOPSIS
-    Valida conectividade, DNS e funcionalidade de Azure Arc (Public ou Private Link).
+    Validates Azure Arc connectivity, DNS resolution, and endpoint reachability
+    (public or Azure Private Link).
 
 .DESCRIPTION
-    - Auto-detecta se o host usa Azure Arc Public ou Private Link Scope (PLS):
-        1) tenta 'azcmagent show -j' e verifica o campo privateLinkScope
-        2) fallback: resolve 'gbl.his.arc.azure.com' e classifica como Private se o IP for RFC1918
-    - Testa DNS, TCP/443 e (para endpoints selecionados) HTTP.
-    - Executa 'azcmagent check' com a flag correta conforme o modo.
-    - Detecta e exibe configuracao de proxy (WinHTTP, env vars, azcmagent).
-    - Suporta ambientes com Azure Firewall Explicit Proxy.
+    - Automatically detects whether the host uses Azure Arc public endpoints or an
+      Azure Arc Private Link Scope (PLS):
+        1) 'azcmagent show -j' - if it reports a privateLinkScope => Private
+        2) otherwise, resolves 'gbl.his.arc.azure.com' and classifies as Private
+           when the IP is RFC1918 (covers the "DNS-based" Private Link scenario)
+    - Tests DNS, TCP/443, and (for selected endpoints) HTTP.
+    - Runs 'azcmagent check' with the correct flag for the detected mode.
+    - Detects and displays the proxy configuration following the agent precedence
+      (azcmagent proxy.url > HTTPS_PROXY). The Windows system-wide proxy
+      (WinHTTP/WinINET) is shown for information only, because the agent ignores it.
+    - Supports environments with Azure Firewall Explicit Proxy.
 
 .PARAMETER Region
-    Regiao Azure (default: eastus2).
+    Azure region (default: eastus2).
 
 .PARAMETER Mode
     Auto | Public | Private. Default: Auto.
 
 .PARAMETER ProxyUrl
-    URL do proxy HTTP/HTTPS (ex: http://10.0.1.4:8443). Se nao informado,
-    o script tenta auto-detectar via WinHTTP, env vars ou azcmagent config.
+    HTTP/HTTPS proxy URL (e.g., http://10.0.1.4:8443). If omitted, the script
+    auto-detects using the same precedence as the Azure Arc agent: 1) azcmagent
+    proxy.url (agent config - takes precedence); 2) the HTTPS_PROXY environment
+    variable. The Windows system-wide proxy (WinHTTP/WinINET) is only reported,
+    never applied automatically - mirroring the agent.
+    Ref: https://learn.microsoft.com/azure/azure-arc/servers/manage-agent-proxy-settings
 
 .PARAMETER LogFilePath
-    Caminho do arquivo de log. Default: C:\temp\Arclogfile.txt.
+    Log file path. Default: C:\temp\Arclogfile.txt.
 
 .PARAMETER IncludeSQL
-    Inclui endpoints especificos do Azure Arc SQL Server.
+    Includes Azure Arc-enabled SQL Server endpoints: data processing service and
+    telemetry (*.arcdataservices.com), san-af (legacy), and graph.microsoft.com
+    (Microsoft Entra authentication). Aligned with the official Arc SQL connectivity
+    test (DPS => 200, telemetry => 401).
 
 .PARAMETER IncludeAMA
-    Inclui endpoints do Azure Monitor Agent (AMA).
+    Includes Azure Monitor Agent (AMA) endpoints.
 
 .PARAMETER IncludeMDE
-    Inclui endpoints do Microsoft Defender for Endpoint.
+    Includes Microsoft Defender for Endpoint endpoints.
 
 .PARAMETER IncludeWAC
-    Inclui endpoints do Windows Admin Center.
+    Includes Windows Admin Center endpoints.
+
+.PARAMETER CheckIncludeAll
+    Makes 'azcmagent check' validate everything: adds '--extensions all' (endpoints
+    for all supported extensions) and '--include-all' (extended use cases, e.g.,
+    Windows Server pay-as-you-go). Useful before onboarding. Replaces the
+    '--extensions sql' that -IncludeSQL would add.
 
 .EXAMPLE
     PS> .\ArcEndpointCheck.ps1
-    Auto-detecta o modo (Public/Private) e usa a regiao default 'eastus2'.
+    Auto-detects the mode (Public/Private) and uses the default region 'eastus2'.
 
 .EXAMPLE
     PS> .\ArcEndpointCheck.ps1 -Region brazilsouth -IncludeSQL -IncludeAMA
-    Roda contra brazilsouth incluindo endpoints SQL e AMA.
+    Runs against brazilsouth including SQL and AMA endpoints.
 
 .EXAMPLE
     PS> .\ArcEndpointCheck.ps1 -Region eastus2 -ProxyUrl http://10.0.1.4:8443
-    Forca uso de proxy explicito para todos os testes HTTP.
+    Forces an explicit proxy for all HTTP tests.
 
 .EXAMPLE
     PS> .\ArcEndpointCheck.ps1 -Region westeurope -Mode Public
-    Forca modo Public na regiao westeurope (util pra validar lista de endpoints
-    de internet quando o host ainda nao tem azcmagent instalado).
+    Forces Public mode on westeurope (useful to validate the internet endpoint
+    list when the host does not have the agent installed yet).
 
 .EXAMPLE
     PS> .\ArcEndpointCheck.ps1 -Region brazilsouth -Mode Private -LogFilePath D:\logs\arc-pls.txt
-    Forca validacao Private Link e grava log em caminho customizado. Adiciona
-    a flag '--enable-pls-check' ao 'azcmagent check'.
+    Forces Private Link validation and writes the log to a custom path. Adds the
+    '--enable-pls-check' flag to 'azcmagent check'.
 
 .EXAMPLE
     PS> .\ArcEndpointCheck.ps1 -Region southcentralus -Verbose -IncludeSQL -IncludeAMA -IncludeMDE -IncludeWAC
-    Roda com saida verbose detalhada e todos os grupos de endpoints.
-    Regioes comuns: eastus, eastus2, westus2, westus3, centralus,
-    northeurope, westeurope, uksouth, francecentral, switzerlandnorth,
-    southeastasia, japaneast, australiaeast, brazilsouth,
-    southafricanorth, uaenorth.
+    Runs with detailed verbose output and all endpoint groups.
+    Common regions: eastus, eastus2, westus2, westus3, centralus, northeurope,
+    westeurope, uksouth, francecentral, switzerlandnorth, southeastasia,
+    japaneast, australiaeast, brazilsouth, southafricanorth, uaenorth.
+
+.EXAMPLE
+    PS> .\ArcEndpointCheck.ps1 -Mode Private -CheckIncludeAll
+    Runs 'azcmagent check' with '--extensions all --include-all' (endpoints for all
+    extensions + extended use cases) in Private mode.
 
 .NOTES
-    Requer PowerShell 5.1+; azcmagent.exe e opcional (apenas para o check final).
-    Codigo de saida: 0 = todos os testes OK; 1 = pelo menos uma falha.
-    Versao: 2.2.0 | Data: 2026-06-26
+    Requires PowerShell 5.1+ on Windows (uses netsh, Resolve-DnsName, and azcmagent.exe).
+    azcmagent.exe is optional (only for the final check).
+    Exit code: 0 = all tests OK; 1 = at least one failure.
+    Endpoint lists aligned with the Connected Machine agent network requirements and
+    its extensions (AMA/SQL/MDE/WAC).
+
+.LINK
+    https://azurearcjumpstart.com
 #>
 
 [CmdletBinding()]
@@ -101,7 +115,9 @@ param(
     [switch]$IncludeSQL,
     [switch]$IncludeAMA,
     [switch]$IncludeMDE,
-    [switch]$IncludeWAC
+    [switch]$IncludeWAC,
+
+    [switch]$CheckIncludeAll
 )
 
 # ---------------------------------------------------------------------------
@@ -215,6 +231,11 @@ function Invoke-WebRequestSafe {
         $params['Proxy'] = $script:EffectiveProxy
         $params['ProxyUseDefaultCredentials'] = $true
     }
+    elseif ($PSVersionTable.PSVersion.Major -ge 6) {
+        # PS 6+: espelha o agente, que IGNORA o proxy system-wide. Em PS 5.1 o
+        # mesmo efeito e obtido neutralizando o DefaultWebProxy do .NET no setup.
+        $params['NoProxy'] = $true
+    }
     return Invoke-WebRequest @params
 }
 
@@ -227,22 +248,31 @@ function Get-ProxyDiagnostics {
     Write-Log '=== DIAGNOSTICO DE PROXY ===' Info -NoCount
     [void]$script:LogBuffer.Add('')
 
+    # Precedencia do proxy efetivo (usado nos testes HTTP deste script) — espelha
+    # o comportamento do Azure Connected Machine agent no Windows:
+    #   1) -ProxyUrl            (override explicito do operador)
+    #   2) azcmagent proxy.url  (config do agente — TEM PRECEDENCIA sobre env vars)
+    #   3) HTTPS_PROXY (env)    (system-wide)
+    # O agente IGNORA o proxy system-wide do Windows (WinHTTP/WinINET); por isso o
+    # WinHTTP abaixo e apenas REPORTADO, nunca aplicado automaticamente.
+    # Ref: https://learn.microsoft.com/azure/azure-arc/servers/manage-agent-proxy-settings
+
     # 1) Parametro -ProxyUrl
     if ($ProxyUrl) {
         Write-Log "Proxy via parametro: $ProxyUrl" Info -NoCount
         $script:EffectiveProxy = $ProxyUrl
     }
 
-    # 2) WinHTTP
+    # WinHTTP (apenas informativo — o agente ignora o proxy system-wide)
+    #    Nota: o parse do 'netsh' abaixo depende de Windows em INGLES. Em SO
+    #    localizado (ex.: pt-BR) o regex pode nao casar e reportar 'Direct'
+    #    mesmo havendo proxy configurado no WinHTTP.
     try {
         $winhttp = netsh winhttp show proxy 2>$null
         $winhttpText = ($winhttp | Out-String).Trim()
         if ($winhttpText -match 'Proxy Server\(s\)\s*:\s*(.+)') {
             $winhttpProxy = $Matches[1].Trim()
-            Write-Log "WinHTTP Proxy: $winhttpProxy" Info -NoCount
-            if (-not $script:EffectiveProxy -and $winhttpProxy -ne '(none)') {
-                # Nao usa WinHTTP automaticamente para WebRequest — apenas reporta
-            }
+            Write-Log "WinHTTP Proxy: $winhttpProxy (informativo — o agente ignora o proxy system-wide)" Info -NoCount
         }
         else {
             Write-Log 'WinHTTP Proxy: Direct (sem proxy)' Info -NoCount
@@ -255,23 +285,7 @@ function Get-ProxyDiagnostics {
         Write-Log "WinHTTP: nao foi possivel consultar ($($_.Exception.Message))" Warn
     }
 
-    # 3) Environment variables
-    $envProxy   = [Environment]::GetEnvironmentVariable('HTTPS_PROXY', 'Machine')
-    $envNoProxy = [Environment]::GetEnvironmentVariable('NO_PROXY', 'Machine')
-    if ($envProxy) {
-        Write-Log "Env HTTPS_PROXY: $envProxy" Info -NoCount
-        if (-not $script:EffectiveProxy) {
-            $script:EffectiveProxy = $envProxy
-        }
-    }
-    else {
-        Write-Log 'Env HTTPS_PROXY: (nao definido)' Info -NoCount
-    }
-    if ($envNoProxy) {
-        Write-Log "Env NO_PROXY: $envNoProxy" Info -NoCount
-    }
-
-    # 4) azcmagent config (se disponivel)
+    # 2) azcmagent config (proxy.url TEM PRECEDENCIA sobre HTTPS_PROXY)
     $azcm = Get-AzcmagentPath
     if ($azcm) {
         try {
@@ -295,11 +309,31 @@ function Get-ProxyDiagnostics {
         }
     }
 
+    # 3) Environment variables (verifica Machine -> Process -> User)
+    $envProxy = [Environment]::GetEnvironmentVariable('HTTPS_PROXY', 'Machine')
+    if (-not $envProxy) { $envProxy = [Environment]::GetEnvironmentVariable('HTTPS_PROXY', 'Process') }
+    if (-not $envProxy) { $envProxy = [Environment]::GetEnvironmentVariable('HTTPS_PROXY', 'User') }
+    $envNoProxy = [Environment]::GetEnvironmentVariable('NO_PROXY', 'Machine')
+    if (-not $envNoProxy) { $envNoProxy = [Environment]::GetEnvironmentVariable('NO_PROXY', 'Process') }
+    if (-not $envNoProxy) { $envNoProxy = [Environment]::GetEnvironmentVariable('NO_PROXY', 'User') }
+    if ($envProxy) {
+        Write-Log "Env HTTPS_PROXY: $envProxy" Info -NoCount
+        if (-not $script:EffectiveProxy) {
+            $script:EffectiveProxy = $envProxy
+        }
+    }
+    else {
+        Write-Log 'Env HTTPS_PROXY: (nao definido)' Info -NoCount
+    }
+    if ($envNoProxy) {
+        Write-Log "Env NO_PROXY: $envNoProxy" Info -NoCount
+    }
+
     if ($script:EffectiveProxy) {
         Write-Log "Proxy efetivo para testes HTTP: $($script:EffectiveProxy)" Info -NoCount
     }
     else {
-        Write-Log 'Proxy efetivo: Direct (sem proxy)' Info -NoCount
+        Write-Log 'Proxy efetivo: Direct (sem proxy — testes HTTP vao direto, como o agente)' Info -NoCount
     }
 
     [void]$script:LogBuffer.Add('')
@@ -343,8 +377,10 @@ function Resolve-ArcMode {
                 return 'Private'
             }
             else {
-                Write-Log 'azcmagent nao reporta privateLinkScope (modo publico).' Info -NoCount
-                return 'Public'
+                # NAO conclui Public aqui: cai para o heuristico DNS abaixo. O
+                # Private Link pode ser "via DNS" (Private DNS Zones) sem o agente
+                # expor o PLS localmente em 'azcmagent show -j'.
+                Write-Log 'azcmagent nao reporta privateLinkScope; confirmando via DNS...' Info -NoCount
             }
         }
         catch {
@@ -379,6 +415,14 @@ function Resolve-ArcMode {
 # ---------------------------------------------------------------------------
 Get-ProxyDiagnostics
 
+# Alinhamento com o agente: o Azure Connected Machine agent IGNORA o proxy
+# system-wide do Windows (WinINET/WinHTTP). Se nenhum proxy efetivo foi
+# detectado, neutralizamos o DefaultWebProxy do .NET (PS 5.1) para que os
+# testes HTTP tambem vao direto. Em PS 6+ isso e feito via -NoProxy.
+if (-not $script:EffectiveProxy -and $PSVersionTable.PSVersion.Major -lt 6) {
+    try { [System.Net.WebRequest]::DefaultWebProxy = $null } catch { }
+}
+
 if ($Mode -eq 'Auto') {
     $Mode = Resolve-ArcMode
 }
@@ -402,48 +446,58 @@ $canBePrivateEndpoints = @(
     'global.handler.control.monitor.azure.com'
 )
 
-# Core Arc (obrigatorios)
+# Core Arc (obrigatorios) — alinhado a network-requirements do Connected Machine agent.
+# Doc: https://learn.microsoft.com/azure/azure-arc/servers/network-requirements
 $coreEndpoints = @(
-    # AAD / Identity
+    # AAD / Identity (sempre; Public)
     'login.windows.net'
     'login.microsoftonline.com'
     'pas.windows.net'
-    'graph.microsoft.com'
 
-    # ARM
+    # ARM (conexao/desconexao; Public salvo Resource Management Private Link)
     'management.azure.com'
 
-    # Arc HIMDS (global — cobre tambem o regional internamente)
+    # Arc HIMDS (sempre; Private via PLS)
     'gbl.his.arc.azure.com'
 
-    # Guest Configuration
+    # Guest Configuration / gestao de extensoes (sempre; Private via PLS)
     'agentserviceapi.guestconfiguration.azure.com'
 
-    # Agent Updates
+    # Instalacao/atualizacao do agente (Public)
     'packages.microsoft.com'
     'download.microsoft.com'
 
-    # Telemetry
+    # Telemetria (opcional; NAO usado em agentes 1.24+; Public)
     'dc.services.visualstudio.com'
 )
 
-# SQL endpoints (opcional via -IncludeSQL)
+# SQL endpoints (opcional via -IncludeSQL) — Arc-enabled SQL Server.
+# Doc: network-requirements + sql/.../data-collection. Todos Public; TLS 1.2/1.3.
 $sqlEndpoints = @()
 if ($IncludeSQL) {
     $sqlEndpoints = @(
+        # Data processing service + telemetria (extensoes a partir de mar/2024)
         "dataprocessingservice.$Region.arcdataservices.com"
         "telemetry.$Region.arcdataservices.com"
+        # Legado: usado por extensoes ate 13/fev/2024
         "san-af-$Region-prod.azurewebsites.net"
+        # Autenticacao Microsoft Entra do Arc SQL (Public). So necessario se usar
+        # Entra auth; NAO e endpoint core do agente. Reachable direto, mas pode ser
+        # bloqueado em proxy split-tunnel -> apenas DNS/TCP (sem HTTP probe).
+        'graph.microsoft.com'
     )
 }
 
-# AMA endpoints (opcional via -IncludeAMA)
+# AMA endpoints (opcional via -IncludeAMA) — Azure Monitor Agent.
+# Doc: azure-monitor-agent-network-configuration. Endpoints <workspace-id>.ods e
+# <dce>.ingest.monitor exigem IDs especificos -> nao testaveis genericamente.
 $amaEndpoints = @()
 if ($IncludeAMA) {
     $amaEndpoints = @(
-        'global.handler.control.monitor.azure.com'
-        "$Region.handler.control.monitor.azure.com"
-        "$Region.monitoring.azure.com"
+        'global.handler.control.monitor.azure.com'   # control service
+        'global.prod.microsoftmetrics.com'           # metrics service
+        "$Region.handler.control.monitor.azure.com"  # DCRs da regiao
+        "$Region.monitoring.azure.com"               # custom metrics (opcional)
     )
 }
 
@@ -465,25 +519,30 @@ if ($IncludeWAC) {
     )
 }
 
-# Endpoints que respondem HTTP (validacao extra — 401/403/400 = sucesso)
+# Endpoints que respondem HTTP (validacao L7 — 200/400/401/403/404 = reachable).
+# NAO inclui graph.microsoft.com: e endpoint de Entra auth do Arc SQL (opcional) e
+# costuma ser bloqueado em proxy split-tunnel; o proprio teste oficial de
+# conectividade do Arc SQL valida apenas DPS + telemetria.
 $httpProbeEndpoints = @(
     'login.windows.net'
     'login.microsoftonline.com'
     'management.azure.com'
-    'graph.microsoft.com'
 )
 if ($IncludeSQL) {
+    # Alinhado ao teste oficial do Arc SQL: DPS espera 200; telemetria espera 401
+    # (ambos tratados como reachable aqui).
     $httpProbeEndpoints += "dataprocessingservice.$Region.arcdataservices.com"
     $httpProbeEndpoints += "telemetry.$Region.arcdataservices.com"
 }
 
-# Mapeia grupo por endpoint para o sumario
+# Mapeia grupo por endpoint para o sumario. Core tem PRECEDENCIA: se um endpoint
+# aparece em mais de um grupo (ex.: pas.windows.net em Core e WAC), mantemos 'Core'.
 $endpointGroupMap = @{}
 foreach ($ep in $coreEndpoints) { $endpointGroupMap[$ep] = 'Core' }
-foreach ($ep in $sqlEndpoints)  { $endpointGroupMap[$ep] = 'SQL' }
-foreach ($ep in $amaEndpoints)  { $endpointGroupMap[$ep] = 'AMA' }
-foreach ($ep in $mdeEndpoints)  { $endpointGroupMap[$ep] = 'MDE' }
-foreach ($ep in $wacEndpoints)  { $endpointGroupMap[$ep] = 'WAC' }
+foreach ($ep in $sqlEndpoints)  { if (-not $endpointGroupMap.ContainsKey($ep)) { $endpointGroupMap[$ep] = 'SQL' } }
+foreach ($ep in $amaEndpoints)  { if (-not $endpointGroupMap.ContainsKey($ep)) { $endpointGroupMap[$ep] = 'AMA' } }
+foreach ($ep in $mdeEndpoints)  { if (-not $endpointGroupMap.ContainsKey($ep)) { $endpointGroupMap[$ep] = 'MDE' } }
+foreach ($ep in $wacEndpoints)  { if (-not $endpointGroupMap.ContainsKey($ep)) { $endpointGroupMap[$ep] = 'WAC' } }
 
 # Dynamic allowlist (somente em modo publico; em PLS o trafego e via PE)
 $dynamicEndpoints = @()
@@ -540,7 +599,10 @@ if ($Mode -eq 'Public') {
         }
     }
     catch {
-        Write-Log "Falha ao obter endpoints dinamicos: $($_.Exception.Message)" Fail
+        # Allowlist dinamica e AUXILIAR: sua indisponibilidade nao deve derrubar o
+        # exit code (WARN, nao FAIL). Comum ao forcar -Mode Public num host que, na
+        # pratica, roteia o GNS via Private Link / firewall.
+        Write-Log "Falha ao obter endpoints dinamicos (allowlist auxiliar): $($_.Exception.Message)" Warn
     }
 }
 else {
@@ -568,43 +630,62 @@ foreach ($ep in $allEndpoints) {
     $group = if ($endpointGroupMap.ContainsKey($ep)) { $endpointGroupMap[$ep] } else { 'Dyn' }
     Add-Result -Endpoint $ep -Group $group
 
-    # DNS
-    try {
-        $dns = Resolve-DnsName -Name $ep -ErrorAction Stop
-        $ip  = ($dns | Where-Object IPAddress | Select-Object -First 1).IPAddress
-        $kind = if (Test-IsPrivateIp -Ip $ip) { 'PRIVATE' } else { 'PUBLIC' }
-
-        # Update result
-        $existing = $script:Results | Where-Object { $_.Endpoint -eq $ep }
-        if ($existing) { $existing.IP = $ip; $existing.Type = $kind }
-
-        # Alerta de mismatch DNS x modo
-        # Apenas endpoints em $canBePrivateEndpoints devem resolver para IP privado.
-        # Todos os outros (AAD, ARM, CDN, SQL, AMA, MDE, WAC, GNS) sao sempre publicos.
-        $canBePrivate = $canBePrivateEndpoints -contains $ep
-        $mismatch = $false
-        if ($Mode -eq 'Private' -and $kind -eq 'PUBLIC' -and $canBePrivate) {
-            $mismatch = $true
-        }
-        elseif ($Mode -eq 'Public' -and $kind -eq 'PRIVATE') {
-            $mismatch = $true
-        }
-        if ($mismatch) {
-            Write-Log "DNS WARN $ep -> $ip [$kind] (esperado para modo $Mode era o oposto)" Warn
-            $existing2 = $script:Results | Where-Object { $_.Endpoint -eq $ep }
-            if ($existing2) { $existing2.DNS = 'WARN' }
+    # DNS (com 1 retry em falha transitoria, ex.: SERVFAIL ao resolver muitos nomes)
+    $dns = $null
+    $dnsErr = $null
+    foreach ($attempt in 1..2) {
+        try { $dns = Resolve-DnsName -Name $ep -ErrorAction Stop; $dnsErr = $null; break }
+        catch { $dnsErr = $_; if ($attempt -lt 2) { Start-Sleep -Milliseconds 300 } }
+    }
+    if ($dnsErr) {
+        # Endpoints dinamicos (GNS) sao AUXILIARES: uma falha de DNS neles vira WARN
+        # (nao FAIL), pois um SERVFAIL transitorio ao resolver dezenas de nomes
+        # 'servicebus' nao deve derrubar o exit code. Demais grupos permanecem FAIL.
+        $existingD = $script:Results | Where-Object { $_.Endpoint -eq $ep }
+        if ($group -eq 'GNS') {
+            Write-Log "DNS WARN $ep - $($dnsErr.Exception.Message) (endpoint dinamico/auxiliar)" Warn
+            if ($existingD) { $existingD.DNS = 'WARN' }
         }
         else {
-            Write-Log "DNS OK   $ep -> $ip [$kind]" OK
-            $existing2 = $script:Results | Where-Object { $_.Endpoint -eq $ep }
-            if ($existing2) { $existing2.DNS = 'OK' }
+            Write-Log "DNS FAIL $ep - $($dnsErr.Exception.Message)" Fail
+            if ($existingD) { $existingD.DNS = 'FAIL' }
         }
-    }
-    catch {
-        Write-Log "DNS FAIL $ep - $($_.Exception.Message)" Fail
-        $existing2 = $script:Results | Where-Object { $_.Endpoint -eq $ep }
-        if ($existing2) { $existing2.DNS = 'FAIL' }
         continue
+    }
+
+    # Preferir IPv4 (registro A): o Azure Private Link e a maioria dos endpoints
+    # Arc sao resolvidos por A-record. Um AAAA (IPv6) publico pode coexistir com
+    # o A privado; se escolhido, causa classificacao PUBLIC incorreta e testes
+    # por um caminho IPv6 possivelmente inexistente/nao roteado.
+    $rec = $dns | Where-Object { $_.Type -eq 'A' -and $_.IPAddress } | Select-Object -First 1
+    if (-not $rec) { $rec = $dns | Where-Object IPAddress | Select-Object -First 1 }
+    $ip   = $rec.IPAddress
+    $kind = if (Test-IsPrivateIp -Ip $ip) { 'PRIVATE' } else { 'PUBLIC' }
+
+    # Update result
+    $existing = $script:Results | Where-Object { $_.Endpoint -eq $ep }
+    if ($existing) { $existing.IP = $ip; $existing.Type = $kind }
+
+    # Alerta de mismatch DNS x modo
+    # Apenas endpoints em $canBePrivateEndpoints devem resolver para IP privado.
+    # Todos os outros (AAD, ARM, CDN, SQL, AMA, MDE, WAC, GNS) sao sempre publicos.
+    $canBePrivate = $canBePrivateEndpoints -contains $ep
+    $mismatch = $false
+    if ($Mode -eq 'Private' -and $kind -eq 'PUBLIC' -and $canBePrivate) {
+        $mismatch = $true
+    }
+    elseif ($Mode -eq 'Public' -and $kind -eq 'PRIVATE') {
+        $mismatch = $true
+    }
+    if ($mismatch) {
+        Write-Log "DNS WARN $ep -> $ip [$kind] (esperado para modo $Mode era o oposto)" Warn
+        $existing2 = $script:Results | Where-Object { $_.Endpoint -eq $ep }
+        if ($existing2) { $existing2.DNS = 'WARN' }
+    }
+    else {
+        Write-Log "DNS OK   $ep -> $ip [$kind]" OK
+        $existing2 = $script:Results | Where-Object { $_.Endpoint -eq $ep }
+        if ($existing2) { $existing2.DNS = 'OK' }
     }
 
     # TCP/443 (TcpClient com timeout — muito mais rapido que Test-NetConnection)
@@ -634,17 +715,33 @@ if ($azcmPath -and $script:EffectiveProxy) {
     try {
         $bypassRaw = & $azcmPath config get proxy.bypass 2>$null
         if ($bypassRaw -and $bypassRaw.Trim()) {
-            $bypassClean = $bypassRaw.Trim().Trim('[',']')
+            $bypassClean = $bypassRaw.Trim().Trim('[', ']')
             $proxyBypassCategories = $bypassClean -split ',' | ForEach-Object { $_.Trim() }
         }
     }
     catch { }
 }
 
-# Mapa de categorias de bypass -> endpoints afetados
+# Mapa de categorias de bypass -> endpoints afetados (conforme doc oficial:
+# https://learn.microsoft.com/azure/azure-arc/servers/manage-agent-proxy-settings).
+# IMPORTANTE: 'graph.microsoft.com' NAO e coberto por nenhum bypass — o agente
+# usa o proxy para ele; por isso ele NAO deve ser pulado nos testes HTTP.
+# 'ArcData' e valido a partir do agente 1.36; em versoes anteriores os endpoints
+# arcdataservices ficavam sob a categoria 'Arc'.
 $bypassCategoryEndpoints = @{
-    'AAD' = @('login.windows.net','login.microsoftonline.com','pas.windows.net','graph.microsoft.com')
-    'ARM' = @('management.azure.com')
+    'AAD'     = @('login.windows.net', 'login.microsoftonline.com', 'pas.windows.net')
+    'ARM'     = @('management.azure.com')
+    'AMA'     = @(
+        'global.handler.control.monitor.azure.com'
+        "$Region.handler.control.monitor.azure.com"
+        'management.azure.com'
+        "$Region.monitoring.azure.com"
+    )
+    'Arc'     = @('gbl.his.arc.azure.com', 'agentserviceapi.guestconfiguration.azure.com')
+    'ArcData' = @(
+        "dataprocessingservice.$Region.arcdataservices.com"
+        "telemetry.$Region.arcdataservices.com"
+    )
 }
 
 $httpBypassedEndpoints = [System.Collections.ArrayList]::new()
@@ -709,7 +806,16 @@ foreach ($ep in $httpProbeEndpoints) {
 $azcm = Get-AzcmagentPath
 if ($azcm) {
     $checkArgs = @('check', '--location', $Region, '--cloud', 'AzureCloud')
-    if ($IncludeSQL) { $checkArgs += @('--extensions', 'sql') }
+    if ($CheckIncludeAll) {
+        # Doc oficial: '--extensions' e '--include-all' sao ORTOGONAIS.
+        #   --extensions all -> endpoints de TODAS as extensoes (SQL, etc.)
+        #   --include-all    -> casos de uso ESTENDIDOS (ex.: Windows Server PAYG)
+        # Combinamos os dois para cobertura total.
+        $checkArgs += @('--extensions', 'all', '--include-all')
+    }
+    elseif ($IncludeSQL) {
+        $checkArgs += @('--extensions', 'sql')
+    }
     if ($Mode -eq 'Private') { $checkArgs += '--enable-pls-check' }
 
     Write-Log "Executando: azcmagent $($checkArgs -join ' ')" Info -NoCount
@@ -749,9 +855,9 @@ $tableObjects = $script:Results | ForEach-Object { [pscustomobject]$_ }
 Write-Host ''
 Write-Host '=================== SUMARIO ===================' -ForegroundColor Cyan
 
-$rowFormat = "{0,-5} {1,-55} {2,-16} {3,-8} {4,-5} {5,-5} {6,-12} {7,-9}"
+$rowFormat = "{0,-5} {1,-55} {2,-26} {3,-8} {4,-5} {5,-5} {6,-12} {7,-9}"
 Write-Host ($rowFormat -f 'Group', 'Endpoint', 'IP', 'Type', 'DNS', 'TCP', 'HTTP', 'Latency') -ForegroundColor Cyan
-Write-Host ($rowFormat -f ('-' * 5), ('-' * 55), ('-' * 16), ('-' * 8), ('-' * 5), ('-' * 5), ('-' * 12), ('-' * 9)) -ForegroundColor DarkGray
+Write-Host ($rowFormat -f ('-' * 5), ('-' * 55), ('-' * 26), ('-' * 8), ('-' * 5), ('-' * 5), ('-' * 12), ('-' * 9)) -ForegroundColor DarkGray
 
 foreach ($r in $tableObjects) {
     $hasFail = ($r.DNS -eq 'FAIL') -or ($r.TCP -eq 'FAIL') -or ($r.HTTP -like 'FAIL*')
