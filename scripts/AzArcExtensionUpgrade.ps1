@@ -1,4 +1,3 @@
-# =============================================================================
 # DISCLAIMER:
 #   This script is provided "AS IS" without warranty of any kind, express or
 #   implied. Use at your own risk. Always test in a non-production environment
@@ -33,16 +32,16 @@
     Modo de operação. Report (default) apenas lista; os demais aplicam alterações.
 
 .EXAMPLE
-    .\AzArcExtensionUpgrade.ps1 -Mode Report
+    .\arc-extension-upgrade.ps1 -Mode Report
 
 .EXAMPLE
-    .\AzArcExtensionUpgrade.ps1 -Mode Upgrade
+    .\arc-extension-upgrade.ps1 -Mode Upgrade
 
 .EXAMPLE
-    .\AzArcExtensionUpgrade.ps1 -Mode Upgrade -WhatIf
+    .\arc-extension-upgrade.ps1 -Mode Upgrade -WhatIf
 
 .EXAMPLE
-    .\AzArcExtensionUpgrade.ps1 -Mode EnableAutoUpgrade
+    .\arc-extension-upgrade.ps1 -Mode EnableAutoUpgrade
 
 .NOTES
     KQL base para validação manual no Azure Resource Graph.
@@ -79,7 +78,7 @@
       - UpgradeAvailable  → requer comparação CurrentVersion vs LatestVersion
     O script resolve isto automaticamente nos modos Report e Upgrade.
 
-.PREREQUISITES
+PREREQUISITES:
     - PowerShell 7.2+ Runtime Environment
     - Azure CLI (pre-installed in Azure Automation)
     - Managed Identity with the following MINIMUM RBAC roles:
@@ -97,7 +96,7 @@
 param(
     [Parameter()]
     [ValidateSet('Report', 'Upgrade', 'EnableAutoUpgrade', 'DisableAutoUpgrade')]
-    [string]$Mode = 'Upgrade'
+    [string]$Mode = 'Report'
 )
 
 $ErrorActionPreference = 'Stop'
