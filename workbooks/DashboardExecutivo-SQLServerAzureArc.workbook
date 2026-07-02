@@ -1,25 +1,161 @@
-```workbook
-
 {
   "version": "Notebook/1.0",
   "items": [
     {
       "type": 1,
       "content": {
-        "json": "### Change Log\r\n\r\n| Version | Date | Description | Author |\r\n| ------- | ----- | ----------- | ------ |\r\n| v1.0.0 | Outubro 2025 | - Criação inicial do Workbook em **13/10/2025**. </br> - Info adicional. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |"
+        "json": "> ⚠️ **Aviso / Disclaimer**\n>\n> Este workbook é uma ferramenta **auxiliar e informativa**, fornecida no estado em que se encontra (*as is*), **sem qualquer garantia**. As informações são **estimativas técnicas** derivadas do Azure Resource Graph e **não constituem, não substituem e não têm valor equivalente** ao relatório, à fatura ou ao trabalho **oficial** de licenciamento, faturamento ou compliance da Microsoft ou de parceiros autorizados.\n>\n> A **posição de licenciamento e os custos reais** devem ser sempre confirmados nas fontes oficiais — **Azure Cost Management**, **portal EA / Microsoft Bulk Licensing**, contratos vigentes e a **documentação oficial da Microsoft** — e validados com seu **representante de contas, revendedor (LSP) ou o time de licenciamento da Microsoft**. Em caso de divergência, **prevalecem sempre os registros e relatórios oficiais**.\n>\n> O autor e os mantenedores **não se responsabilizam** por decisões de compra, provisionamento, *true-up* ou compliance tomadas com base exclusivamente neste material."
       },
       "conditionalVisibility": {
-        "parameterName": "isVisible",
+        "parameterName": "SelectedTab",
         "comparison": "isEqualTo",
-        "value": "Never",
-        "customWidth": "70"
+        "value": "VisaoGeral"
+      },
+      "name": "disclaimer"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "sub-arc-sql-0001",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "label": "Assinatura",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "includeAll": false,
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "value": [
+              "value::all"
+            ]
+          },
+          {
+            "id": "rg-arc-sql-0002",
+            "version": "KqlParameterItem/1.0",
+            "name": "ResourceGroup",
+            "label": "Grupo de Recursos",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines' or type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| distinct resourceGroup\n| sort by resourceGroup asc",
+            "crossComponentResources": [
+              "{Subscription}"
+            ],
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "showDefault": false
+            },
+            "defaultValue": "value::all",
+            "queryType": 1,
+            "resourceType": "microsoft.resourcegraph/resources"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "name": "filters"
+    },
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "selectedtab-default-0001",
+            "version": "KqlParameterItem/1.0",
+            "name": "SelectedTab",
+            "type": 1,
+            "isHiddenWhenLocked": true,
+            "value": "VisaoGeral",
+            "defaultValue": "VisaoGeral"
+          }
+        ],
+        "style": "pills",
+        "queryType": 0
+      },
+      "name": "selected_tab_default"
+    },
+    {
+      "type": 11,
+      "content": {
+        "version": "LinkItem/1.0",
+        "style": "tabs",
+        "links": [
+          {
+            "id": "tab-visao-0001",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "📊 Visão Geral",
+            "subTarget": "VisaoGeral",
+            "style": "link"
+          },
+          {
+            "id": "tab-lic-0002",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🧾 Licenciamento (true-up)",
+            "subTarget": "Licenciamento",
+            "style": "link"
+          },
+          {
+            "id": "tab-inv-0004",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "📋 Inventário",
+            "subTarget": "Inventario",
+            "style": "link"
+          },
+          {
+            "id": "tab-chg-0005",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🕑 Changelog",
+            "subTarget": "Changelog",
+            "style": "link"
+          }
+        ]
+      },
+      "name": "main_tabs"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "### Change Log\r\n\r\n| Version | Date | Description | Author |\r\n| ------- | ----- | ----------- | ------ |\r\n| v1.0.0 | Outubro 2025 | - Criação inicial do Workbook em **13/10/2025**. </br> - Info adicional. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.1.0 | Junho 2026 | - License type passa a ser lido da extensão (`properties.settings.LicenseType`), fonte de verdade. </br> - Rótulos corrigidos para PAYG / Paid / LicenseOnly. | Correção |\r\n| v1.2.0 | Junho 2026 | - Inventário ganha colunas **ESU** (enableExtendedSecurityUpdates) e **Licença p-core** (UsePhysicalCoreLicense.IsApplied). </br> - Notas: Developer/Evaluation = medidor $0; criar licença SQL p-core não altera LicenseType por host. | Correção |\r\n| v1.2.1 | Junho 2026 | - Colunas ESU/p-core passam a ser binárias: ausente = ❌ Não (ESU) / v-core (p-core). | Correção |\r\n| v1.3.0 | Junho 2026 | - Dashboard reposicionado como **inventário técnico**; removidas as seções de Custo/ROI/Economia que somavam vCores por instância (super-contagem). </br> - Nova seção **Posição de Licenciamento (true-up / ACR)** por host (OSE), projetando o **Meter SKU** oficial (PAYG / AHB / License only / DR replica / Virtual license), cores cobráveis (`logicalCoreCount`, mín. 4) e passivo HA/DR ($0). | Correção |\r\n| v1.3.1 | Junho 2026 | - Adicionada coluna **Extensão** (saúde de `provisioningState` da extensão Microsoft.AzureData) no inventário e na visão de licenciamento, mais KPI **Extensões com Problema** — pois LicenseType/ESU/p-core/Meter dependem da extensão saudável. | Correção |\r\n| v1.3.2 | Junho 2026 | - Inventário ganha coluna **Modelo SQL** (`licenseType` da instância: HA/DR passivo, Server+CAL, Per-core, Free) para identificar papel/licença por instância. </br> - **Guia de Interpretação** realinhado às colunas reais (inclui Extensão e Modelo SQL). </br> - Correções: emoji do header de distribuição e marcador duplicado na legenda. | Correção |\r\n| v1.3.3 | Junho 2026 | - **ESU** revisado: deixa de ser binário e distingue **N/A** (host LicenseOnly/pendente, não elegível) de **Não (elegível)** (host Paid/PAYG que pode assinar). </br> - Realinhamento visual: inventário passa a 70/30, consistente com a seção de licenciamento. | Correção |\r\n| v1.3.4 | Junho 2026 | - **KPIs do topo** revisados para compliance: substituídos Operacionais/Edições/Modelos por **🔁 Réplicas HA/DR**, **🛡️ ESU Habilitado** e **🧩 Extensões com Problema**. </br> - **Reordenação executiva**: KPIs → Posição de Licenciamento → Distribuição → Análise Visual → Inventário. </br> - Paleta/ícones unificados (Estado com 🔁; cores de Extensão no inventário). | Correção |\r\n| v1.3.5 | Junho 2026 | - **Separação dos conceitos de licenciamento SQL**: KPIs e inventário distinguem **🗃️ SA SQL** (Paid/AHB lido da extensão `LicenseType`) e **🛡️ ESU SQL** (atualizações). </br> - KPIs do topo: Extensões→**🗃️ SQL SA — Paid**; HA/DR mantido. </br> - Inventário ganha coluna **SA SQL** no lugar da coluna única `sqlLicenseType`. </br> - Guia de interpretação reescrito explicando os conceitos independentes. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.3.6 | Junho 2026 | - **ESU SQL renomeado**: coluna **ESU** passa a se chamar **ESU SQL** no inventário (lida de `settings.enableExtendedSecurityUpdates`). </br> - **KPIs reagrupados por produto**: contexto (Servidores/Instâncias) + par **🗃️ SQL** (SA + ESU). </br> - **Legenda reescrita com tabelas (bordas)**, com campo/fonte oficial e referências de documentação (manage-license-billing, cost-governance). </br> - Validação cruzada com a documentação oficial Microsoft Learn. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.3.7 | Junho 2026 | - **Clareza do nó HA/DR cobrável**: coluna **Estado** passa a distinguir **🔁 Passivo isento (R$ 0)** (host Paid/PAYG) de **🔁 Passivo cobrável (sem AHB)** (host LicenseOnly/pendente) — explica casos como `sqlnode2` (HA/DR mas cobrável por estar LicenseOnly). </br> - **Guia de Licenciamento reescrito** com tabelas (regras, estados, Meter SKU) e exemplo prático; visual mais limpo. </br> - **Auditoria de queries**: propriedades validadas contra schemas oficiais (REST API specs, bicep-types, Community-Policy) — `detectedProperties.logicalCoreCount` e demais propriedades de licenciamento SQL confirmadas; nenhuma correção necessária. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.4.0 | Junho 2026 | - **Reestruturação em abas** (padrão do workbook do Advisor): navegação por **📊 Visão Geral**, **🧾 Licenciamento (true-up)**, **📈 Capacidade**, **📋 Inventário** e **🕑 Changelog** via `LinkItem` + `conditionalVisibility`. </br> - **Filtro de Assinatura** (parâmetro tipo 6, `pills`) ligado a todas as queries por `crossComponentResources={Subscription}`. </br> - **Mensagens de \"sem dados\"** nas tabelas de licenciamento e inventário. </br> - Changelog deixa de ser oculto e vira aba dedicada. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.4.1 | Junho 2026 | - **Filtro de Grupo de Recursos** (parâmetro tipo 2, multiSelect, `pills`, padrão do workbook do Advisor) adicionado à barra de filtros do topo. </br> - **Grupo de Recursos** (`resourceGroup in~ ({ResourceGroup})`) ligado a **todas as queries** (KPIs, gráficos, true-up e inventário), em conjunto com o filtro de **Assinatura**. </br> - Escopo de filtragem definido como **Assinatura + Grupo de Recursos**; filtro de Tags avaliado e descartado por simplicidade (escopo já atendido por assinatura/RG). | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.4.2 | Junho 2026 | - **Gráfico de ativação de Software Assurance** na aba Visão Geral: donut de **SA SQL** (extensão `LicenseType = Paid`/AHB) ativado vs não ativado, restrito a hosts com SQL Server. </br> - Cabeçalho da seção de true-up renomeado para **Posição de Licenciamento de SQL Server**, deixando explícito que o escopo é SQL. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.4.3 | Junho 2026 | - **Dashboard 100% SQL Server**: KPIs, donut de ativação, colunas do inventário e legenda focados exclusivamente em **SQL Server** (SA SQL e ESU SQL). </br> - **Visão Geral** — seção de ativação reescrita para **SA SQL** (`LicenseType = Paid`/AHB) × **ESU SQL** (`enableExtendedSecurityUpdates`); KPIs do topo reduzidos a Servidores, Instâncias, SA SQL e ESU SQL (4 tiles a 25%). </br> - Correção de **emojis corrompidos** nos cabeçalhos de Ativação (🗃️) e Inventário (📋). | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.4.4 | Junho 2026 | - **Aba Capacidade consolidada no Inventário**: os tiles de **vCores por Edição SQL** e **por Modelo de Licença** passam para a aba **📋 Inventário** (capacidade técnica junto do registro detalhado); a aba **📈 Capacidade** foi removida da navegação. </br> - **Changelog** higienizado: removidas as menções históricas a **SA Windows** e **ESU Windows**, mantendo apenas SQL. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.4.5 | Junho 2026 | - **Legenda do true-up completa**: nova seção **Colunas da tabela** explicando todas as 11 colunas da Posição de Licenciamento por Host (incluindo **ESU**, **PCore**, **Tipo** e **Edicao**, antes ausentes ou apenas implícitas). | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.5.0 | Julho 2026 | - **Correções de consistência para publicação pública**: escopo unificado para **multi-OS** (Windows + Linux) em KPIs, gráficos, pizzas e inventário (antes restritos a Windows), alinhando-os ao true-up e eliminando divergência de totais entre abas. </br> - Removido filtro case-sensitive `osName == \"windows\"`. </br> - Coloração da coluna **Edição SQL** passa a usar `contains` (evita perda de cor quando `edition` vem como 'Enterprise Edition'). </br> - Emoji do KPI **ESU SQL** corrigido para 🛡️ (consistente com o restante). </br> - **Aba padrão** (Visão Geral) definida no carregamento (parâmetro `SelectedTab`). </br> - Adicionado **Disclaimer** (ferramenta auxiliar; não substitui relatório/fatura/trabalho oficial). </br> - Cor da série **Expired** no gráfico de status; rótulos da legenda alinhados à coluna `Extensao`; removido `sortBy` duplicado no inventário; nota sobre hosts com LicenseType pendente. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |\r\n| v1.6.0 | Julho 2026 | - **Clareza fatura Azure × licença**: a aba Licenciamento passa a separar **💰 Cores cobrados no Azure (PAYG)** de **🏦 Cores AHB (licenças a possuir · R$ 0 no Azure)**. </br> - Nova coluna **FaturaAzure** (💰 PAYG · 🏦 AHB · ⚠️ LicenseOnly · R$ 0) e renomeação **CoresCobravels → CoresLicenca** (cores que exigem licença ≠ fatura do Azure). </br> - Cabeçalho e legenda reescritos com a tabela **Fatura do Azure × Licença que você possui**, deixando explícito que só **PAYG** gera custo na fatura; **Paid (AHB)** e **LicenseOnly** = R$ 0 no Azure. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Changelog"
       },
       "name": "Dashboard Executivo - SQL Server Azure Arc"
     },
     {
       "type": 1,
       "content": {
-        "json": "## 📊 KPIs Executivos\n**Indicadores críticos para gestão de custos e recursos**"
+        "json": "## 📊 KPIs Técnicos & Compliance\n**Inventário consolidado de SQL Server habilitado por Azure Arc**"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
       },
       "name": "metrics_header"
     },
@@ -33,41 +169,13 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVcores)\n| summarize TotalVCores = sum(sqlVcores)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where resourceGroup in~ ({ResourceGroup})\n| where isnotempty(sqlVcores)\n| summarize TotalMachines = dcount(joinId)",
               "size": 4,
-              "title": "⚡ vCores Totais Alocados",
+              "title": "🏢 Servidores SQL (hosts)",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "leftContent": {
-                  "columnMatch": "TotalVCores",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "blue"
-                  }
-                },
-                "showBorder": true,
-                "size": "small"
-              }
-            },
-            "customWidth": "16.66",
-            "name": "total_vcores"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVcores)\n| summarize TotalMachines = dcount(joinId)",
-              "size": 4,
-              "title": "🏢 Servidores no Inventário",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "tiles",
               "tileSettings": {
@@ -82,48 +190,20 @@
                 "size": "small"
               }
             },
-            "customWidth": "16.66",
-            "name": "total_machines"
+            "customWidth": "25",
+            "name": "kpi_machines"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVcores)\n| summarize ConnectedMachines = dcountif(joinId, status == 'Connected')",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| summarize TotalInstances = count()",
               "size": 4,
-              "title": "🟢 Servidores Operacionais",
+              "title": "⚙️ Instâncias SQL",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "leftContent": {
-                  "columnMatch": "ConnectedMachines",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "greenBright"
-                  }
-                },
-                "showBorder": true,
-                "size": "small"
-              }
-            },
-            "customWidth": "16.66",
-            "name": "connected_machines"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| summarize TotalInstances = count()",
-              "size": 4,
-              "title": "⚙️ Instâncias SQL Ativas",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "tiles",
               "tileSettings": {
@@ -138,25 +218,53 @@
                 "size": "small"
               }
             },
-            "customWidth": "16.66",
-            "name": "total_instances"
+            "customWidth": "25",
+            "name": "kpi_instances"
           },
           {
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize TotalEditions = dcount(sqlEdition)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| where resourceGroup in~ ({ResourceGroup})\n| summarize SqlSA = countif(tostring(properties.settings.LicenseType) =~ \"Paid\")",
               "size": 4,
-              "title": "📦 Edições SQL em Uso",
+              "title": "🗃️ SA SQL (Paid)",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "tiles",
               "tileSettings": {
                 "leftContent": {
-                  "columnMatch": "TotalEditions",
+                  "columnMatch": "SqlSA",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "blue"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "25",
+            "name": "kpi_sa_sql"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| where resourceGroup in~ ({ResourceGroup})\n| summarize ESUHabilitado = countif(tostring(properties.settings.enableExtendedSecurityUpdates) =~ \"true\")",
+              "size": 4,
+              "title": "🛡️ ESU SQL",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "ESUHabilitado",
                   "formatter": 12,
                   "formatOptions": {
                     "palette": "purple"
@@ -166,45 +274,327 @@
                 "size": "small"
               }
             },
-            "customWidth": "16.66",
-            "name": "total_editions"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | project arcMachineId, sqlLicenseType\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlLicenseType)\n| summarize TotalLicenseTypes = dcount(sqlLicenseType)",
-              "size": 4,
-              "title": "📋 Modelos de Licença",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "leftContent": {
-                  "columnMatch": "TotalLicenseTypes",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "yellow"
-                  }
-                },
-                "showBorder": true,
-                "size": "small"
-              }
-            },
-            "customWidth": "16.66",
-            "name": "total_license_types"
+            "customWidth": "25",
+            "name": "kpi_esu_sql"
           }
         ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
       },
       "name": "metrics_group"
     },
     {
       "type": 1,
       "content": {
-        "json": "---\n## 💰 Análise de Custos por Licenciamento\n**Distribuição de vCores por edições SQL e modelos de pagamento**"
+        "json": "---\n## 🧾 Posição de Licenciamento de **SQL Server** (compliance / true-up)\n**Por host (OSE): o que o **Azure fatura** (só PAYG) e o que você precisa **possuir em licenças** (AHB/SA). Base para reconciliação (true-up EA) e auditoria.**\n\n> 💡 **Onde cai a cobrança?** O **Azure só fatura** SQL Server em hosts **PAYG** (pago por hora). Hosts **Paid (AHB/SA)** e **LicenseOnly** = **R$ 0 na fatura do Azure** — mas você deve **possuir as licenças** (com SA, no caso de AHB) via seu contrato/EA.\n\n> 🗃️ **Escopo: licenciamento de SQL Server** (não Windows Server). `LicenseType = Paid` = **SQL com Software Assurance / Azure Hybrid Benefit (AHB)**; `PAYG` = pago por hora (Azure fatura); `LicenseOnly` = licença perpétua **sem** SA.\n\n*Não é a fatura do Azure (visão diferente do inventário técnico da aba 📋 Inventário): consolida por servidor pela edição mais cara, mín. 4 cores, isenta passivos HA/DR e edições gratuitas.*"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Licenciamento"
+      },
+      "name": "trueup_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\") by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresCobravels = case(topEdition == \"Sem instância\", 0, topEdition in (\"Developer\", \"Evaluation\", \"Express\"), 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresCobravels > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| summarize CoresPAYG = sum(coresPAYG)",
+              "size": 4,
+              "title": "💰 Cores cobrados no Azure (PAYG)",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "CoresPAYG",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "red"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "25",
+            "name": "trueup_kpi_billable"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\") by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresGratis = case(topEdition in (\"Developer\", \"Evaluation\", \"Express\"), coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize Gratis = sum(coresGratis)",
+              "size": 4,
+              "title": "🆓 Cores em R$ 0 (HA/DR + grátis)",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "Gratis",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "green"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "25",
+            "name": "trueup_kpi_free"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\") by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresCobravels = case(topEdition == \"Sem instância\", 0, topEdition in (\"Developer\", \"Evaluation\", \"Express\"), 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresAHB = iff(coresCobravels > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| summarize CoresAHB = sum(coresAHB)",
+              "size": 4,
+              "title": "🏦 Cores AHB (licenças próprias)",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "CoresAHB",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "blue"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "25",
+            "name": "trueup_kpi_hosts"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| where resourceGroup in~ ({ResourceGroup})\n| summarize Risco = countif(licenseTypeRaw == \"LicenseOnly\")",
+              "size": 4,
+              "title": "⚠️ Hosts LicenseOnly (compliance)",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "Risco",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "orange"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "25",
+            "name": "trueup_kpi_risk"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Licenciamento"
+      },
+      "name": "trueup_kpis_group"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, osName = tostring(properties.osName), logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\") by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend meterSku = case(topEdition == \"Sem instância\", \"Aguardando inventário SQL\", topEdition in (\"Developer\", \"Evaluation\"), strcat(topEdition, \" edition — R$ 0\"), topEdition == \"Express\", \"Express edition — R$ 0\", isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), strcat(ed3, \" edition - DR replica — R$ 0\"), isempty(licenseTypeRaw), \"Configuração pendente\", pcoreRaw =~ \"true\", strcat(ed3, \" edition - Virtual license\"), licenseTypeRaw == \"PAYG\", strcat(ed3, \" edition - PAYG\"), licenseTypeRaw == \"Paid\", strcat(ed3, \" edition - AHB\"), licenseTypeRaw == \"LicenseOnly\", strcat(ed3, \" edition - License only\"), \"—\")\n| extend coresCobravels = case(topEdition == \"Sem instância\", 0, topEdition in (\"Developer\", \"Evaluation\", \"Express\"), 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend Tipo = iff(osName =~ \"windows\", \"Windows\", \"Linux\")\n| extend isPassivoIsento = (isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"))\n| extend Estado = case(topEdition == \"Sem instância\", \"Sem instância\", isPassivoIsento, \"🔁 Passivo isento (R$ 0)\", isPassivo, \"🔁 Passivo cobrável (sem AHB)\", \"Ativo\")\n| extend ESU = case(esuRaw =~ \"true\", \"✅\", licenseTypeRaw in (\"Paid\", \"PAYG\"), \"❌\", \"🚫\")\n| extend PCore = iff(pcoreRaw =~ \"true\", \"✅ p-core\", \"v-core\")\n| extend Extensao = case(extState =~ \"Succeeded\", \"✅ OK\", extState =~ \"Failed\", \"❌ Falha\", isempty(extState), \"—\", strcat(\"⏳ \", extState))\n| extend FaturaAzure = case(topEdition == \"Sem instância\", \"—\", isempty(licenseTypeRaw), \"⏳ pendente\", coresCobravels > 0 and licenseTypeRaw == \"PAYG\", \"💰 PAYG — Azure cobra\", coresCobravels > 0 and licenseTypeRaw == \"Paid\", \"🏦 AHB — R$ 0 (SA própria)\", coresCobravels > 0 and licenseTypeRaw == \"LicenseOnly\", \"⚠️ LicenseOnly — R$ 0 (sem SA)\", \"R$ 0 (isento)\")\n| project Host = machineName, Tipo, Edicao = topEdition, Extensao, LicenseType = iff(isempty(licenseTypeRaw), \"pendente\", licenseTypeRaw), Estado, FaturaAzure, MeterSKU = meterSku, CoresLicenca = coresCobravels, CoresHost = coresHost, ESU, PCore\n| order by CoresLicenca desc, Host asc",
+              "size": 0,
+              "title": "🧾 Posição de Licenciamento SQL Server por Host (OSE)",
+              "noDataMessage": "Nenhum host SQL Server (Azure Arc) com extensão Microsoft.AzureData no escopo selecionado.",
+              "noDataMessageStyle": 3,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Extensao",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "OK",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Falha",
+                          "representation": "red",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "yellow",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "Estado",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "isento",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "cobrável",
+                          "representation": "orange",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Ativo",
+                          "representation": "red",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "gray",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "FaturaAzure",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "PAYG",
+                          "representation": "red",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "AHB",
+                          "representation": "blue",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "LicenseOnly",
+                          "representation": "orange",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "isento",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "gray",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "CoresLicenca",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "red"
+                    }
+                  },
+                  {
+                    "columnMatch": "CoresHost",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "palette": "blue"
+                    }
+                  }
+                ],
+                "filter": true
+              },
+              "sortBy": []
+            },
+            "customWidth": "70",
+            "name": "trueup_table"
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### 🧾 Como ler a Posição de Licenciamento\n\n**Host (OSE)** = a base é o **servidor** (VM/físico), **não** a instância. A tabela mostra **onde cai a cobrança** e quantos cores exigem licença — base do **true-up** (EA) e da auditoria.\n\n#### 💰 Fatura do Azure × Licença que você possui\n| LicenseType | Fatura do Azure | Sua obrigação |\n| --- | --- | --- |\n| **PAYG** | 💰 **cobra** por hora/core | nada a possuir |\n| **Paid (AHB/SA)** | **R$ 0** | possuir licenças core **com SA** |\n| **LicenseOnly** | **R$ 0** | perpétua **sem** SA (sem DR grátis/ESU) |\n| Dev/Eval/Express · Passivo (Paid/PAYG) | **R$ 0** | isento |\n\n> ⚠️ **Só PAYG gera custo na fatura do Azure.** AHB e LicenseOnly custam **R$ 0** no Azure — o custo real é a licença que você já possui (paga no EA/LSP).\n\n#### ⚙️ Regras de cálculo\n| Regra | Detalhe |\n| --- | --- |\n| Por host | 1× por servidor, pela **edição mais cara** |\n| Cores | `logicalCoreCount` (VM) ou `coreCount` (físico), **mín. 4** |\n| Passivo HA/DR | **R$ 0 só se** host for **Paid/PAYG** |\n| Dev/Eval/Express | sempre **R$ 0** |\n| p-core (UV) | meter *Virtual license* |\n\n#### 🔁 Por que um nó HA/DR pode ser cobrado?\nO medidor **DR replica (R$ 0)** exige **Software Assurance/Subscrição** — ou seja, LicenseType **Paid** ou **PAYG**. Um secundário passivo com **LicenseOnly** (ou pendente) **não** tem direito ao benefício → entra como **cobrável**.\n\n| Estado | Significado |\n| --- | --- |\n| 🔁 **Passivo isento (R$ 0)** | passivo **e** Paid/PAYG |\n| 🔁 **Passivo cobrável (sem AHB)** | passivo, mas **LicenseOnly/pendente** |\n| **Ativo** | nó primário/ativo → cobrável |\n\n> **Ex.: `sqlnode2`** é HA/DR passivo, mas está **LicenseOnly** → aparece **cobrável**. Defina **Paid** (com SA) ou **PAYG** para torná-lo **R$ 0**.\n\n#### 💰 Meter SKU projetado\n| Edição + Licença | Meter |\n| --- | --- |\n| Ent/Std + PAYG | `… - PAYG` |\n| Ent/Std + Paid (SA/AHB) | `… - AHB` |\n| Ent/Std + LicenseOnly | `… - License only` |\n| p-core (UV) | `… - Virtual license` |\n| Passivo (Paid/PAYG) | `… - DR replica` (R$ 0) |\n| Dev/Eval/Express | R$ 0 |\n\n#### 📋 Colunas da tabela\n| Coluna | Significado |\n| --- | --- |\n| **Host** | servidor (OSE), base do licenciamento |\n| **Tipo** | Windows · Linux (Linux não reporta passivo → conta como ativo) |\n| **Edicao** | edição SQL mais cara do host (Enterprise / Standard / Web / Express / Developer / Evaluation) |\n| **Extensao** | saúde da extensão `Microsoft.AzureData` (✅ OK · ❌ Falha · ⏳ em progresso) |\n| **LicenseType** | Paid (AHB/SA) · PAYG · LicenseOnly · pendente |\n| **Estado** | 🔁 Passivo isento (R$ 0) · 🔁 Passivo cobrável · Ativo |\n| **FaturaAzure** | 💰 PAYG (Azure cobra) · 🏦 AHB (R$ 0) · ⚠️ LicenseOnly (R$ 0) · R$ 0 (isento) |\n| **MeterSKU** | medidor projetado (ver tabela acima) |\n| **CoresLicenca** | cores que **exigem licença** (PAYG + AHB + LicenseOnly ativos) |\n| **CoresHost** | cores do host (mín. 4) |\n| **ESU** | ✅ habilitado · ❌ elegível sem ESU · 🚫 exige Paid/PAYG |\n| **PCore** | ✅ p-core (licença física / UV) · v-core |\n\n#### ⚠️ Avisos\n- **CoresLicenca ≠ fatura do Azure**: a fatura só vem de hosts **PAYG** (coluna **FaturaAzure** = 💰).\n- Depende da extensão `Microsoft.AzureData` **Succeeded** (coluna **Extensao**).\n- **Linux** não reporta passivo → conta como **ativo**.\n- Hosts com **LicenseType pendente/vazio** não entram em nenhum total (aguardam definição do tipo de licença).\n- Projeção **indicativa**: fatura real = medição horária (ACR) no **Cost Management**.\n\n*Fontes: aka.ms/sqlserverlicensing · learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing*"
+            },
+            "customWidth": "30",
+            "name": "trueup_legend"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Licenciamento"
+      },
+      "name": "trueup_detail_group"
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n## 📊 Distribuição de Capacidade Técnica\n**vCores alocados por edição SQL e por modelo de licença (visão técnica de capacidade — não-faturável)**"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Inventario"
       },
       "name": "distribution_header"
     },
@@ -218,13 +608,13 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize TotalVCores = sum(sqlVcores) by sqlEdition\n| order by TotalVCores desc",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where resourceGroup in~ ({ResourceGroup})\n| where isnotempty(sqlEdition)\n| summarize TotalVCores = sum(sqlVcores) by sqlEdition\n| order by TotalVCores desc",
               "size": 4,
               "title": "💻 Capacidade por Edição SQL",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "tiles",
               "tileSettings": {
@@ -250,18 +640,18 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlLicenseType, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlLicenseType)\n| summarize TotalVCores = sum(sqlVcores) by sqlLicenseType\n| order by TotalVCores desc",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n    | project extMachineId, licenseTypeRaw\n)\non $left.joinId == $right.extMachineId\n| where isnotempty(extMachineId)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| extend LicenseType = case(\n    licenseTypeRaw == \"PAYG\", \"Pay-as-you-go (PAYG)\",\n    licenseTypeRaw == \"Paid\", \"Software Assurance (Paid)\",\n    licenseTypeRaw == \"LicenseOnly\", \"License Only\",\n    isempty(licenseTypeRaw), \"Configuração pendente\",\n    licenseTypeRaw)\n| where resourceGroup in~ ({ResourceGroup})\n| summarize TotalVCores = sum(sqlVcores) by LicenseType\n| order by TotalVCores desc",
               "size": 4,
               "title": "💳 Capacidade por Modelo de Licença",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "tiles",
               "tileSettings": {
                 "titleContent": {
-                  "columnMatch": "sqlLicenseType",
+                  "columnMatch": "LicenseType",
                   "formatter": 1
                 },
                 "leftContent": {
@@ -280,12 +670,22 @@
           }
         ]
       },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Inventario"
+      },
       "name": "charts_group"
     },
     {
       "type": 1,
       "content": {
         "json": "---\n## 📈 Análise Visual de Compliance\n**Status operacional e distribuição de recursos críticos**"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
       },
       "name": "pie_charts_header"
     },
@@ -299,13 +699,13 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize Machines = dcount(joinId) by status",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| where resourceGroup in~ ({ResourceGroup})\n| summarize Machines = dcount(joinId) by status",
               "size": 1,
               "title": "🔍 Status Operacional dos Servidores",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "piechart",
               "chartSettings": {
@@ -327,6 +727,10 @@
                     "color": "#ffc107"
                   },
                   {
+                    "seriesName": "Expired",
+                    "color": "#fd7e14"
+                  },
+                  {
                     "seriesName": "Unknown",
                     "color": "#6c757d"
                   }
@@ -340,51 +744,154 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlEdition = tostring(properties.edition)\n    | extend vCores = toint(properties.vCore)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize TotalVCores = sum(sqlVcores) by sqlEdition\n| order by TotalVCores desc",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n    | project extMachineId, licenseTypeRaw\n)\non $left.joinId == $right.extMachineId\n| where isnotempty(extMachineId)\n| extend LicenseType = case(\n    licenseTypeRaw == \"PAYG\", \"Pay-as-you-go (PAYG)\",\n    licenseTypeRaw == \"Paid\", \"Software Assurance (Paid)\",\n    licenseTypeRaw == \"LicenseOnly\", \"License Only\",\n    isempty(licenseTypeRaw), \"Configuração pendente\",\n    licenseTypeRaw)\n| where resourceGroup in~ ({ResourceGroup})\n| summarize Servidores = dcount(joinId) by LicenseType\n| order by Servidores desc",
               "size": 1,
-              "title": "📊 Distribuição de Investimento por Edição",
+              "title": "📊 Distribuição por Modelo de Licença",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "piechart",
               "chartSettings": {
-                "labelColumn": "sqlEdition",
-                "valueColumn": "TotalVCores",
+                "labelColumn": "LicenseType",
+                "valueColumn": "Servidores",
                 "showLegend": true,
                 "createOtherGroup": 0,
                 "seriesLabelSettings": [
                   {
-                    "seriesName": "Enterprise",
-                    "color": "#6f42c1"
-                  },
-                  {
-                    "seriesName": "Standard",
+                    "seriesName": "Pay-as-you-go (PAYG)",
                     "color": "#007bff"
                   },
                   {
-                    "seriesName": "Developer",
+                    "seriesName": "Software Assurance (Paid)",
+                    "color": "#28a745"
+                  },
+                  {
+                    "seriesName": "License Only",
                     "color": "#fd7e14"
                   },
                   {
-                    "seriesName": "Express",
+                    "seriesName": "Configuração pendente",
                     "color": "#6c757d"
                   }
                 ]
               }
             },
             "customWidth": "50",
-            "name": "edition_pie"
+            "name": "license_pie"
           }
         ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
       },
       "name": "pie_charts_group"
     },
     {
       "type": 1,
       "content": {
+        "json": "---\n## 🗃️ Ativação de Licenciamento SQL (SA × ESU)\n**Hosts com SQL Server: SA SQL (`LicenseType = Paid`/AHB) e ESU SQL (`enableExtendedSecurityUpdates`) ativados vs não ativados.**"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
+      },
+      "name": "sa_activation_header"
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind=inner (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | distinct arcMachineId\n) on $left.joinId == $right.arcMachineId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n    | project extMachineId, licenseTypeRaw\n) on $left.joinId == $right.extMachineId\n| where resourceGroup in~ ({ResourceGroup})\n| extend SA_SQL = iff(licenseTypeRaw == \"Paid\", \"✅ Ativado (Paid/SA)\", \"❌ Não ativado\")\n| summarize Hosts = dcount(joinId) by SA_SQL",
+              "size": 1,
+              "title": "🗃️ SA SQL — Ativação (Paid/AHB)",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "piechart",
+              "chartSettings": {
+                "createOtherGroup": 0,
+                "showLegend": true,
+                "labelColumn": "SA_SQL",
+                "valueColumn": "Hosts",
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "✅ Ativado (Paid/SA)",
+                    "color": "#28a745"
+                  },
+                  {
+                    "seriesName": "❌ Não ativado",
+                    "color": "#dc3545"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "sa_sql_activation_pie"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind=inner (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | distinct arcMachineId\n) on $left.joinId == $right.arcMachineId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n    | project extMachineId, esuRaw\n) on $left.joinId == $right.extMachineId\n| where resourceGroup in~ ({ResourceGroup})\n| extend ESU_SQL = iff(esuRaw =~ \"true\", \"✅ Habilitado\", \"❌ Não habilitado\")\n| summarize Hosts = dcount(joinId) by ESU_SQL",
+              "size": 1,
+              "title": "🛡️ ESU SQL — Ativação (hosts SQL)",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "piechart",
+              "chartSettings": {
+                "createOtherGroup": 0,
+                "showLegend": true,
+                "labelColumn": "ESU_SQL",
+                "valueColumn": "Hosts",
+                "seriesLabelSettings": [
+                  {
+                    "seriesName": "✅ Habilitado",
+                    "color": "#28a745"
+                  },
+                  {
+                    "seriesName": "❌ Não habilitado",
+                    "color": "#dc3545"
+                  }
+                ]
+              }
+            },
+            "customWidth": "50",
+            "name": "esu_sql_activation_pie"
+          }
+        ]
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
+      },
+      "name": "sa_activation_group"
+    },
+    {
+      "type": 1,
+      "content": {
         "json": "---\n## 📋 Inventário Corporativo\n**Registro detalhado para auditoria e compliance**"
+      },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Inventario"
       },
       "name": "inventory_header"
     },
@@ -398,13 +905,15 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlVersion = tostring(properties.version)\n    | extend vCores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | extend sqlInstanceName = name\n    | project arcMachineId, sqlInstanceName, sqlVersion, sqlEdition, sqlLicenseType, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlVersion)\n| project \n    machineName = name,\n    status,\n    operatingSystem = tostring(properties.osSku),\n    sqlInstanceName,\n    sqlVersion,\n    sqlEdition,\n    sqlLicenseType,\n    sqlVcores\n| order by machineName asc",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend status = case(\n    tolower(properties.status) == 'connected', 'Connected',\n    tolower(properties.status) == 'disconnected', 'Offline',\n    tolower(properties.status) == 'error', 'Error',\n    tolower(properties.status) == 'expired', 'Expired',\n    'Unknown'\n)\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlVersion = tostring(properties.version)\n    | extend vCores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | extend sqlInstanceName = name\n    | extend instLicType = tostring(properties.licenseType)\n    | project arcMachineId, sqlInstanceName, sqlVersion, sqlEdition, sqlVcores = vCores, instLicType\n)\non $left.joinId == $right.arcMachineId\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n    | extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n    | extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n    | extend extStateRaw = tostring(properties.provisioningState)\n    | project extMachineId, licenseTypeRaw, esuRaw, pcoreRaw, extStateRaw\n)\non $left.joinId == $right.extMachineId\n| where isnotempty(sqlVersion)\n| extend SA_SQL = case(licenseTypeRaw == \"Paid\", \"✅ Paid (SA)\", licenseTypeRaw == \"PAYG\", \"☁️ PAYG\", licenseTypeRaw == \"LicenseOnly\", \"❌ License only\", \"⏳ pendente\")\n| extend ESU_SQL = case(esuRaw =~ \"true\", \"✅ Habilitado\", licenseTypeRaw in (\"Paid\", \"PAYG\"), \"❌ Não (elegível)\", \"🚫 N/A (exige Paid/PAYG)\")\n| extend LicencaPCore = iff(pcoreRaw =~ \"true\", \"✅ p-core (UV)\", \"v-core\")\n| extend Extensao = case(extStateRaw =~ \"Succeeded\", \"✅ OK\", extStateRaw =~ \"Failed\", \"❌ Falha\", isempty(extStateRaw), \"❔ Sem extensão\", strcat(\"⏳ \", extStateRaw))\n| extend ModeloSQL = case(instLicType =~ \"HADR\", \"🔁 HA/DR (passivo)\", instLicType =~ \"ServerCAL\", \"Server+CAL\", instLicType =~ \"PerCore\", \"Per-core\", instLicType =~ \"Free\", \"Grátis (Eval/Express)\", isempty(instLicType), \"—\", instLicType)\n| where resourceGroup in~ ({ResourceGroup})\n| project \n    machineName = name,\n    status,\n    Extensao,\n    operatingSystem = tostring(properties.osSku),\n    sqlInstanceName,\n    sqlVersion,\n    sqlEdition,\n    ModeloSQL,\n    SA_SQL,\n    ESU_SQL,\n    LicencaPCore,\n    sqlVcores\n| order by machineName asc",
               "size": 0,
               "title": "📋 Registro Oficial de Instâncias SQL Server",
+              "noDataMessage": "Nenhuma instância SQL Server (Azure Arc) no escopo selecionado.",
+              "noDataMessageStyle": 3,
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
-                "value::all"
+                "{Subscription}"
               ],
               "visualization": "table",
               "gridSettings": {
@@ -437,6 +946,33 @@
                     }
                   },
                   {
+                    "columnMatch": "Extensao",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "OK",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Falha",
+                          "representation": "red",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "yellow",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
                     "columnMatch": "sqlVcores",
                     "formatter": 8,
                     "formatOptions": {
@@ -450,20 +986,107 @@
                       "thresholdsOptions": "colors",
                       "thresholdsGrid": [
                         {
-                          "operator": "==",
+                          "operator": "contains",
                           "thresholdValue": "Enterprise",
                           "representation": "purple",
                           "text": "{0}{1}"
                         },
                         {
-                          "operator": "==",
+                          "operator": "contains",
                           "thresholdValue": "Standard",
                           "representation": "blue",
                           "text": "{0}{1}"
                         },
                         {
-                          "operator": "==",
+                          "operator": "contains",
                           "thresholdValue": "Developer",
+                          "representation": "orange",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "gray",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "ModeloSQL",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "HA/DR",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Grátis",
+                          "representation": "gray",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "blue",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "ESU_SQL",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Habilitado",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "elegível",
+                          "representation": "orange",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "gray",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "SA_SQL",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "colors",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "Paid",
+                          "representation": "green",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "PAYG",
+                          "representation": "blue",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "contains",
+                          "thresholdValue": "License only",
                           "representation": "orange",
                           "text": "{0}{1}"
                         },
@@ -484,137 +1107,27 @@
                     "sortOrder": 1
                   }
                 ]
-              },
-              "sortBy": [
-                {
-                  "itemKey": "machineName",
-                  "sortOrder": 1
-                }
-              ]
+              }
             },
-            "customWidth": "65",
+            "customWidth": "70",
             "name": "Tabela_Detalhes"
           },
           {
             "type": 1,
             "content": {
-              "json": "### 📝 Guia de Interpretação\n\n**Status Operacional:**\n- 🟢 **Operacional**: Servidor online e monitorado\n- 🔴 **Indisponível**: Servidor offline ou com falhas  \n- 🟡 **Atenção**: Requer investigação técnica\n\n**Edições SQL Server:**\n- 🟣 **Enterprise**: Máxima capacidade e recursos\n- 🔵 **Standard**: Padrão corporativo\n- 🟠 **Developer**: Ambiente de desenvolvimento\n- ⚪ **Express**: Edição gratuita limitada\n\n**Métricas de Negócio:**\n- **vCores**: Capacidade computacional licenciada\n- **Modelo de Licença**: PAYG (pague conforme uso) vs AHUB (benefício híbrido)\n- **Ambiente**: Versão do sistema operacional host\n\n**⚠️ Ações Recomendadas:**\n- Servidores offline: Verificar conectividade\n- Licenças PAYG: Avaliar migração para AHUB  \n- Edições Express: Considerar upgrade conforme crescimento"
+              "json": "### 📝 Guia de Interpretação\n*(colunas da tabela ao lado)*\n\n#### 🔑 Os 2 conceitos de licenciamento SQL\n\n| Conceito | Campo (fonte oficial) | Valores |\n| --- | --- | --- |\n| 🗃️ **SA SQL** | extensão · `settings.LicenseType` | Paid · PAYG · LicenseOnly |\n| 🛡️ **ESU SQL** | extensão · `settings.enableExtendedSecurityUpdates` | ✅ · ❌ · 🚫 |\n\nSão **independentes**: **SA SQL** (Software Assurance / AHB) cobre o licenciamento; **ESU SQL** exige LicenseType **Paid/PAYG** e cobre atualizações de segurança estendidas.\n\n#### 📋 Demais colunas\n\n| Coluna | Significado |\n| --- | --- |\n| **status** | 🟢 Connected · 🔴 Offline · 🟡 Error/Expired |\n| **Extensao** | saúde de `Microsoft.AzureData` (✅ OK · ❌ Falha · ⏳ · ❔). Se ≠ OK, licença/ESU podem estar desatualizados |\n| **sqlEdition** | 🟣 Enterprise · 🔵 Standard · 🟠 Developer · ⚪ Express/Eval/Web |\n| **Modelo SQL** | papel da instância (`licenseType`): 🔁 HA/DR passivo · Server+CAL · Per-core · Grátis |\n| **Licença p-core** | ✅ p-core (UV, virtualização ilimitada) · v-core |\n| **sqlVcores** | capacidade técnica — **não** é base de cobrança (a base é o nº de cores do host) |\n\n#### 🗃️ SA SQL (detalhe)\n- ✅ **Paid (SA)** = licença com SA / Azure Hybrid Benefit.\n- ☁️ **PAYG** = pago por hora (sem SA).\n- ❌ **License only** = perpétua / Server+CAL sem SA.\n- ⏳ **pendente** = LicenseType não definido.\n\n#### 🛡️ ESU SQL (detalhe)\n- ✅ **Habilitado** = `enableExtendedSecurityUpdates = true` (recebe ESU do SQL Server).\n- ❌ **Não habilitado** = host elegível (Paid/PAYG) sem ESU SQL ativado.\n- 🚫 **N/A** = exige LicenseType **Paid/PAYG**.\n\n#### ⚠️ Ações\n- Offline ou Extensão ≠ OK → investigar.\n- `LicenseOnly` → avaliar Paid/PAYG (ESU SQL e HA/DR exigem).\n- Definir `LicenseType` via runbook `AzArcSQLModifyLicenseTypeforSA`.\n\n#### 📚 Referências oficiais\n- **Licença & billing SQL**: learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing\n- **Custo do Arc** (control plane gratuito): learn.microsoft.com/azure/cloud-adoption-framework/scenarios/hybrid/arc-enabled-servers/eslz-cost-governance"
             },
-            "customWidth": "25",
+            "customWidth": "30",
             "name": "legends_sidebar"
           }
         ]
       },
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Inventario"
+      },
       "name": "inventory_group"
-    },
-    {
-      "type": 1,
-      "content": {
-        "json": "---\n## 📊 Relatório Executivo de Custos\n**Análise consolidada para otimização de gastos e planejamento**\n\n*Use estas tabelas para identificar oportunidades de economia e otimização de recursos.*"
-      },
-      "name": "stats_header"
-    },
-    {
-      "type": 12,
-      "content": {
-        "version": "NotebookGroup/1.0",
-        "groupType": "editable",
-        "items": [
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | project arcMachineId, sqlEdition, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlEdition)\n| summarize \n    Instancias = count(),\n    TotalVCores = sum(sqlVcores)\nby sqlEdition\n| extend VCoresPorInstancia = round(todouble(TotalVCores) / todouble(Instancias), 1)\n| project sqlEdition, Instancias, TotalVCores, VCoresPorInstancia\n| order by TotalVCores desc",
-              "size": 1,
-              "title": "💰 ROI por Edição SQL Server",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "table",
-              "gridSettings": {
-                "formatters": [
-                  {
-                    "columnMatch": "sqlEdition",
-                    "formatter": 1
-                  },
-                  {
-                    "columnMatch": "TotalVCores",
-                    "formatter": 8,
-                    "formatOptions": {
-                      "palette": "blue"
-                    }
-                  },
-                  {
-                    "columnMatch": "Instancias",
-                    "formatter": 8,
-                    "formatOptions": {
-                      "palette": "green"
-                    }
-                  },
-                  {
-                    "columnMatch": "VCoresPorInstancia",
-                    "formatter": 8,
-                    "formatOptions": {
-                      "palette": "orange"
-                    }
-                  }
-                ]
-              }
-            },
-            "customWidth": "50",
-            "name": "edition_summary"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| where properties.osName == \"windows\"\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend vCores = toint(properties.vCore)\n    | extend sqlLicenseType = tostring(properties.licenseType)\n    | project arcMachineId, sqlLicenseType, sqlVcores = vCores\n)\non $left.joinId == $right.arcMachineId\n| where isnotempty(sqlLicenseType)\n| summarize \n    Instancias = count(),\n    TotalVCores = sum(sqlVcores)\nby sqlLicenseType\n| extend VCoresPorInstancia = round(todouble(TotalVCores) / todouble(Instancias), 1)\n| project sqlLicenseType, Instancias, TotalVCores, VCoresPorInstancia\n| order by TotalVCores desc",
-              "size": 1,
-              "title": "📊 Análise de Economia por Licenciamento",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "table",
-              "gridSettings": {
-                "formatters": [
-                  {
-                    "columnMatch": "sqlLicenseType",
-                    "formatter": 1
-                  },
-                  {
-                    "columnMatch": "TotalVCores",
-                    "formatter": 8,
-                    "formatOptions": {
-                      "palette": "orange"
-                    }
-                  },
-                  {
-                    "columnMatch": "Instancias",
-                    "formatter": 8,
-                    "formatOptions": {
-                      "palette": "green"
-                    }
-                  },
-                  {
-                    "columnMatch": "VCoresPorInstancia",
-                    "formatter": 8,
-                    "formatOptions": {
-                      "palette": "yellow"
-                    }
-                  }
-                ]
-              }
-            },
-            "customWidth": "50",
-            "name": "license_summary"
-          }
-        ]
-      },
-      "name": "stats_group"
     }
   ],
   "defaultResourceIds": [
@@ -622,5 +1135,3 @@
   ],
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
-
-```
