@@ -13,43 +13,79 @@
 <#
 .SYNOPSIS
     Enables LeastPrivilege FeatureFlag on Azure Arc machines with SQL Server extension.
+
 .DESCRIPTION
     Queries all subscriptions for Azure Arc machines with WindowsAgent.SqlServer
-    extension where LeastPrivilege feature flag is disabled or missing, and enables it.
-    Modos de operacao:
-    - Report: Lista maquinas sem LeastPrivilege — nenhuma alteracao e aplicada.
-    - Enable: Habilita o FeatureFlag LeastPrivilege nas maquinas elegiveis.
+    extension where LeastPrivilege is NOT EXPLICITLY enabled, and enables it.
+
+    O runbook FORÇA o flag LeastPrivilege explicitamente em TODAS as máquinas SQL
+    Arc Connected que não o declaram no FeatureFlags. Como isso ALTERA a settings
+    da extensão, o RP re-executa o Enable e o deployer roda
+    GrantLeastPrivilegePermissions(), que configura:
+    - Conta de serviço: NT SERVICE\SqlServerExtension
+    - Grupo local: Hybrid Agent Extension Applications
+    - Permissões SQL mínimas (Connect SQL, View Server State, etc.)
+    - Scheduled Task: SqlServerExtensionPermissionProvider
+
+    Mesmo em versões >= 1.1.2504 (LP default-ON), forçar o flag explícito ACIONA o
+    deployer para re-configurar a conta de serviço caso ela esteja como LocalSystem.
+
+    NOTA: este runbook valida apenas o lado Azure (sucesso do 'feature-flag set').
+    A troca efetiva da conta de serviço no SO deve ser confirmada no próprio nó
+    (grupo local + logon da conta do serviço da extensão).
+
+    Modos de operação:
+    - Report: Lista máquinas não-compliant — nenhuma alteração é aplicada.
+    - Enable: Habilita o FeatureFlag LeastPrivilege nas máquinas elegíveis.
+
     Uses ONLY Azure CLI — no Az PowerShell modules required.
+
 .PARAMETER Mode
-    Modo de operacao. Enable (default for scheduled execution) aplica alteracoes;
-    Report apenas lista.
+    Modo de operação. Report (default) apenas lista; Enable aplica alterações.
+
 .EXAMPLE
-    .\AzArcSQLEnableLeastPrivilege.ps1 -Mode Report
+    .\sql-least-privilege.ps1 -Mode Report
+
 .EXAMPLE
-    .\AzArcSQLEnableLeastPrivilege.ps1 -Mode Enable
+    .\sql-least-privilege.ps1 -Mode Enable
+
+.EXAMPLE
+    .\sql-least-privilege.ps1 -Mode Enable -WhatIf
+
 .NOTES
-    Reference: https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/configure-least-privilege
+    Reference: https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/configure-least-privilege?view=sql-server-ver17
 
 .PREREQUISITES
-    - PowerShell 7.2+ Runtime Environment
-    - Azure CLI (pre-installed in Azure Automation)
-    - Managed Identity with the following MINIMUM RBAC roles:
-      1. Reader (subscription scope) — required for Azure Resource Graph queries
-      2. Azure Connected Machine Resource Administrator (subscription or resource group scope)
-         — required for Microsoft.HybridCompute/machines/extensions/write
-    - Assignment command:
-      az role assignment create --assignee <MI-ObjectId> --role 'Reader' --scope /subscriptions/<sub-id>
-      az role assignment create --assignee <MI-ObjectId> --role 'Azure Connected Machine Resource Administrator' --scope /subscriptions/<sub-id>
+    - PowerShell 7.2+ Runtime Environment (confirme em Runbook > Runtime environment).
+    - Azure CLI (pre-installed in Azure Automation).
+    - Managed Identity com os papeis RBAC MINIMOS, em TODAS as assinaturas-alvo:
+        1. Reader (escopo de assinatura) — necessario para Azure Resource Graph.
+        2. Azure Connected Machine Resource Administrator (assinatura ou RG)
+           — necessario para Microsoft.HybridCompute/machines/extensions/write.
+      Comando de atribuicao:
+        az role assignment create --assignee <MI-ObjectId> --role 'Reader' --scope /subscriptions/<sub-id>
+        az role assignment create --assignee <MI-ObjectId> --role 'Azure Connected Machine Resource Administrator' --scope /subscriptions/<sub-id>
+
+.PARAMETER ExtensionVersions
+    Hashtable opcional para FIXAR a versao das extensoes do Azure CLI e evitar
+    breaking changes (ex.: @{ arcdata = '1.5.13'; 'resource-graph' = '2.1.0' }).
+    Sem valor, instala a versao mais recente.
 #>
 
 [CmdletBinding(PositionalBinding = $false, SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
 param(
     [Parameter()]
     [ValidateSet('Report', 'Enable')]
-    [string]$Mode = 'Enable'
+    [string]$Mode = 'Report',
+
+    [Parameter()]
+    [hashtable]$ExtensionVersions = @{}
 )
 
 $ErrorActionPreference = "Stop"
+
+# Padroes de erro transiente (retry com backoff) compartilhados entre ARG e enable.
+$script:TransientPatterns = @('RequestTimeout', 'TooManyRequests', '429', '503', 'ServiceUnavailable', 'GatewayTimeout', 'ConnectionReset')
 
 # =============================================================================
 # LOGGING
@@ -80,11 +116,20 @@ function Test-Prerequisites {
 }
 
 function Install-RequiredExtensions {
+    param([hashtable] $Versions = @{})
+
     $installed = (az extension list --output json 2>$null | ConvertFrom-Json).name
     foreach ($ext in @("resource-graph", "arcdata")) {
         if ($ext -notin $installed) {
-            Write-Log INFO "Installing extension '$ext'..."
-            az extension add --name $ext --yes 2>$null | Out-Null
+            $ver = $Versions[$ext]
+            if ($ver) {
+                Write-Log INFO "Installing extension '$ext' (version $ver)..."
+                az extension add --name $ext --version $ver --yes 2>$null | Out-Null
+            }
+            else {
+                Write-Log INFO "Installing extension '$ext' (latest)..."
+                az extension add --name $ext --yes 2>$null | Out-Null
+            }
             if ($LASTEXITCODE -ne 0) { throw "Failed to install extension '$ext'." }
         }
     }
@@ -101,10 +146,10 @@ function Connect-Azure {
 }
 
 # =============================================================================
-# RESOURCE GRAPH QUERY
+# RESOURCE GRAPH QUERY (single call across all subscriptions, with retry)
 # =============================================================================
 function Get-TargetMachines {
-    param ([string] $SubscriptionId)
+    param ([string[]] $SubscriptionIds)
 
     $queryFile = Join-Path ([IO.Path]::GetTempPath()) "arg_$([guid]::NewGuid().ToString('N')).kql"
 
@@ -113,51 +158,68 @@ resources
 | where type == "microsoft.hybridcompute/machines/extensions"
 | where name == "WindowsAgent.SqlServer"
 | extend settings = parse_json(properties).settings
-| where tostring(settings.SqlManagement.IsEnabled) == "true"
 | extend machineName = tolower(extract("machines/([^/]+)/extensions", 1, id))
+| extend version = tostring(properties.typeHandlerVersion)
 | where isnotempty(machineName)
 | join kind=inner (
     resources
     | where type == "microsoft.hybridcompute/machines"
     | where tolower(tostring(properties.status)) == "connected"
-    | project machineId = id,
-             machineName = tolower(name),
-             lastStatusChange = tostring(properties.lastStatusChange)
+    | project machineName = tolower(name)
 ) on machineName
 | extend ffLower = tolower(tostring(settings.FeatureFlags))
-| where not(ffLower matches regex '("name":"leastprivilege"[^}]*"enable":(true|"true"))|("enable":(true|"true")[^}]*"name":"leastprivilege")')
-| extend lpEnabled = iff(ffLower has "leastprivilege", "false", "notset")
-| project machineName, resourceGroup, subscriptionId, lpEnabled, lastStatusChange, machineId
+// Considera LP explicitamente habilitado APENAS se o FeatureFlags contém "leastprivilege" com "true"
+| extend lpExplicitlyEnabled = ffLower has "leastprivilege" and ffLower has "true"
+// Retorna TODAS que NAO tem LP explicitamente habilitado — para forçar enable
+| where not(lpExplicitlyEnabled)
+| extend lpStatus = iff(ffLower has "leastprivilege", "ExplicitlyDisabled", "NotSet")
+| project machineName, resourceGroup, subscriptionId, version, lpStatus
 | where isnotempty(machineName) and isnotempty(resourceGroup)
 '@
+
+    $transientPatterns = $script:TransientPatterns
 
     try {
         Set-Content -Path $queryFile -Value $kql -Encoding UTF8 -Force
 
         $pageSize = 1000
         $skip = 0
-        $allData = @()
+        $maxRetries = 5
+        $allData = [System.Collections.Generic.List[object]]::new()
 
         do {
-            $json = az graph query -q "@$queryFile" --subscriptions $SubscriptionId `
-                --first $pageSize --skip $skip --output json 2>&1
-            if ($LASTEXITCODE -ne 0) { throw "Resource Graph query failed: $($json -join ' ')" }
+            $page = $null
+            for ($attempt = 1; $attempt -le $maxRetries; $attempt++) {
+                $json = az graph query -q "@$queryFile" --subscriptions $SubscriptionIds `
+                    --first $pageSize --skip $skip --output json 2>&1
 
-            $result = $json | ConvertFrom-Json
-            $pageData = $result.data
-            $pageCount = $pageData.Count
+                if ($LASTEXITCODE -eq 0) { $page = $json | ConvertFrom-Json; break }
 
-            if ($pageCount -gt 0) {
-                $allData += $pageData
-                $skip += $pageCount
+                $errMsg = $json -join ' '
+                $isTransient = $transientPatterns | Where-Object { $errMsg -match $_ }
+                if (-not $isTransient -or $attempt -eq $maxRetries) {
+                    throw "Resource Graph query failed: $errMsg"
+                }
+
+                $delay = [math]::Pow(2, $attempt) * 2
+                Write-Log WARN "ARG transient error (attempt $attempt/$maxRetries) — retrying in ${delay}s..."
+                Start-Sleep -Seconds $delay
             }
 
-            if ($skip -gt $pageSize) {
-                Write-Log INFO "Paginating Resource Graph: $($allData.Count) rows fetched so far..."
+            $pageData = $page.data
+            $pageCount = ($pageData | Measure-Object).Count
+
+            if ($pageCount -gt 0) {
+                $allData.AddRange([object[]]$pageData)
+                $skip += $pageCount
+                if ($skip -gt $pageSize) {
+                    Write-Log INFO "Paginating Resource Graph: $($allData.Count) rows fetched so far..."
+                }
             }
         } while ($pageCount -eq $pageSize)
 
-        return $allData
+        # Virgula evita o unrolling da List no return (lista vazia viraria $null).
+        return , $allData
     }
     finally {
         if (Test-Path $queryFile) { Remove-Item $queryFile -Force -ErrorAction SilentlyContinue }
@@ -174,8 +236,6 @@ function Enable-LeastPrivilegeFlag {
         [int]    $MaxRetries = 3
     )
 
-    $transientPatterns = @('RequestTimeout', 'TooManyRequests', '429', '503', 'ServiceUnavailable', 'GatewayTimeout', 'ConnectionReset')
-
     for ($i = 1; $i -le $MaxRetries; $i++) {
         $out = az sql server-arc extension feature-flag set `
             --name LeastPrivilege --enable true `
@@ -184,7 +244,7 @@ function Enable-LeastPrivilegeFlag {
         if ($LASTEXITCODE -eq 0) { return "Success" }
 
         $errMsg = $out -join ' '
-        $isTransient = $transientPatterns | Where-Object { $errMsg -match $_ }
+        $isTransient = $script:TransientPatterns | Where-Object { $errMsg -match $_ }
 
         if (-not $isTransient) {
             Write-Log ERROR "Non-transient error for '$MachineName': $errMsg"
@@ -203,59 +263,50 @@ function Enable-LeastPrivilegeFlag {
 }
 
 # =============================================================================
-# PROCESS SUBSCRIPTION
+# PROCESS MACHINES
 # =============================================================================
-function Invoke-Subscription {
+function Invoke-Machines {
     param (
-        [string] $SubscriptionId,
-        [string] $SubscriptionName,
+        [System.Collections.Generic.List[object]] $Machines,
         [hashtable] $Stats
     )
 
-    Write-Log INFO "--- Subscription: $SubscriptionName ($SubscriptionId)"
+    $currentSub = $null
 
-    az account set --subscription $SubscriptionId 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Log WARN "Could not set context. Skipping."
-        $Stats.Skipped++
-        return
-    }
+    foreach ($m in $Machines) {
+        Write-Log INFO "  -> $($m.machineName) | Sub: $($m.subscriptionId) | RG: $($m.resourceGroup) | LP: $($m.lpStatus) | Ver: $($m.version)"
 
-    $machines = Get-TargetMachines -SubscriptionId $SubscriptionId
+        $csvFields = @($m.machineName, $m.resourceGroup, $m.subscriptionId, $m.version, $m.lpStatus) | ForEach-Object { Format-CsvField $_ }
 
-    if (-not $machines -or $machines.Count -eq 0) {
-        Write-Log INFO "All machines compliant (or none exist)."
-        $Stats.Compliant++
-        return
-    }
+        if ($Mode -eq 'Report') {
+            Write-Log RESULT (($csvFields + (Format-CsvField 'PendingEnable')) -join ',')
+            $Stats.Total++
+            continue
+        }
 
-    Write-Log INFO "Found $($machines.Count) non-compliant machine(s)."
+        # --- Enable ---
+        if (-not $PSCmdlet.ShouldProcess("$($m.machineName) (RG: $($m.resourceGroup))", "Enable LeastPrivilege FeatureFlag")) {
+            continue
+        }
 
-    foreach ($m in $machines) {
-        Write-Log INFO "  -> $($m.machineName) | RG: $($m.resourceGroup) | LP: $($m.lpEnabled)"
-
-        $csvFields = @($m.machineName, $m.resourceGroup, $SubscriptionId, $m.lpEnabled) | ForEach-Object { Format-CsvField $_ }
-
-        switch ($Mode) {
-            'Report' {
-                Write-Log RESULT (($csvFields + (Format-CsvField 'PendingEnable')) -join ',')
-                $Stats.Total++
+        # Troca o contexto somente quando a assinatura muda (a query foi unica).
+        if ($m.subscriptionId -ne $currentSub) {
+            az account set --subscription $m.subscriptionId 2>$null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Log WARN "Could not set context for $($m.subscriptionId). Skipping $($m.machineName)."
+                $Stats.Failure++; $Stats.Total++
+                Write-Log RESULT (($csvFields + (Format-CsvField 'ContextError')) -join ',')
                 continue
             }
-
-            'Enable' {
-                if (-not $PSCmdlet.ShouldProcess("$($m.machineName) (RG: $($m.resourceGroup))", "Enable LeastPrivilege FeatureFlag")) {
-                    continue
-                }
-
-                $result = Enable-LeastPrivilegeFlag -ResourceGroup $m.resourceGroup -MachineName $m.machineName
-
-                if ($result -eq "Success") { $Stats.Success++ } else { $Stats.Failure++ }
-                $Stats.Total++
-
-                Write-Log RESULT (($csvFields + (Format-CsvField $result)) -join ',')
-            }
+            $currentSub = $m.subscriptionId
         }
+
+        $result = Enable-LeastPrivilegeFlag -ResourceGroup $m.resourceGroup -MachineName $m.machineName
+
+        if ($result -eq "Success") { $Stats.Success++ } else { $Stats.Failure++ }
+        $Stats.Total++
+
+        Write-Log RESULT (($csvFields + (Format-CsvField $result)) -join ',')
     }
 }
 
@@ -270,7 +321,7 @@ try {
 
     Test-Prerequisites
     Connect-Azure
-    Install-RequiredExtensions
+    Install-RequiredExtensions -Versions $ExtensionVersions
 
     $subsJson = az account list --all --output json 2>$null
     if ($LASTEXITCODE -ne 0) { throw "Failed to list subscriptions." }
@@ -278,18 +329,24 @@ try {
 
     Write-Log INFO "Found $($subs.Count) enabled subscription(s)."
 
-    $stats = @{ Total = 0; Success = 0; Failure = 0; Compliant = 0; Skipped = 0 }
+    $stats = @{ Total = 0; Success = 0; Failure = 0 }
 
-    Write-Log RESULT "MachineName,ResourceGroup,SubscriptionId,LPStatusBefore,UpdateResult"
+    Write-Log INFO "Querying Resource Graph across all subscriptions..."
+    $machines = Get-TargetMachines -SubscriptionIds $subs.id
 
-    foreach ($sub in $subs) {
-        Invoke-Subscription -SubscriptionId $sub.id -SubscriptionName $sub.name -Stats $stats
+    Write-Log RESULT "MachineName,ResourceGroup,SubscriptionId,Version,LPStatus,UpdateResult"
+
+    if ($machines.Count -eq 0) {
+        Write-Log INFO "All machines compliant (or none exist)."
+    }
+    else {
+        $affectedSubs = ($machines.subscriptionId | Sort-Object -Unique | Measure-Object).Count
+        Write-Log INFO "Found $($machines.Count) non-compliant machine(s) across $affectedSubs subscription(s)."
+        Invoke-Machines -Machines $machines -Stats $stats
     }
 
-    $subsProcessed = $subs.Count - $stats.Compliant - $stats.Skipped
-
     Write-Log INFO "=== SUMMARY ==="
-    Write-Log INFO "Subscriptions: $($subs.Count) total | $subsProcessed with non-compliant machines | $($stats.Compliant) fully compliant | $($stats.Skipped) skipped"
+    Write-Log INFO "Subscriptions scanned: $($subs.Count)"
 
     switch ($Mode) {
         'Report' {
