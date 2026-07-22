@@ -995,6 +995,10 @@ elseif ($envProxy -and (Test-IsValidProxyUri $envProxy)) {
 }
 
 $script:ProxyMode = if ($script:EffectiveProxy) { 'ExplicitProxy' } else { 'Direct' }
+$script:ScenarioProxy = $script:EffectiveProxy
+if ($Mode -eq 'Gateway' -and $agentProxy) {
+    $script:ScenarioProxy = $agentProxy
+}
 
 $pFmt = "  {0,-18} | {1,-35} | {2,-22}"
 Write-Host ($pFmt -f 'Source', 'Proxy', 'Used By') -ForegroundColor Cyan
@@ -2047,7 +2051,7 @@ Write-Host ("  Mode interpretation: {0}" -f $modeInterpretation) -ForegroundColo
 foreach ($summaryLine in $script:ScenarioSummary) {
     Write-Host ("  Summary: {0}" -f $summaryLine) -ForegroundColor DarkGray
 }
-Write-Host ("  Scenario: Platform={0} Mode={1} Region={2} Proxy={3}" -f $Platform, $Mode, $Region, $(if ($script:EffectiveProxy) { $script:EffectiveProxy } else { 'Direct' })) -ForegroundColor DarkGray
+Write-Host ("  Scenario: Platform={0} Mode={1} Region={2} Proxy={3}" -f $Platform, $Mode, $Region, $(if ($script:ScenarioProxy) { $script:ScenarioProxy } else { 'Direct' })) -ForegroundColor DarkGray
 Write-Host ("  Log: {0}" -f $LogFilePath) -ForegroundColor DarkGray
 Write-Host ('=' * 82) -ForegroundColor DarkCyan
 
@@ -2064,7 +2068,7 @@ foreach ($r in $results) {
         Add-Content -Path $LogFilePath -Value (("        Notes: {0}" -f $r.Notes))
     }
 }
-Add-Content -Path $LogFilePath -Value ("Status: $status | Platform=$Platform Mode=$Mode Region=$Region Proxy=" + $(if ($script:EffectiveProxy) { $script:EffectiveProxy } else { 'Direct' }))
+Add-Content -Path $LogFilePath -Value ("Status: $status | Platform=$Platform Mode=$Mode Region=$Region Proxy=" + $(if ($script:ScenarioProxy) { $script:ScenarioProxy } else { 'Direct' }))
 if ($script:Issues.Count -gt 0) {
     Add-Content -Path $LogFilePath -Value ''
     Add-Content -Path $LogFilePath -Value '=================== ISSUES ==================='
