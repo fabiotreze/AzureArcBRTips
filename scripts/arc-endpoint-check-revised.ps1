@@ -34,7 +34,7 @@
     Override proxy URL. Auto-detected if omitted.
 
 .PARAMETER LogFilePath
-    Log file path. Default: C:\temp\ArcEndpointCheck_<computer>.txt.
+    Log file path. Default: C:\temp\arc-endpoint-check-revised_<computer>.txt.
 
 .PARAMETER SkipPKI
     Skips PKI/OCSP/CRL testing.
@@ -70,7 +70,7 @@ param(
 
     [string]$ProxyUrl,
 
-    [string]$LogFilePath = "C:\temp\ArcEndpointCheck_$($env:COMPUTERNAME).txt",
+    [string]$LogFilePath = "C:\temp\arc-endpoint-check-revised_$($env:COMPUTERNAME).txt",
 
     [switch]$SkipPKI,
     [switch]$SkipExtensions,
