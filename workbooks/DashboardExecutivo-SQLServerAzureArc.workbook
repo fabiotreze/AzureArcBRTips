@@ -4,7 +4,7 @@
     {
       "type": 1,
       "content": {
-        "json": "> ⚠️ **Aviso / Disclaimer**\n>\n> Este workbook é uma ferramenta **auxiliar e informativa** para inventário técnico e posicionamento de configuração de **SQL Server enabled by Azure Arc**. As informações são derivadas de Azure Resource Graph e dos recursos reportados pelo Azure Arc, incluindo Arc-enabled servers, Azure Extension for SQL Server e SQL Server instances no escopo selecionado.\n>\n> O workbook **não substitui** relatório oficial de licenciamento, fatura do Azure, Azure Cost Management, Product Terms, contratos vigentes, EA/Volume Licensing, LSP ou validação do time de licenciamento Microsoft. Em caso de divergência, prevalecem as fontes oficiais e os contratos aplicáveis.\n>\n> Escopo explícito: **SQL Server enabled by Azure Arc**. Este workbook não cobre licenciamento, ESU ou benefícios de Windows Server."
+        "json": "> ⚠️ **Disclaimer público / Public disclaimer**\n>\n> Este workbook é uma ferramenta **informativa e de referência técnica** para inventário de **SQL Server enabled by Azure Arc** usando dados reportados por recursos do Azure. Ele foi desenhado para apoiar conversas técnicas, revisão de inventário e cruzamentos posteriores com fontes oficiais de licenciamento, billing, SAM/FinOps ou processos internos de cada organização.\n>\n> O workbook **não é uma fonte oficial de licenciamento, compliance, cobrança ou entitlement**. Ele não substitui Microsoft Product Terms, contrato comercial, Enterprise Agreement, Cloud Solution Provider agreement, Volume Licensing, LSP, Azure Cost Management, fatura do Azure, auditoria SAM ou orientação formal da Microsoft.\n>\n> O escopo é exclusivamente **SQL Server enabled by Azure Arc**. O workbook não cobre licenciamento, ESU, Azure Hybrid Benefit ou benefícios de Windows Server."
       },
       "name": "disclaimer",
       "conditionalVisibility": {
@@ -40,7 +40,7 @@
             },
             "defaultValue": "value::all",
             "value": [
-              "/subscriptions/bbfbd247-2a41-46b3-8334-9bffb526c218"
+              "value::all"
             ]
           },
           {
@@ -121,6 +121,38 @@
             "style": "link"
           },
           {
+            "id": "tab-health-0009",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🩺 Saúde Operacional",
+            "subTarget": "SaudeOperacional",
+            "style": "link"
+          },
+          {
+            "id": "tab-advanced-0010",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "🧭 Avançado",
+            "subTarget": "Avancado",
+            "style": "link"
+          },
+          {
+            "id": "tab-lim-0007",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "⚠️ Limitações",
+            "subTarget": "Limitacoes",
+            "style": "link"
+          },
+          {
+            "id": "tab-gloss-0008",
+            "cellValue": "SelectedTab",
+            "linkTarget": "parameter",
+            "linkLabel": "📖 Glossário",
+            "subTarget": "Glossario",
+            "style": "link"
+          },
+          {
             "id": "tab-ref-0005",
             "cellValue": "SelectedTab",
             "linkTarget": "parameter",
@@ -143,7 +175,7 @@
     {
       "type": 1,
       "content": {
-        "json": "## 📊 KPIs Técnicos de SQL Server enabled by Azure Arc\n**Inventário SQL Server e posicionamento técnico de configuração. KPIs por host usam contagem distinta para evitar dupla contagem por múltiplas instâncias.**"
+        "json": "## 📊 Executive Dashboard - SQL Server enabled by Azure Arc\n**Inventário técnico, configuração da extensão SQL Server e estimativas de apoio para licenciamento. KPIs por host usam contagem distinta para evitar dupla contagem quando há múltiplas instâncias no mesmo servidor.**"
       },
       "name": "metrics_header",
       "conditionalVisibility": {
@@ -218,9 +250,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresLicenciamentoSQLEstimado = sum(coresLicencaEstimados)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresConsideradosAnalise = sum(coresLicencaEstimados)",
               "size": 4,
-              "title": "📌 Cores de licenciamento SQL (estimado)",
+              "title": "📌 Cores considerados na análise",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -229,7 +261,7 @@
               "visualization": "tiles",
               "tileSettings": {
                 "leftContent": {
-                  "columnMatch": "CoresLicenciamentoSQLEstimado",
+                  "columnMatch": "CoresConsideradosAnalise",
                   "formatter": 12,
                   "formatOptions": {
                     "palette": "purple"
@@ -302,9 +334,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize HostsLicenseOnlyComLicenciamento = dcountif(hostId, coresLicenseOnlyComLicenciamento > 0)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize HostsLicenseOnlyComLicenciamento = dcountif(hostId, coresLicenseOnlyComLicenciamento > 0)",
               "size": 4,
-              "title": "⚠️ LicenseOnly com cores de licenciamento",
+              "title": "⚠️ LicenseOnly com cores estimados",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -325,62 +357,6 @@
             },
             "customWidth": "9",
             "name": "kpi_licenseonly_billable"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend joinId = tolower(id)\n| join kind=inner (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | distinct arcMachineId\n) on $left.joinId == $right.arcMachineId\n| where resourceGroup in~ ({ResourceGroup})\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | project extMachineId\n) on $left.joinId == $right.extMachineId\n| summarize CoveragePct = round(100.0 * dcountif(joinId, isnotempty(extMachineId)) / dcount(joinId), 1)",
-              "size": 4,
-              "title": "🧩 Coverage Extensão SQL",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "{Subscription}"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "leftContent": {
-                  "columnMatch": "CoveragePct",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "blue"
-                  }
-                },
-                "showBorder": true,
-                "size": "small"
-              }
-            },
-            "customWidth": "9",
-            "name": "kpi_extension_coverage"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| where resourceGroup in~ ({ResourceGroup})\n| summarize ExtensoesSQLComProblema = dcountif(hostId, tostring(properties.provisioningState) !~ \"Succeeded\")",
-              "size": 4,
-              "title": "⚠️ Extensões SQL com problema",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "{Subscription}"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "leftContent": {
-                  "columnMatch": "ExtensoesSQLComProblema",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "red"
-                  }
-                },
-                "showBorder": true,
-                "size": "small"
-              }
-            },
-            "customWidth": "9",
-            "name": "kpi_extension_issues"
           },
           {
             "type": 3,
@@ -465,6 +441,142 @@
             },
             "customWidth": "9",
             "name": "kpi_sql_eos_esu_not_enabled"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| summarize SQLDiscoveredHosts = dcount(HostId)\n| extend JoinKey = 1\n| join kind=inner (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines/extensions'\n    | where resourceGroup in~ ({ResourceGroup})\n    | where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n    | where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n    | extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n    | summarize SQLExtensionHosts = dcount(HostId)\n    | extend JoinKey = 1\n) on JoinKey\n| extend CoveragePct = iff(SQLDiscoveredHosts == 0, 0.0, round(100.0 * todouble(SQLExtensionHosts) / todouble(SQLDiscoveredHosts), 2))\n| extend Metric = 'Cobertura SQL extension (%)', Value = CoveragePct, Detail = strcat(tostring(SQLExtensionHosts), ' de ', tostring(SQLDiscoveredHosts), ' hosts')\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "Coverage SQL extension",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "kpi_extension_coverage_final",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| summarize SQLDiscoveredHosts = dcount(HostId)\n| extend JoinKey = 1\n| join kind=inner (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines/extensions'\n    | where resourceGroup in~ ({ResourceGroup})\n    | where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n    | where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n    | extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n    | summarize SQLExtensionHosts = dcount(HostId)\n    | extend JoinKey = 1\n) on JoinKey\n| extend Value = SQLDiscoveredHosts - SQLExtensionHosts\n| extend Metric = 'Hosts sem SQL extension', Detail = strcat('Cobertura calculada sobre ', tostring(SQLDiscoveredHosts), ' hosts SQL descobertos')\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "Hosts sem SQL extension",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "kpi_missing_extension_final",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(HealthState == 'Healthy')\n| extend Metric = 'SQL extensions saudáveis', Detail = 'Sinal de confiança dos dados reportados'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions saudáveis",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "kpi_healthy_extension_final",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(HealthState != 'Healthy')\n| extend Metric = 'SQL extensions com atenção', Detail = 'Indica risco de dados incompletos ou desatualizados'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions com atenção",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "kpi_unhealthy_extension_final",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
           }
         ]
       },
@@ -476,9 +588,367 @@
       }
     },
     {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend hostId = tolower(tostring(properties.containerResourceId))\n| extend edition = tostring(properties.edition)\n| extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n| summarize topRank = max(editionRank) by hostId\n| extend EdicaoHost = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Não identificado\")\n| summarize HostsEnterprise = dcountif(hostId, EdicaoHost == \"Enterprise\")",
+              "size": 4,
+              "title": "🏢 Hosts Enterprise",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "HostsEnterprise",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "purple"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "20",
+            "name": "kpi_hosts_enterprise"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend hostId = tolower(tostring(properties.containerResourceId))\n| extend edition = tostring(properties.edition)\n| extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n| summarize topRank = max(editionRank) by hostId\n| extend EdicaoHost = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Não identificado\")\n| summarize HostsStandard = dcountif(hostId, EdicaoHost == \"Standard\")",
+              "size": 4,
+              "title": "🏢 Hosts Standard",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "HostsStandard",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "blue"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "20",
+            "name": "kpi_hosts_standard"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend hostId = tolower(tostring(properties.containerResourceId))\n| extend edition = tostring(properties.edition)\n| extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n| summarize topRank = max(editionRank) by hostId\n| extend EdicaoHost = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Não identificado\")\n| summarize HostsEdicoesGratuitasOuTeste = dcountif(hostId, EdicaoHost in (\"Developer\", \"Evaluation\", \"Express\"))",
+              "size": 4,
+              "title": "🧪 Hosts Developer/Evaluation/Express",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "HostsEdicoesGratuitasOuTeste",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "green"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "20",
+            "name": "kpi_hosts_free_editions"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend hostId = tolower(tostring(properties.containerResourceId))\n| extend edition = tostring(properties.edition)\n| extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n| summarize topRank = max(editionRank) by hostId\n| extend EdicaoHost = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Não identificado\")\n| summarize HostsOutrasEdicoes = dcountif(hostId, EdicaoHost !in (\"Enterprise\", \"Standard\", \"Developer\", \"Evaluation\", \"Express\"))",
+              "size": 4,
+              "title": "📦 Hosts outras edições",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "leftContent": {
+                  "columnMatch": "HostsOutrasEdicoes",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "orange"
+                  }
+                },
+                "showBorder": true,
+                "size": "small"
+              }
+            },
+            "customWidth": "20",
+            "name": "kpi_hosts_other_editions"
+          }
+        ]
+      },
+      "name": "edition_summary_group",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
+      }
+    },
+    {
       "type": 1,
       "content": {
-        "json": "---\n### Nota de leitura\n- **LicenseType = Paid / PAYG / LicenseOnly** é configuração reportada pela extensão SQL Server no Azure Arc. O workbook não confirma entitlement contratual.\n- **SQL Server ESU** refere-se à configuração `enableExtendedSecurityUpdates` da extensão SQL Server. Não representa ESU de Windows Server.\n- **Cores de licenciamento SQL (estimado)** é cálculo do workbook com base nas propriedades reportadas pelo Azure Arc e nas regras implementadas nas queries. Não representa fatura oficial nem substitui validação de licenciamento.\n- **vCoreInstancia / sqlVcores** representa capacidade técnica reportada por instância SQL Server. Como múltiplas instâncias podem existir no mesmo host, não compare 1:1 com estimativas de licenciamento, ACR ou fatura."
+        "json": "## 📡 Data Quality & Telemetry Confidence\n\nEsta seção resume a confiabilidade dos dados usados no workbook. A extensão SQL não é o foco principal do relatório; ela é usada como um agregador de confiança para inventário, LicenseType, ESU, edição, versão e sinais de cores. Valores com atenção indicam que parte dos dados pode estar incompleta ou desatualizada."
+      },
+      "name": "data_quality_confidence_intro",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tostring(properties.containerResourceId)\n| summarize Value = dcount(HostId)\n| extend Metric = 'SQL hosts descobertos', Detail = 'Hosts com instâncias SQL Server enabled by Azure Arc'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL hosts descobertos",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "dq_sql_hosts",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n| summarize Value = dcount(HostId)\n| extend Metric = 'SQL extensions instaladas', Detail = 'Hosts com Azure Extension for SQL Server'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions instaladas",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "dq_sql_extensions",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| summarize SQLDiscoveredHosts = dcount(HostId)\n| extend JoinKey = 1\n| join kind=inner (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines/extensions'\n    | where resourceGroup in~ ({ResourceGroup})\n    | where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n    | where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n    | extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n    | summarize SQLExtensionHosts = dcount(HostId)\n    | extend JoinKey = 1\n) on JoinKey\n| extend Value = SQLDiscoveredHosts - SQLExtensionHosts\n| extend Metric = 'Hosts sem SQL extension', Detail = strcat('Cobertura calculada sobre ', tostring(SQLDiscoveredHosts), ' hosts SQL descobertos')\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "Hosts sem SQL extension",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "dq_missing_extension",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| summarize SQLDiscoveredHosts = dcount(HostId)\n| extend JoinKey = 1\n| join kind=inner (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines/extensions'\n    | where resourceGroup in~ ({ResourceGroup})\n    | where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n    | where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n    | extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n    | summarize SQLExtensionHosts = dcount(HostId)\n    | extend JoinKey = 1\n) on JoinKey\n| extend CoveragePct = iff(SQLDiscoveredHosts == 0, 0.0, round(100.0 * todouble(SQLExtensionHosts) / todouble(SQLDiscoveredHosts), 2))\n| extend Metric = 'Cobertura SQL extension (%)', Value = CoveragePct, Detail = strcat(tostring(SQLExtensionHosts), ' de ', tostring(SQLDiscoveredHosts), ' hosts')\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "Cobertura SQL extension",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "dq_coverage",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(HealthState == 'Healthy')\n| extend Metric = 'SQL extensions saudáveis', Detail = 'Sinal de confiança dos dados reportados'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions saudáveis",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "dq_healthy_extensions",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(HealthState != 'Healthy')\n| extend Metric = 'SQL extensions com atenção', Detail = 'Indica risco de dados incompletos ou desatualizados'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions com atenção",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "dq_unhealthy_extensions",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "VisaoGeral"
+            }
+          }
+        ]
+      },
+      "name": "data_quality_confidence_group",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "VisaoGeral"
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "---\n### Como interpretar os KPIs\n- **LicenseType = Paid / PAYG / LicenseOnly** é uma configuração reportada pela Azure Extension for SQL Server no Azure Arc. O workbook não valida direito contratual, Software Assurance, subscrição SQL ou elegibilidade comercial.\n- **SQL Server ESU** refere-se à configuração `enableExtendedSecurityUpdates` da extensão SQL Server. Não representa ESU de Windows Server.\n- **Cores considerados na análise** é um cálculo auxiliar do workbook com base nas propriedades reportadas pelo Azure Arc e na lógica KQL implementada. Não representa fatura oficial, custo final, entitlement ou posição SAM.\n- **vCoreInstancia / sqlVcores** representa capacidade técnica reportada por instância SQL Server. Como múltiplas instâncias podem existir no mesmo host, não compare 1:1 com estimativas por host, ACR, fatura ou true-up.\n\n> Exemplo comum: é esperado que a soma de `vCoreInstancia` seja diferente dos `CoresConsideradosAnalise`, porque um valor é reportado por instância SQL Server e o outro é calculado por host/OSE."
       },
       "name": "concept_note",
       "conditionalVisibility": {
@@ -575,7 +1045,7 @@
     {
       "type": 1,
       "content": {
-        "json": "---\n## 🧾 Posição Técnica de Licenciamento de SQL Server enabled by Azure Arc\n**Visão por host/OSE para apoiar reconciliação técnica, true-up e análise com Licensing Specialist/SAM.**\n\n> A lógica do workbook consolida por host, usa a edição SQL Server mais alta identificada no host, aplica mínimo de 4 cores e trata edições gratuitas ou passivos HA/DR conforme o LicenseType reportado. A fatura real e a posição oficial de licenciamento devem ser validadas em Cost Management e nas fontes oficiais de licenciamento."
+        "json": "---\n## 🧾 Análise Técnica de Configuração de SQL Server enabled by Azure Arc\n**Visão por host/OSE para apoiar inventário técnico, análise SAM/FinOps e cruzamento posterior com fontes oficiais.**\n\n> A lógica consolida por host, usa a edição SQL Server mais alta identificada no host, aplica mínimo técnico de 4 cores no cálculo auxiliar e trata edições gratuitas ou passivos HA/DR conforme campos reportados. A posição oficial deve ser validada em Product Terms, contratos aplicáveis, Azure Cost Management e fontes oficiais de licenciamento/billing."
       },
       "name": "trueup_header",
       "conditionalVisibility": {
@@ -594,7 +1064,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresPAYG = sum(coresPAYG)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresPAYG = sum(coresPAYG)",
               "size": 4,
               "title": "💰 Cores PAYG",
               "queryType": 1,
@@ -622,9 +1092,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresRZero = sum(coresRZero)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresRZero = sum(coresRZero)",
               "size": 4,
-              "title": "🆓 Cores R$ 0 (edições gratuitas/HA-DR)",
+              "title": "🆓 Cores não considerados na análise (edições gratuitas/HA-DR)",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -650,9 +1120,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresPaid = sum(coresPaid)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresPaid = sum(coresPaid)",
               "size": 4,
-              "title": "🏦 Cores LicenseType = Paid",
+              "title": "🏦 Cores em hosts LicenseType = Paid",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -678,9 +1148,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresLicenciamentoSQLEstimado = sum(coresLicencaEstimados)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize CoresConsideradosAnalise = sum(coresLicencaEstimados)",
               "size": 4,
-              "title": "📌 Cores de licenciamento SQL (estimado)",
+              "title": "📌 Cores considerados na análise",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -689,7 +1159,7 @@
               "visualization": "tiles",
               "tileSettings": {
                 "leftContent": {
-                  "columnMatch": "CoresLicenciamentoSQLEstimado",
+                  "columnMatch": "CoresConsideradosAnalise",
                   "formatter": 12,
                   "formatOptions": {
                     "palette": "purple"
@@ -706,9 +1176,9 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize HostsLicenseOnlyComLicenciamento = dcountif(hostId, coresLicenseOnlyComLicenciamento > 0)",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize HostsLicenseOnlyComLicenciamento = dcountif(hostId, coresLicenseOnlyComLicenciamento > 0)",
               "size": 4,
-              "title": "⚠️ Hosts LicenseOnly com cores de licenciamento",
+              "title": "⚠️ Hosts LicenseOnly com cores estimados",
               "queryType": 1,
               "resourceType": "microsoft.resourcegraph/resources",
               "crossComponentResources": [
@@ -749,9 +1219,84 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, pcoreRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend coresLicencaEstimados = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComLicenciamento = iff(coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresRZero = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| extend meterSkuProjetado = case(topEdition == \"Sem instância\", \"Aguardando inventário SQL Server\", topEdition in (\"Developer\", \"Evaluation\"), strcat(topEdition, \" edition - R$ 0\"), topEdition == \"Express\", \"Express edition - R$ 0\", isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), strcat(ed3, \" edition - DR replica - R$ 0\"), isempty(licenseTypeRaw), \"Configuração pendente\", pcoreRaw =~ \"true\", strcat(ed3, \" edition - Virtual license\"), licenseTypeRaw == \"PAYG\", strcat(ed3, \" edition - PAYG\"), licenseTypeRaw == \"Paid\", strcat(ed3, \" edition - Paid\"), licenseTypeRaw == \"LicenseOnly\", strcat(ed3, \" edition - License only\"), \"-\")\n| extend estadoSQL = case(topEdition == \"Sem instância\", \"Sem instância\", isFreeEdition, \"Edição gratuita\", isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), \"Passivo HA/DR isento\", isPassivo, \"Passivo HA/DR sem benefício\", \"Ativo\")\n| extend statusESUSQLServer = case(hasSQLServerESUVersion and esuRaw =~ \"true\", \"SQL Server ESU habilitado\", hasSQLServerESUVersion, \"SQL Server ESU não habilitado\", \"Fora do escopo SQL Server 2014/2016\")\n| extend extensaoSQL = case(extState =~ \"Succeeded\", \"OK\", extState =~ \"Failed\", \"Falha\", isempty(extState), \"Sem estado\", extState)\n| extend faturaAzure = case(topEdition == \"Sem instância\", \"-\", isempty(licenseTypeRaw), \"Pendente\", coresLicencaEstimados > 0 and licenseTypeRaw == \"PAYG\", \"PAYG - Azure cobra\", coresLicencaEstimados > 0 and licenseTypeRaw == \"Paid\", \"Paid - R$ 0 no Azure\", coresLicencaEstimados > 0 and licenseTypeRaw == \"LicenseOnly\", \"LicenseOnly - R$ 0 no Azure\", \"R$ 0\")\n| extend ExisteSQL2014_2016 = iff(hasSQLServerESUVersion, \"Sim\", \"Não\")\n| project Host = machineName, EdicaoSQL = topEdition, VersoesSQL = tostring(versoesSQL), ExisteSQL2014_2016, ExtensaoSQL = extensaoSQL, LicenseType = iff(isempty(licenseTypeRaw), \"Pendente\", licenseTypeRaw), EstadoSQL = estadoSQL, FaturaAzure = faturaAzure, MeterProjetado = meterSkuProjetado, CoresLicenciamentoEstimado = coresLicencaEstimados, CoresHost = coresHost, SQLServerESU = statusESUSQLServer, PCore = iff(pcoreRaw =~ \"true\", \"p-core\", \"v-core\")\n| order by CoresLicenciamentoEstimado desc, Host asc",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores, arcStatus = tostring(properties.status)\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend sqlVcores = toint(properties.vCore)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20), instancias=count(), vCoreInstanciaTotal=sum(sqlVcores) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend CoresConsideradosAnalise = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(CoresConsideradosAnalise > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(CoresConsideradosAnalise > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComAnalise = iff(CoresConsideradosAnalise > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresNaoConsiderados = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| summarize Hosts=dcount(hostId), Instancias=sum(instancias), vCoreInstancia=sum(vCoreInstanciaTotal), CoresConsideradosAnalise=sum(CoresConsideradosAnalise) by EdicaoSQL=topEdition\n| order by CoresConsideradosAnalise desc, Hosts desc",
               "size": 0,
-              "title": "🧾 Posição Técnica SQL Server por Host/OSE",
+              "title": "📊 Matrix por edição SQL Server",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "filter": true
+              }
+            },
+            "name": "matrix_by_edition",
+            "customWidth": "33"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines/extensions\"\n| where properties.publisher =~ \"Microsoft.AzureData\"\n| where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n| extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n| extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n| extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend extState = tostring(properties.provisioningState)\n| where resourceGroup in~ ({ResourceGroup})\n| project hostId, licenseTypeRaw, esuRaw, extState\n| join kind=inner (\n    resources\n    | where type == \"microsoft.hybridcompute/machines\"\n    | extend hostId = tolower(id)\n    | extend logicalCores = toint(properties.detectedProperties.logicalCoreCount)\n    | extend physicalCores = toint(properties.detectedProperties.coreCount)\n    | project hostId, machineName = name, logicalCores, physicalCores, arcStatus = tostring(properties.status)\n) on hostId\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend edition = tostring(properties.edition)\n    | extend instLicType = tostring(properties.licenseType)\n    | extend sqlVersion = tostring(properties.version)\n    | extend sqlVcores = toint(properties.vCore)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend isSQLServerESUVersion = SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | extend editionRank = case(edition has \"Enterprise\", 6, edition has \"Standard\", 5, edition has \"Web\", 4, edition has \"Express\", 3, edition has \"Developer\", 2, edition has \"Evaluation\", 1, 0)\n    | summarize topRank = max(editionRank), ativos = countif(instLicType !~ \"HADR\"), qtdSQLServerESU = countif(isSQLServerESUVersion), versoesSQL = make_set(SQLVersionMajor, 20), instancias=count(), vCoreInstanciaTotal=sum(sqlVcores) by hostId\n) on hostId\n| extend topEdition = case(topRank == 6, \"Enterprise\", topRank == 5, \"Standard\", topRank == 4, \"Web\", topRank == 3, \"Express\", topRank == 2, \"Developer\", topRank == 1, \"Evaluation\", \"Sem instância\")\n| extend ed3 = case(topEdition == \"Enterprise\", \"Ent\", topEdition == \"Standard\", \"Std\", topEdition == \"Web\", \"Web\", topEdition == \"Express\", \"Exp\", topEdition)\n| extend isFreeEdition = topEdition in (\"Developer\", \"Evaluation\", \"Express\")\n| extend isPassivo = (topRank > 0 and ativos == 0)\n| extend hasSQLServerESUVersion = qtdSQLServerESU > 0\n| extend coresDetectados = coalesce(logicalCores, physicalCores, 0)\n| extend coresHost = iff(coresDetectados < 4, 4, coresDetectados)\n| extend CoresConsideradosAnalise = case(topEdition == \"Sem instância\", 0, isFreeEdition, 0, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), 0, isempty(licenseTypeRaw), 0, coresHost)\n| extend coresPAYG = iff(CoresConsideradosAnalise > 0 and licenseTypeRaw == \"PAYG\", coresHost, 0)\n| extend coresPaid = iff(CoresConsideradosAnalise > 0 and licenseTypeRaw == \"Paid\", coresHost, 0)\n| extend coresLicenseOnlyComAnalise = iff(CoresConsideradosAnalise > 0 and licenseTypeRaw == \"LicenseOnly\", coresHost, 0)\n| extend coresNaoConsiderados = case(isFreeEdition, coresHost, isPassivo and licenseTypeRaw in (\"Paid\", \"PAYG\"), coresHost, 0)\n| extend LicenseType = iff(isempty(licenseTypeRaw), \"Pendente\", licenseTypeRaw)\n| summarize Hosts=dcount(hostId), Instancias=sum(instancias), Edicoes=make_set(topEdition, 20), vCoreInstancia=sum(vCoreInstanciaTotal), CoresConsideradosAnalise=sum(CoresConsideradosAnalise) by LicenseType\n| order by Hosts desc",
+              "size": 0,
+              "title": "📊 Matrix por LicenseType",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "filter": true
+              }
+            },
+            "name": "matrix_by_license",
+            "customWidth": "33"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type == \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend hostId = tolower(tostring(properties.containerResourceId))\n| extend sqlVersion = tostring(properties.version)\n| extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n| summarize Instancias=count(), Hosts=dcount(hostId) by SQLVersionMajor\n| join kind=leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend hostId = tolower(tostring(properties.containerResourceId))\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", \"Other\")\n    | where SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\")\n    | summarize by SQLVersionMajor, hostId\n    | join kind=leftouter (\n        resources\n        | where type == \"microsoft.hybridcompute/machines/extensions\"\n        | where properties.publisher =~ \"Microsoft.AzureData\"\n        | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n        | extend hostId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n        | extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n        | project hostId, esuRaw\n    ) on hostId\n    | summarize HostsESUHabilitado=dcountif(hostId, esuRaw =~ \"true\"), HostsESUNaoHabilitado=dcountif(hostId, esuRaw !~ \"true\" or isempty(esuRaw)) by SQLVersionMajor\n) on SQLVersionMajor\n| extend AplicabilidadeESU = iff(SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\"), \"Aplicável\", \"Não aplicável\")\n| project SQLVersionMajor, Instancias, Hosts, AplicabilidadeESU, HostsESUHabilitado=coalesce(HostsESUHabilitado,0), HostsESUNaoHabilitado=coalesce(HostsESUNaoHabilitado,0)\n| order by SQLVersionMajor asc",
+              "size": 0,
+              "title": "🛡️ SQL Server ESU readiness",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "filter": true
+              }
+            },
+            "name": "esu_readiness",
+            "customWidth": "34"
+          }
+        ]
+      },
+      "name": "analysis_matrices",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Licenciamento"
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n| extend Host = tostring(split(id, '/')[8])\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend SQLServerESU = case(tostring(properties.settings.enableExtendedSecurityUpdates) =~ 'true', 'Enabled', tostring(properties.settings.enableExtendedSecurityUpdates) =~ 'false', 'Not enabled', 'Not reported')\n| extend ExtensionState = tostring(properties.provisioningState)\n| project HostId, Host, LicenseType, SQLServerESU, ExtensionState, ResourceGroup = tostring(resourceGroup), SubscriptionId = tostring(subscriptionId)\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend HostId = tolower(id)\n    | extend ArcStatus = tostring(properties.status)\n    | extend LogicalCoreCount = toint(properties.detectedProperties.logicalCoreCount)\n    | extend PhysicalCoreCount = toint(properties.detectedProperties.coreCount)\n    | extend CoresDetectados = coalesce(LogicalCoreCount, PhysicalCoreCount, 0)\n    | extend CoresHost = iff(CoresDetectados < 4, 4, CoresDetectados)\n    | project HostId, ArcStatus, LogicalCoreCount, PhysicalCoreCount, CoresHost\n) on HostId\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend HostId = tolower(tostring(properties.containerResourceId))\n    | extend EdicaoSQL = tostring(properties.edition)\n    | extend InstanceLicenseType = tostring(properties.licenseType)\n    | extend SQLVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(SQLVersion has 'SQL Server 2014' or SQLVersion startswith '12.', 'SQL Server 2014', SQLVersion has 'SQL Server 2016' or SQLVersion startswith '13.', 'SQL Server 2016', SQLVersion has 'SQL Server 2017' or SQLVersion startswith '14.', 'SQL Server 2017', SQLVersion has 'SQL Server 2019' or SQLVersion startswith '15.', 'SQL Server 2019', SQLVersion has 'SQL Server 2022' or SQLVersion startswith '16.', 'SQL Server 2022', SQLVersion has 'SQL Server 2025' or SQLVersion startswith '17.', 'SQL Server 2025', 'Não identificado')\n    | extend VCoreInstancia = toint(properties.vCore)\n    | extend EditionRank = case(EdicaoSQL has 'Enterprise', 6, EdicaoSQL has 'Standard', 5, EdicaoSQL has 'Web', 4, EdicaoSQL has 'Express', 3, EdicaoSQL has 'Developer', 2, EdicaoSQL has 'Evaluation', 1, 0)\n    | summarize InstanciasSQL = count(), InstanciasAtivas = countif(InstanceLicenseType !~ 'HADR'), EditionRank = max(EditionRank), EdicoesRaw = make_set(EdicaoSQL, 20), VersoesRaw = make_set(SQLVersionMajor, 20), InstanceLicenseTypesRaw = make_set(InstanceLicenseType, 20), vCoreInstanciaTotal = sum(VCoreInstancia) by HostId\n) on HostId\n| extend EdicaoMaisAlta = case(EditionRank == 6, 'Enterprise', EditionRank == 5, 'Standard', EditionRank == 4, 'Web', EditionRank == 3, 'Express', EditionRank == 2, 'Developer', EditionRank == 1, 'Evaluation', 'Não identificado')\n| extend EdicoesSQL = tostring(EdicoesRaw), VersoesSQL = tostring(VersoesRaw), LicenseTypesInstancia = tostring(InstanceLicenseTypesRaw)\n| extend IsFreeEdition = EdicaoMaisAlta in ('Developer','Evaluation','Express')\n| extend IsPassivoHADR = coalesce(InstanciasSQL, 0) > 0 and coalesce(InstanciasAtivas, 0) == 0\n| extend CoresConsideradosAnalise = case(coalesce(InstanciasSQL, 0) == 0, 0, IsFreeEdition, 0, IsPassivoHADR and LicenseType in ('Paid','PAYG'), 0, isempty(LicenseType), 0, CoresHost)\n| extend ClassificacaoWorkbook = case(isempty(LicenseType), 'LicenseType pendente', IsFreeEdition, 'Edição gratuita / avaliação', IsPassivoHADR, 'Somente HA/DR reportado', LicenseType == 'PAYG', 'Configuração PAYG', LicenseType == 'Paid', 'Configuração Paid', LicenseType == 'LicenseOnly', 'Configuração LicenseOnly', 'Configuração reportada')\n| extend InterpretacaoConfiguracao = case(isempty(LicenseType), 'Revisar configuração da extensão SQL Server', IsFreeEdition, 'Cores não considerados na análise', IsPassivoHADR, 'Cores não considerados na análise HA/DR', CoresConsideradosAnalise > 0, 'Cores considerados na análise técnica', 'Sem cores considerados')\n| project Host, ArcStatus, ExtensionState, LicenseType, SQLServerESU, EdicaoMaisAlta, EdicoesSQL, VersoesSQL, LicenseTypesInstancia, InstanciasSQL, vCoreInstanciaTotal, LogicalCoreCount, PhysicalCoreCount, CoresHost, CoresConsideradosAnalise, ClassificacaoWorkbook, InterpretacaoConfiguracao, ResourceGroup, SubscriptionId\n| order by Host asc",
+              "size": 0,
+              "title": "🧾 Análise Técnica SQL Server por Host/OSE",
               "noDataMessage": "Nenhum host SQL Server enabled by Azure Arc com extensão SQL Server no escopo selecionado.",
               "noDataMessageStyle": 3,
               "queryType": 1,
@@ -764,7 +1309,7 @@
                 "filter": true,
                 "formatters": [
                   {
-                    "columnMatch": "CoresLicenciamentoEstimado",
+                    "columnMatch": "CoresConsideradosAnalise",
                     "formatter": 8,
                     "formatOptions": {
                       "palette": "red"
@@ -786,7 +1331,7 @@
           {
             "type": 1,
             "content": {
-              "json": "### Como ler a tabela\n\n**Host/OSE** é o servidor físico ou VM que hospeda uma ou mais instâncias SQL Server. Esta visão é consolidada por host, não por instância individual.\n\n| Campo | Leitura |\n| --- | --- |\n| **LicenseType** | valor reportado pela extensão SQL Server: `Paid`, `PAYG`, `LicenseOnly` ou pendente |\n| **CoresLicenciamentoEstimado** | estimativa calculada pelo workbook para apoiar análise técnica de licenciamento SQL Server |\n| **CoresHost** | cores reportados pelo host via Azure Arc, usando `logicalCoreCount` ou `coreCount`, com mínimo de 4 aplicado na query |\n| **MeterProjetado** | medidor projetado pelo workbook com base em edição, LicenseType, p-core e estado HA/DR |\n| **SQLServerESU** | estado da configuração de Extended Security Updates do SQL Server reportada pela extensão SQL Server |\n| **VersoesSQL** | versões principais identificadas nas instâncias SQL Server do host |\n\n**Limitação intencional:** este workbook não confirma entitlement contratual. `LicenseType = Paid` deve ser reconciliado com Product Terms, EA/Volume Licensing, contratos vigentes, LSP ou time de licenciamento."
+              "json": "### Como ler a tabela\n\n**Host/OSE** é o servidor físico ou máquina virtual que hospeda uma ou mais instâncias SQL Server. Esta visão é consolidada por host, não por instância individual.\n\n| Campo | Leitura |\n| --- | --- |\n| **LicenseType** | valor reportado pela Azure Extension for SQL Server: `Paid`, `PAYG`, `LicenseOnly` ou pendente |\n| **CoresConsideradosAnalise** | estimativa técnica calculada pelo workbook para apoiar análise de configuração SQL Server por host/OSE |\n| **CoresHost** | cores reportados pelo host via Azure Arc, usando `logicalCoreCount` ou `coreCount`, com mínimo de 4 aplicado no cálculo auxiliar |\n| **ClassificacaoWorkbook** | classificação auxiliar calculada pelo workbook com base em edição, LicenseType e estado HA/DR reportado |\n| **InterpretacaoConfiguracao** | leitura auxiliar da configuração reportada, não uma linha de fatura |\n| **SQLServerESU** | estado da configuração de Extended Security Updates do SQL Server quando a versão é SQL Server 2014 ou SQL Server 2016 |\n| **VersoesSQL** | versões principais identificadas nas instâncias SQL Server do host |\n\n**Nota:** a configuração `UsePhysicalCoreLicense` é documentada para cenários específicos, mas não foi mantida como coluna/KPI principal porque pode aparecer vazia em consultas de Azure Resource Graph em alguns ambientes. A query de validação está na aba **Referências**."
             },
             "name": "trueup_legend",
             "customWidth": "30"
@@ -913,7 +1458,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend arcStatus = case(tolower(properties.status) == 'connected', 'Connected', tolower(properties.status) == 'disconnected', 'Offline', tolower(properties.status) == 'error', 'Error', tolower(properties.status) == 'expired', 'Expired', 'Unknown')\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend sqlVcores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | extend sqlInstanceName = name\n    | extend sqlModel = tostring(properties.licenseType)\n    | project arcMachineId, sqlInstanceName, sqlVersion, SQLVersionMajor, sqlEdition, sqlVcores, sqlModel\n) on $left.joinId == $right.arcMachineId\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n    | extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n    | extend pcoreRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n    | extend extStateRaw = tostring(properties.provisioningState)\n    | project extMachineId, licenseTypeRaw, esuRaw, pcoreRaw, extStateRaw\n) on $left.joinId == $right.extMachineId\n| where isnotempty(sqlVersion)\n| where resourceGroup in~ ({ResourceGroup})\n| extend LicenseTypeSQL = case(licenseTypeRaw == \"Paid\", \"Paid\", licenseTypeRaw == \"PAYG\", \"PAYG\", licenseTypeRaw == \"LicenseOnly\", \"LicenseOnly\", \"Pendente\")\n| extend SQLServerESU = case(SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\") and esuRaw =~ \"true\", \"SQL Server ESU habilitado\", SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\"), \"SQL Server ESU não habilitado\", \"Fora do escopo SQL Server 2014/2016\")\n| extend PCore = iff(pcoreRaw =~ \"true\", \"p-core\", \"v-core\")\n| extend ExtensaoSQL = case(extStateRaw =~ \"Succeeded\", \"OK\", extStateRaw =~ \"Failed\", \"Falha\", isempty(extStateRaw), \"Sem extensão\", extStateRaw)\n| extend ModeloSQL = case(sqlModel =~ \"HADR\", \"HA/DR passivo\", sqlModel =~ \"ServerCAL\", \"Server+CAL\", sqlModel =~ \"PerCore\", \"Per-core\", sqlModel =~ \"Free\", \"Free/Eval/Express\", isempty(sqlModel), \"-\", sqlModel)\n| project Host = name, ArcStatus = arcStatus, ExtensaoSQL, InstanciaSQL = sqlInstanceName, VersaoSQL = sqlVersion, SQLVersionMajor, EdicaoSQL = sqlEdition, ModeloSQL, LicenseTypeSQL, SQLServerESU, PCore, vCoreInstancia = sqlVcores\n| order by Host asc",
+              "query": "resources\n| where type == \"microsoft.hybridcompute/machines\"\n| extend arcStatus = case(tolower(properties.status) == 'connected', 'Connected', tolower(properties.status) == 'disconnected', 'Offline', tolower(properties.status) == 'error', 'Error', tolower(properties.status) == 'expired', 'Expired', 'Unknown')\n| extend joinId = tolower(id)\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.azurearcdata/sqlserverinstances\"\n    | extend arcMachineId = tolower(tostring(properties.containerResourceId))\n    | extend sqlVersion = tostring(properties.version)\n    | extend SQLVersionMajor = case(sqlVersion has \"SQL Server 2014\" or sqlVersion startswith \"12.\", \"SQL Server 2014\", sqlVersion has \"SQL Server 2016\" or sqlVersion startswith \"13.\", \"SQL Server 2016\", sqlVersion has \"SQL Server 2017\" or sqlVersion startswith \"14.\", \"SQL Server 2017\", sqlVersion has \"SQL Server 2019\" or sqlVersion startswith \"15.\", \"SQL Server 2019\", sqlVersion has \"SQL Server 2022\" or sqlVersion startswith \"16.\", \"SQL Server 2022\", sqlVersion has \"SQL Server 2025\" or sqlVersion startswith \"17.\", \"SQL Server 2025\", \"Não identificado\")\n    | extend sqlVcores = toint(properties.vCore)\n    | extend sqlEdition = tostring(properties.edition)\n    | extend sqlInstanceName = name\n    | extend sqlModel = tostring(properties.licenseType)\n    | project arcMachineId, sqlInstanceName, sqlVersion, SQLVersionMajor, sqlEdition, sqlVcores, sqlModel\n) on $left.joinId == $right.arcMachineId\n| join kind = leftouter (\n    resources\n    | where type == \"microsoft.hybridcompute/machines/extensions\"\n    | where properties.publisher =~ \"Microsoft.AzureData\"\n    | where tostring(properties.type) in (\"WindowsAgent.SqlServer\", \"LinuxAgent.SqlServer\")\n    | extend extMachineId = tolower(substring(id, 0, indexof(id, \"/extensions\")))\n    | extend licenseTypeRaw = tostring(properties.settings.LicenseType)\n    | extend esuRaw = tostring(properties.settings.enableExtendedSecurityUpdates)\n        | extend extStateRaw = tostring(properties.provisioningState)\n    | project extMachineId, licenseTypeRaw, esuRaw, extStateRaw\n) on $left.joinId == $right.extMachineId\n| where isnotempty(sqlVersion)\n| where resourceGroup in~ ({ResourceGroup})\n| extend LicenseTypeSQL = case(licenseTypeRaw == \"Paid\", \"Paid\", licenseTypeRaw == \"PAYG\", \"PAYG\", licenseTypeRaw == \"LicenseOnly\", \"LicenseOnly\", \"Pendente\")\n| extend SQLServerESU = case(SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\") and esuRaw =~ \"true\", \"SQL Server ESU habilitado\", SQLVersionMajor in (\"SQL Server 2014\", \"SQL Server 2016\"), \"SQL Server ESU não habilitado\", \"Não aplicável\")\n| extend ExtensaoSQL = case(extStateRaw =~ \"Succeeded\", \"OK\", extStateRaw =~ \"Failed\", \"Falha\", isempty(extStateRaw), \"Sem extensão\", extStateRaw)\n| extend ModeloSQL = case(sqlModel =~ \"HADR\", \"HA/DR passivo\", sqlModel =~ \"ServerCAL\", \"Server+CAL\", sqlModel =~ \"PerCore\", \"Per-core\", sqlModel =~ \"Free\", \"Free/Eval/Express\", isempty(sqlModel), \"-\", sqlModel)\n| project Host = name, ArcStatus = arcStatus, ExtensaoSQL, InstanciaSQL = sqlInstanceName, VersaoSQL = sqlVersion, SQLVersionMajor, EdicaoSQL = sqlEdition, ModeloSQL, LicenseTypeSQL, SQLServerESU, vCoreInstancia = sqlVcores\n| order by Host asc",
               "size": 0,
               "title": "📋 Registro de Instâncias SQL Server enabled by Azure Arc",
               "noDataMessage": "Nenhuma instância SQL Server enabled by Azure Arc no escopo selecionado.",
@@ -966,7 +1511,254 @@
     {
       "type": 1,
       "content": {
-        "json": "## 📚 Referências oficiais e escopo\n\n### Documentação pública Microsoft\n- **Manage licensing and billing of SQL Server enabled by Azure Arc**: referência para métodos de licenciamento baseados em core, LicenseType, billing, PAYG, Paid, License only, v-core, p-core e virtualização ilimitada.\n- **Configure SQL Server enabled by Azure Arc**: referência para configuração de propriedades do SQL Server enabled by Azure Arc após instalação da Azure Extension for SQL Server.\n- **SQL Server Extended Security Updates FAQ**: referência para datas de ESU. O FAQ lista SQL Server 2016 com ESU Start Date em 14 de julho de 2026, Year 1 até 13 de julho de 2027, Year 2 até 18 de julho de 2028 e Year 3 até 17 de julho de 2029. O FAQ também informa que SQL Server ESU inclui somente atualizações de segurança Critical e não inclui novos recursos, hotfixes não relacionados a segurança ou solicitações de mudança de design.\n- **SQL Server Extended Security Updates enabled by Azure Arc**: referência para assinatura e gerenciamento de SQL Server ESU via Azure Arc para SQL Server 2014 e SQL Server 2016.\n- **Azure Workbooks data sources**: referência para uso de Azure Resource Graph como fonte de dados em workbooks.\n\n### Escopo explícito deste workbook\nEste workbook cobre exclusivamente **SQL Server enabled by Azure Arc**. Não cobre Windows Server ESU, Windows Server licensing, Windows Server Azure Hybrid Benefit ou inventário de licenciamento de sistema operacional."
+        "json": "## 📡 Saúde operacional como confiança dos dados\n\nEsta aba não substitui o dashboard operacional oficial de SQL Server enabled by Azure Arc. O objetivo aqui é indicar se os dados de inventário, LicenseType, ESU, edição, versão e cores têm boa confiabilidade para análise técnica.\n\n**Interpretação recomendada:** cobertura alta da SQL extension e maior número de extensões saudáveis aumentam a confiança do workbook. Extensões com atenção, máquinas desconectadas, certificados expirados, uploadStatus diferente de OK ou upload antigo reduzem a confiança dos dados, mas não alteram por si só o direito contratual de licenciamento."
+      },
+      "name": "operational_health_intro",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "SaudeOperacional"
+      }
+    },
+    {
+      "type": 12,
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| summarize SQLDiscoveredHosts = dcount(HostId)\n| extend JoinKey = 1\n| join kind=inner (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines/extensions'\n    | where resourceGroup in~ ({ResourceGroup})\n    | where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n    | where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n    | extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n    | summarize SQLExtensionHosts = dcount(HostId)\n    | extend JoinKey = 1\n) on JoinKey\n| extend CoveragePct = iff(SQLDiscoveredHosts == 0, 0.0, round(100.0 * todouble(SQLExtensionHosts) / todouble(SQLDiscoveredHosts), 2))\n| extend Metric = 'Cobertura SQL extension (%)', Value = CoveragePct, Detail = strcat(tostring(SQLExtensionHosts), ' de ', tostring(SQLDiscoveredHosts), ' hosts')\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "Cobertura Azure Arc SQL",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "op_extension_coverage",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(HealthState == 'Healthy')\n| extend Metric = 'SQL extensions saudáveis', Detail = 'Sinal de confiança dos dados reportados'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions saudáveis",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "op_healthy_extensions",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(HealthState != 'Healthy')\n| extend Metric = 'SQL extensions com atenção', Detail = 'Indica risco de dados incompletos ou desatualizados'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "SQL extensions com atenção",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "op_unhealthy_extensions",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc\n| summarize Value = countif(LastExtensionUploadStatus != 'OK')\n| extend Metric = 'DPS upload com atenção', Detail = 'UploadStatus diferente de OK'\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "DPS upload com atenção",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "name": "op_dps_attention",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where resourceGroup in~ ({ResourceGroup})\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend ExtensionResourceID = tostring(id)\n| extend targetMachineName = tolower(tostring(split(id, '/')[8]))\n| extend ExtensionProvisioningState = tostring(properties.provisioningState)\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend Message = tostring(properties.instanceView.status.message)\n| extend LastReportedExtensionHealth = iff(Message contains 'SQL Server Extension Agent : Healthy', 'Healthy', 'Unhealthy')\n| extend LastExtensionUploadStatus = iff(Message contains 'uploadStatus : OK', 'OK', 'Unhealthy')\n| extend LastExtensionUploadTimestamp = extract('timestampUTC : ([0-9]{4}/[0-9]{2}/[0-9]{2})', 1, Message)\n| extend LastExtensionUploadDate = todatetime(strcat(replace_string(LastExtensionUploadTimestamp, '/', '-'), 'T00:00:00Z'))\n| extend LastUploadOutsideAcceptableRange = isempty(LastExtensionUploadTimestamp) or LastExtensionUploadDate < startofday(ago(3d))\n| join kind=leftouter (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines'\n    | where resourceGroup in~ ({ResourceGroup})\n    | extend LowerMachineName = tolower(tostring(name))\n    | project MachineId = tostring(id), MachineName = tostring(name), LowerMachineName, MachineStatus = tostring(properties.status), MachineProvisioningStatus = tostring(properties.provisioningState), MachineErrors = tostring(properties.errorDetails), subscriptionId, resourceGroup, TenantID = tenantId\n) on $left.targetMachineName == $right.LowerMachineName, subscriptionId, resourceGroup\n| extend IsHealthy = MachineStatus =~ 'Connected' and LastReportedExtensionHealth =~ 'Healthy' and LastExtensionUploadStatus =~ 'OK' and ExtensionProvisioningState =~ 'Succeeded' and LastUploadOutsideAcceptableRange == false\n| extend HealthState = iff(IsHealthy, 'Healthy', 'Needs attention')\n| extend FailureReasons = strcat(\n    iif(MachineStatus !~ 'Connected', strcat('Machine status is ', MachineStatus, '; '), ''),\n    iif(isnotempty(MachineErrors) and MachineErrors != '[]', 'Machine reports errors; ', ''),\n    iif(LastReportedExtensionHealth !~ 'Healthy', 'Extension reported unhealthy; ', ''),\n    iif(LastUploadOutsideAcceptableRange, 'Last upload outside acceptable range; ', ''),\n    iif(LastExtensionUploadStatus !~ 'OK', 'Upload status not OK; ', ''),\n    iif(ExtensionProvisioningState !~ 'Succeeded', strcat('Extension provisioning state is ', ExtensionProvisioningState, '; '), '')\n)\n| extend RecommendedAction = case(\n    MachineStatus =~ 'Disconnected', 'Reconnect the Azure Arc machine and validate agent connectivity.',\n    MachineStatus =~ 'Expired', 'Renew or repair the Azure Arc machine certificate and reconnect the machine.',\n    LastExtensionUploadStatus !~ 'OK', 'Review SQL extension status message, DPS connectivity and extension logs.',\n    LastUploadOutsideAcceptableRange, 'Validate whether the extension is still uploading inventory and billing data.',\n    LastReportedExtensionHealth !~ 'Healthy', 'Review SQL extension status message and failure reasons.',\n    ExtensionProvisioningState !~ 'Succeeded', 'Validate SQL extension provisioning state.',\n    'No immediate action from this workbook signal.'\n)\n| project MachineName, MachineStatus, HealthState, LastReportedExtensionHealth, LastExtensionUploadStatus, LastExtensionUploadTimestamp, LicenseType, ExtensionProvisioningState, RecommendedAction, FailureReasons, SubscriptionID = subscriptionId, ResourceGroup = resourceGroup, ExtensionResourceID, MachineId\n| order by HealthState desc, MachineName asc",
+              "size": 0,
+              "title": "Detalhe de confiança e telemetria da extensão SQL",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "filter": true
+              }
+            },
+            "name": "op_extension_detail",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
+          }
+        ]
+      },
+      "name": "operational_health_group",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "SaudeOperacional"
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## 🧭 Avançado: Physical Core / Unlimited Virtualization\n\nUse esta seção apenas quando o cenário envolver physical core licensing, unlimited virtualization ou validação explícita de `UsePhysicalCoreLicense`.\n\nO painel principal não usa `UsePhysicalCoreLicense` como KPI de licenciamento. Quando o valor estiver vazio, a interpretação correta é **Não reportado / Não aplicável**, sem X vermelho."
+      },
+      "name": "advanced_physical_core_intro",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Avancado"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n| where tostring(properties.type) in ('WindowsAgent.SqlServer', 'LinuxAgent.SqlServer')\n| where resourceGroup in~ ({ResourceGroup})\n| extend Machine = tostring(split(id, '/')[8])\n| extend LicenseType = tostring(properties.settings.LicenseType)\n| extend UsePhysicalCoreLicenseRaw = tostring(properties.settings.UsePhysicalCoreLicense.IsApplied)\n| extend UsePhysicalCoreLicense = iff(isempty(UsePhysicalCoreLicenseRaw), 'Não reportado / Não aplicável', UsePhysicalCoreLicenseRaw)\n| extend ESU = tostring(properties.settings.enableExtendedSecurityUpdates)\n| extend ProvisioningState = tostring(properties.provisioningState)\n| project Machine, LicenseType, UsePhysicalCoreLicense, ESU, ProvisioningState, ResourceGroup = tostring(resourceGroup), SubscriptionId = tostring(subscriptionId)\n| order by Machine asc",
+        "size": 0,
+        "title": "Validação avançada: UsePhysicalCoreLicense",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "visualization": "table",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "name": "advanced_physical_core_validation",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Avancado"
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## ⚠️ Limitações, disclaimers e uso responsável\n\n### Escopo\nEste workbook cobre **SQL Server enabled by Azure Arc**. Ele não cobre Windows Server ESU, Windows Server licensing, Windows Server Azure Hybrid Benefit ou inventário de licenciamento de sistema operacional.\n\n### Licenciamento\n`LicenseType`, `Edition`, `Version`, `HADR`, `CoresConsideradosAnalise` e demais campos são sinais técnicos reportados ou calculados a partir de Azure Resource Graph. Este workbook não determina direito contratual, Software Assurance, SQL subscription, SPLA, Flexible Virtualization Benefit, Product Terms, compliance final, custo final, fatura oficial ou posição SAM definitiva.\n\n### Cores\nOs cálculos de cores são auxiliares para análise técnica por host/OSE. Eles não substituem Azure Cost Management, billing meters, Product Terms, contrato de licenciamento ou validação SAM oficial.\n\n### ESU\nA análise de ESU neste workbook é limitada a SQL Server e usa sinais de versão SQL Server e configuração `enableExtendedSecurityUpdates` da Azure Extension for SQL Server. Ela não representa Windows Server ESU.\n\n### Data Quality & Telemetry Confidence\nA saúde da extensão SQL é usada como indicador de confiança dos dados reportados. Extensões com atenção podem indicar inventário, LicenseType, ESU, edição, versão ou telemetria incompletos ou desatualizados. Isso não significa, isoladamente, não conformidade de licenciamento.\n\n### UsePhysicalCoreLicense\n`UsePhysicalCoreLicense` é mantido somente na aba Avançado e em queries de validação. Quando o campo estiver vazio, exiba como **Não reportado / Não aplicável**, sem X vermelho e sem conclusão automática de não conformidade."
+      },
+      "name": "public_limitations",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Limitacoes"
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## 📖 Glossário e abreviações\n\nEste glossário ajuda clientes, CSAs, SAM, FinOps e Licensing Specialists a interpretar o workbook com a mesma linguagem. As definições abaixo são descrições práticas para leitura do workbook e não substituem a documentação oficial ou contratos aplicáveis.\n\n| Termo | Definição prática no workbook | Observação |\n| --- | --- | --- |\n| **Azure Arc** | Serviço usado para estender gerenciamento do Azure a recursos fora do Azure ou em ambientes híbridos/multicloud. | Base para visualizar servidores e SQL Server como recursos gerenciáveis no Azure. |\n| **Arc-enabled server** | Servidor Windows ou Linux conectado ao Azure Arc. | No workbook, normalmente aparece como recurso `microsoft.hybridcompute/machines`. |\n| **SQL Server enabled by Azure Arc** | Capacidade que permite gerenciar instâncias SQL Server por meio do Azure Arc. | O workbook é focado somente neste escopo. |\n| **Azure Extension for SQL Server** | Extensão instalada no Arc-enabled server para inventariar e configurar propriedades relacionadas ao SQL Server. | No workbook, é consultada em `microsoft.hybridcompute/machines/extensions` com publisher `Microsoft.AzureData`. |\n| **Arc SQL extension** | Nome abreviado usado para Azure Extension for SQL Server. | Pode aparecer como `WindowsAgent.SqlServer` ou `LinuxAgent.SqlServer`. |\n| **Azure Resource Graph (ARG)** | Serviço usado para consultar recursos e metadados do Azure em escala. | É a principal fonte de dados das queries do workbook. |\n| **KQL** | Linguagem de consulta usada nas queries do workbook. | Azure Resource Graph usa um subconjunto de KQL. |\n| **Host** | Servidor físico ou máquina virtual que hospeda uma ou mais instâncias SQL Server. | O cálculo auxiliar de cores é consolidado por host/OSE. |\n| **OSE** | Operating System Environment. | Neste workbook, use como o ambiente de sistema operacional onde o SQL Server está instalado. |\n| **Instância SQL Server** | Instalação/instância do SQL Server identificada pelo inventário do Azure Arc. | Um mesmo host pode ter múltiplas instâncias. |\n| **vCoreInstancia / sqlVcores** | Capacidade técnica reportada por instância SQL Server. | Não é equivalente direto à estimativa por host usada no workbook. |\n| **CoresHost** | Cores reportados pelo host por `logicalCoreCount` ou `coreCount`. | Usado como insumo para a estimativa técnica. |\n| **CoresConsideradosAnalise** | Cálculo auxiliar do workbook para análise técnica por host. | Não representa fatura, entitlement, licença oficial ou posição SAM. |\n| **LicenseType** | Configuração de licenciamento reportada pela extensão SQL Server. | Valores comuns no workbook: `Paid`, `PAYG`, `LicenseOnly` ou pendente. |\n| **Paid** | Valor de LicenseType reportado pela extensão SQL Server. | Deve ser validado contra contratos e direitos aplicáveis. O workbook não confirma entitlement. |\n| **PAYG** | Pay-as-you-go. Valor de LicenseType associado a modelo de consumo. | Use Azure Cost Management/fatura para validação financeira. |\n| **LicenseOnly** | Valor de LicenseType reportado pela extensão SQL Server. | O workbook apenas identifica a configuração, sem validar contrato ou adequação. |\n| **ESU** | Extended Security Updates. | No workbook, refere-se a SQL Server ESU, não Windows Server ESU. |\n| **SQL Server ESU** | Extended Security Updates para versões qualificadas de SQL Server após fim de suporte. | O workbook trata SQL Server 2014/2016 como foco de ESU. |\n| **enableExtendedSecurityUpdates** | Propriedade de configuração reportada pela extensão SQL Server para indicar SQL Server ESU. | Usada nas queries para classificar SQL Server ESU como habilitado ou não. |\n| **pCore** | Physical core. Modelo baseado em cores físicos. | Conceito documentado para cenários específicos; o workbook mantém como referência, não como KPI principal. |\n| **vCore** | Virtual core. Modelo baseado em núcleos virtuais. | No workbook, `vCoreInstancia` é capacidade técnica da instância, não estimativa de cobrança. |\n| **HA/DR** | High Availability / Disaster Recovery. | Usado para indicar cenários de alta disponibilidade ou recuperação de desastre. |\n| **HADR** | Valor/indicador relacionado a HA/DR em propriedades de instância SQL Server. | O workbook usa esse valor para leitura auxiliar de passivo HA/DR quando reportado. |\n| **FCI** | Failover Cluster Instance. | Tipo de implantação SQL Server de alta disponibilidade. |\n| **AG** | Availability Group. | Recurso de alta disponibilidade/recuperação de desastre do SQL Server. |\n| **SAM** | Software Asset Management. | Processo/função de gestão de ativos de software. |\n| **FinOps** | Gestão financeira de cloud. | Pode usar o workbook como insumo técnico, mas não como fonte oficial de cobrança. |\n| **LSP** | Licensing Solution Provider. | Parceiro/entidade usada para suporte em licenciamento, dependendo do contrato. |\n| **UsePhysicalCoreLicense** | Propriedade da Azure Extension for SQL Server usada em cenários de physical core licensing ou unlimited virtualization. | Se estiver vazio, trate como **Não reportado / Não aplicável**, não como erro. |\n| **Product Terms** | Termos oficiais de produto/licenciamento Microsoft. | Fonte contratual deve prevalecer sobre qualquer leitura do workbook. |\n| **Cost Management** | Ferramenta do Azure para análise de custos. | Deve ser usada para validação financeira e cobrança real. |\n| **Reclassificação interna** | Processo interno de categorização/reconciliação definido por cada organização. | O workbook pode ser referência técnica inicial, mas não define a regra interna. |\n\n### Leitura recomendada\n- Use **Inventário** para validar hosts, instâncias, versão e edição.\n- Use **Análise Técnica** para discutir configuração por host/OSE.\n- Use **Referências** para executar queries de contraprova.\n- Use **Limitações** antes de qualquer conversa de cobrança, SAM, compliance ou licenciamento.\n\n### Nota rápida sobre DPS e Telemetry\n- **DPS** significa Data Processing Service. O endpoint recebe informações de inventário, disponibilidade, bancos, grupos de disponibilidade e dados usados para billing.\n- **Telemetry endpoint** recebe logs do Connected Machine Agent, logs da Azure Extension for SQL Server e dados de DMV.\n- A aba **Saúde Operacional** usa sinais como `uploadStatus` e `timestampUTC` quando esses valores são reportados pela extensão."
+      },
+      "name": "glossary_content",
+      "conditionalVisibility": {
+        "parameterName": "SelectedTab",
+        "comparison": "isEqualTo",
+        "value": "Glossario"
+      }
+    },
+    {
+      "type": 1,
+      "content": {
+        "json": "## 📚 Referências oficiais e validação\n\n### Documentação pública Microsoft\n- Manage licensing and billing of SQL Server enabled by Azure Arc: modelos de licenciamento por vCore, physical cores e unlimited virtualization, além dos valores de `LicenseType`.\n- Configure SQL Server enabled by Azure Arc: configuração da Azure Extension for SQL Server, `LicenseType`, `EnableExtendedSecurityUpdates`, `UsePhysicalCoreLicense` e configuração de SQL Server ESU.\n- Troubleshoot connectivity to DPS and telemetry endpoints: interpretação de `uploadStatus`, `timestampUTC`, DPS e telemetria da Azure Extension for SQL Server.\n- SQL Server Extended Security Updates FAQ: datas de ESU de SQL Server 2014 e SQL Server 2016, cobertura de atualizações Critical e opções vCore/pCore.\n- Azure Workbooks data sources: suporte a Azure Resource Graph como fonte de dados para Workbooks.\n\n### Diretriz de design desta versão\nO workbook prioriza inventário, licenciamento técnico, ESU readiness, edição, versão e cores. A saúde da extensão SQL aparece como **Data Quality & Telemetry Confidence**, não como objetivo primário do relatório.\n\n### Query de cobertura SQL extension validada\n```kusto\nresources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| summarize SQLDiscoveredHosts = dcount(HostId)\n| extend JoinKey = 1\n| join kind=inner (\n    resources\n    | where type =~ 'microsoft.hybridcompute/machines/extensions'\n    | where tostring(properties.publisher) =~ 'Microsoft.AzureData'\n    | where tostring(properties.type) in ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n    | extend HostId = tolower(substring(id, 0, indexof(id, '/extensions')))\n    | summarize SQLExtensionHosts = dcount(HostId)\n    | extend JoinKey = 1\n) on JoinKey\n| extend MissingSQLExtension = SQLDiscoveredHosts - SQLExtensionHosts\n| extend CoveragePct = iff(SQLDiscoveredHosts == 0, 0.0, round(100.0 * todouble(SQLExtensionHosts) / todouble(SQLDiscoveredHosts), 2))\n| project SQLDiscoveredHosts, SQLExtensionHosts, MissingSQLExtension, CoveragePct\n```\n\n### Regra para UsePhysicalCoreLicense\n`UsePhysicalCoreLicense` é propriedade documentada para cenários específicos de SQL Server enabled by Azure Arc, especialmente physical core licensing e unlimited virtualization. Ela aparece apenas na aba Avançado. Valor vazio deve ser tratado como **Não reportado / Não aplicável**, não como erro."
       },
       "name": "references",
       "conditionalVisibility": {
@@ -978,7 +1770,7 @@
     {
       "type": 1,
       "content": {
-        "json": "### Change Log\n\n| Version | Date | Description | Author |\n| --- | --- | --- | --- |\n| v1.9.0 | Agosto 2026 | Revisão fim a fim de textos e queries conforme documentação pública Microsoft. Termos ajustados para evitar afirmações não verificáveis: **Cores de licenciamento SQL (estimado)** no lugar de cores licenciáveis, **LicenseType = Paid** no lugar de AHB/SA como conclusão contratual, e **LicenseOnly com cores de licenciamento** no lugar de risco genérico. Adicionados KPIs específicos para **SQL Server 2014/2016**, incluindo hosts com e sem **SQL Server ESU** habilitado. Adicionada nota de SQL Server 2016 ESU com datas oficiais do FAQ e escopo de updates Critical. Inventário passa a exibir `SQLVersionMajor` e status de SQL Server ESU somente para SQL Server 2014/2016. | Fabio Rodrigues Vieira Costa - CSA Azure Infra |"
+        "json": "### Change Log\n\n| Version | Date | Description | Author |\n| --- | --- | --- | --- |\n| v2.5.0 | Agosto 2026 | Versão final completa: reposicionou saúde da extensão como Data Quality & Telemetry Confidence, adicionou cobertura SQL extension, healthy/unhealthy extension signals, detalhe operacional de confiança, manteve foco principal em Arc SQL inventory, LicenseType, edition, version, cores e ESU readiness, reforçou disclaimers e removeu dependência de ProvisioningState como único critério de saúde. | Community / Public Reference |\n\n| v2.4.0 | Agosto 2026 | Versão final sem hardcoding: assinatura padrão removida, queries principais revisadas para evitar blocos monolíticos frágeis, Data Quality & Telemetry Confidence e Análise Técnica por Host/OSE reescritos com consultas ARG-safe, aba Avançado criada para UsePhysicalCoreLicense / pCore / Unlimited Virtualization, e regra sem X vermelho quando o campo estiver vazio. | Community / Public Reference |\n\n| v2.3.0 | Agosto 2026 | Revisão final fim a fim para publicação pública. Removida a query monolítica de validação; adicionadas queries independentes, compatíveis com Azure Resource Graph Explorer; `UsePhysicalCoreLicense` mantido apenas como referência avançada, sem X vermelho quando vazio; textos, glossário, limitações e saúde operacional revisados para uso por cliente, Microsoft, CSA, CSAM, SAM e FinOps. | Community / Public Reference |\n\n| v2.2.1 | Agosto 2026 | Corrigida query de validação completa para usar joins explícitos em Azure Resource Graph (`$left.HostId == $right.HostId`) e evitar erro FailedToResolveEntity em ambientes onde o alias não é resolvido no `join`. | Community / Public Reference |\n| v2.2.0 | Agosto 2026 | Adicionadas matriz por edição, matriz por LicenseType, SQL Server ESU readiness, Data Quality & Telemetry Confidence, aba Saúde Operacional com uploadStatus/timestampUTC, seção mostra/não mostra e query completa de validação. Removida a coluna principal PCore/UsePhysicalCoreLicense da análise por não ser confiável como campo sempre populado em ARG. | Community / Public Reference |\n| v2.1.0 | Agosto 2026 | Adicionada aba **Glossário** com termos e abreviações, linguagem ajustada para reduzir ambiguidade pública, ajuste de nomenclatura para “Cores não considerados na análise”, e melhoria da leitura de campos como `CoresConsideradosAnalise`, `ClassificacaoWorkbook` e `InterpretacaoConfiguracao`. | Community / Public Reference |\n\n| v2.0.0 | Agosto 2026 | Preparação para publicação pública no GitHub. Adicionado disclaimer público, aba de limitações conhecidas, queries de contraprova, KPIs de hosts por edição, nomenclatura neutra para billing/licenciamento, remoção de linguagem que poderia ser interpretada como validação contratual ou fatura, e ajuste de Coverage para exibição percentual. | Community / Public Reference |\n| v1.9.0 | Agosto 2026 | Revisão fim a fim de textos e queries conforme documentação pública Microsoft. Termos ajustados para evitar afirmações não verificáveis: estimativas de licenciamento, LicenseType reportado e SQL Server ESU para SQL Server 2014/2016. | Community / Draft |"
       },
       "name": "changelog",
       "conditionalVisibility": {
