@@ -1559,6 +1559,70 @@
               "comparison": "isEqualTo",
               "value": "SaudeOperacional"
             }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| join kind=leftouter (\n    resources\n    | where type =~ \"microsoft.hybridcompute/machines\"\n    | extend HostId = tolower(id)\n    | project HostId, MachineName = name\n) on HostId\n| where isempty(MachineName)\n| summarize Value = count()\n| extend Metric = \"Instâncias SQL órfãs\", Detail = \"sqlserverinstances sem máquina Arc correspondente\"\n| project Metric, Value, Detail",
+              "size": 1,
+              "title": "Instâncias SQL órfãs",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "tiles",
+              "tileSettings": {
+                "showBorder": false,
+                "titleContent": {
+                  "columnMatch": "Metric"
+                },
+                "leftContent": {
+                  "columnMatch": "Value",
+                  "formatter": 12,
+                  "formatOptions": {
+                    "palette": "red"
+                  }
+                },
+                "secondaryContent": {
+                  "columnMatch": "Detail"
+                }
+              }
+            },
+            "customWidth": "25",
+            "name": "op_orphan_instances",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "resources\n| where type =~ \"microsoft.azurearcdata/sqlserverinstances\"\n| where resourceGroup in~ ({ResourceGroup})\n| extend HostId = tolower(tostring(properties.containerResourceId))\n| extend Instancia = name, Edicao = tostring(properties.edition), Versao = tostring(properties.version), vCore = toint(properties.vCore)\n| join kind=leftouter (\n    resources\n    | where type =~ \"microsoft.hybridcompute/machines\"\n    | extend HostId = tolower(id)\n    | project HostId, MachineName = name\n) on HostId\n| where isempty(MachineName)\n| project Instancia, Edicao, Versao, vCore, MaquinaArcEsperada = HostId, ResourceGroup = resourceGroup, SubscriptionId = subscriptionId\n| order by Instancia asc",
+              "size": 0,
+              "title": "Instâncias SQL órfãs (sem máquina Arc)",
+              "noDataMessage": "Nenhuma instância SQL órfã no escopo selecionado.",
+              "noDataMessageStyle": 3,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "visualization": "table",
+              "gridSettings": {
+                "filter": true
+              }
+            },
+            "name": "op_orphan_detail",
+            "conditionalVisibility": {
+              "parameterName": "SelectedTab",
+              "comparison": "isEqualTo",
+              "value": "SaudeOperacional"
+            }
           }
         ]
       },
