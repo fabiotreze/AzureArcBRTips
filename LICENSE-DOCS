@@ -5,8 +5,8 @@ Copyright (c) 2026 Fabio Rodrigues Vieira Costa
 Scope
 - Standalone documentation files, including README files, DISCLAIMER.md,
   SECURITY.md and CHANGELOG.md, are licensed under CC BY 4.0.
-- Code in scripts/, workbook JSON in workbooks/ (including embedded queries
-  and text), and ARM templates in templates/ are licensed under MIT; see LICENSE.
+- Source code, including scripts, workbook JSON (with embedded queries and
+  text), and deployment templates, is licensed under MIT; see LICENSE.
 - Third-party content and trademarks are not relicensed by this notice.
   They remain subject to their respective owners' rights and terms.
 

@@ -1,12 +1,12 @@
 cff-version: 1.2.0
-message: "If you use this workbook, please cite it using the metadata below."
-title: "AzureArcBRTips - Azure Arc Agent Version Compliance Workbook"
+message: "If you use material from this repository, please cite it using the metadata below."
+title: "AzureArcBRTips - Azure Arc Projects and Practical Guidance"
 abstract: >-
-  Azure Monitor workbook for Azure Arc-enabled servers, covering Connected
-  Machine agent version compliance, estimated support status, automatic
-  upgrade health, Azure Advisor, Azure Policy and extensions. Includes
-  English and Brazilian Portuguese guides, an ARM deployment template
-  and a PowerShell validation script.
+  Collection of projects, Azure Monitor workbooks, scripts, deployment
+  templates and practical guidance for Azure Arc. Each project documents
+  its own purpose, prerequisites, usage, validation and version history.
+  Includes an agent version compliance workbook with English and
+  Brazilian Portuguese guides.
 type: software
 authors:
   - family-names: "Costa"
@@ -14,12 +14,12 @@ authors:
     alias: "fabiotreze"
 repository-code: "https://github.com/fabiotreze/AzureArcBRTips"
 url: "https://github.com/fabiotreze/AzureArcBRTips"
-version: "4.5.0"
 license: MIT
 keywords:
   - azure-arc
   - azure-monitor
-  - workbook
-  - connected-machine-agent
+  - workbooks
+  - hybrid-cloud
+  - deployment-templates
   - azure-resource-graph
   - powershell

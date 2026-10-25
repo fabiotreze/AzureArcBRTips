@@ -5,64 +5,61 @@
 
 **English** · [Português](README.pt-BR.md)
 
-Azure Monitor workbook for reviewing **Azure Arc Connected Machine agent versions, automatic upgrade health and extensions**. The current workbook version is **4.5.0**.
+A collection of **projects, workbooks, scripts, deployment templates and practical guidance for Azure Arc**. AzureArcBRTips is the home for multiple initiatives, each with its own purpose, prerequisites, usage instructions and version history.
 
 > Personal, independent project by Fabio Rodrigues Vieira Costa. Not an official Microsoft product or documentation, and not affiliated with or endorsed by Microsoft. Provided as is, without warranty. Read the [disclaimer](DISCLAIMER.md) before use.
 
-## What it shows
+## Project catalog
 
-- Agent version distribution, connectivity and estimated support status.
-- Agents below the configurable security floor.
-- Automatic upgrade eligibility, progress and failures.
-- Azure Advisor recommendations and Azure Policy compliance.
-- Extension versions, automatic upgrade coverage and issues grouped by cause.
+| Project | Purpose | Documentation |
+|---|---|---|
+| Arc Agent Support Workbook | Agent version compliance, automatic upgrade health, Advisor, Policy and extensions | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
 
-The workbook UI and its detailed guides are available in English and Brazilian Portuguese. Latest-version references are read from Azure signals rather than a maintained version list. **Support status is an estimate**, not a guarantee of support or security; verify findings against the [official agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes).
+The catalog lists projects currently available in this repository. Future projects will be added as they are published. Project versions are independent; the workbook's version is not a version for the entire repository.
 
 ## Get started
 
-Read the [workbook guide](workbooks/arc-agent-support/README.md) for parameters, permissions, deployment and validation.
+1. Choose a project from the catalog.
+2. Read its guide for prerequisites, required permissions, limitations and validation steps.
+3. Review the code and any deployment template before running it.
+4. Test outside production and assess Azure costs and organizational policies.
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ffabiotreze%2FAzureArcBRTips%2Fmain%2Ftemplates%2Farc-agent-support-azuredeploy.json)
-
-- **Deploy:** the button deploys the template from the `main` branch and creates an Azure Monitor workbook in your selected resource group. You need permission to deploy the template and create that resource; Reader alone is not sufficient.
-- **Manual import:** Azure Monitor → Workbooks → New → Advanced Editor → paste the [workbook JSON](workbooks/arc-agent-support-workbook.json) → Apply → Save.
-- **Read data:** use Reader access to the subscriptions or management group being reviewed. Saving the workbook requires additional write permissions.
-
-The workbook queries and validation script read Azure data; they do not upgrade agents or remediate resources. Deploying or saving the workbook does create or update a workbook resource. Review the artifacts, test outside production and follow your organization's policies.
+For the current workbook, the [project guide](workbooks/arc-agent-support/README.md) includes the **Deploy to Azure** button, manual import, configurable rules and validation commands. Its queries are read-only, but deploying or saving it creates or updates a workbook resource. Do not assume future projects are read-only; check each project's documented behavior.
 
 ## Repository
 
 | Path | Purpose |
 |---|---|
-| [Workbook JSON](workbooks/arc-agent-support-workbook.json) | Workbook for manual import |
-| [English guide](workbooks/arc-agent-support/README.md) / [Portuguese guide](workbooks/arc-agent-support/README.pt-BR.md) | Features, rules and usage |
-| [ARM template](templates/arc-agent-support-azuredeploy.json) | Workbook deployment |
-| [Validation script](scripts/Test-ArcAgentSupportWorkbook.ps1) | Smoke and Matrix checks against Azure |
-| [Changelog](workbooks/arc-agent-support/CHANGELOG.md) | Workbook version history |
+| [workbooks/](workbooks/) | Azure Monitor workbook JSON and project-specific guides and changelogs |
+| [scripts/](scripts/) | Scripts for validation, automation or other project tasks |
+| [templates/](templates/) | Azure resource deployment templates |
+| Root documentation | Repository overview, licenses, citation, disclaimer and security policy |
 
-## Validation and privacy
+The repository is organized by artifact type. A project guide connects its related workbook, scripts and templates. Existing artifact paths are preserved for links and deployments.
 
-The validation script requires **PowerShell 7+**, the **Az.Accounts** and **Az.ResourceGraph** modules, and an authenticated Azure context. Run from the repository root:
+## Adding future projects
 
-```powershell
-Connect-AzAccount
-./scripts/Test-ArcAgentSupportWorkbook.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Mode Smoke -OutFolder ./wb-test
-```
+- Add an entry to the catalog in both root README files.
+- Use descriptive artifact names and a dedicated project guide; avoid overwriting another project's files.
+- Document purpose, prerequisites, permissions, read/write effects, costs, limitations, deployment, validation and version history.
+- Link related artifacts from the project guide. Put project-specific details and deployment buttons there rather than treating the root as a single-project guide.
+- Add directories for new artifact types only when there is content to publish.
 
-Use `-Mode Matrix` for broader scenario coverage. These checks make live Azure requests and may encounter API throttling.
+## Privacy and safe use
 
-Workbook exports and test reports can contain machine names, resource IDs, subscription information and operational details. Keep them confidential; do not attach them to public issues or commits. The default test output directories are excluded by [.gitignore](.gitignore), but this does not replace reviewing what you publish.
+Exports, script output and test reports can contain machine names, resource IDs, subscription information and operational details. Keep them confidential; do not attach them to public issues or commits. The workbook's default test output directories are excluded by [.gitignore](.gitignore), but custom output locations and future projects need their own review.
+
+Use least privilege and validate recommendations against current official documentation. Analysis results are not a guarantee of support, security or compliance. See the [disclaimer](DISCLAIMER.md).
 
 ## Feedback and security
 
-For bugs and suggestions, [open an issue](https://github.com/fabiotreze/AzureArcBRTips/issues) with sanitized reproduction steps. Include the workbook version, deployment method and error message, but no credentials or environment data.
+For bugs and suggestions, [open an issue](https://github.com/fabiotreze/AzureArcBRTips/issues) with sanitized reproduction steps. Include the project name, version or commit, execution/deployment method and error message, but no credentials or environment data.
 
 For vulnerabilities, follow the [security policy](SECURITY.md); do not disclose them in public issues.
 
 ## License and citation
 
-- **Code, workbook JSON and ARM templates:** [MIT](LICENSE).
+- **Code, scripts, workbook JSON and deployment templates:** [MIT](LICENSE).
 - **Standalone documentation:** [CC BY 4.0](LICENSE-DOCS).
 - Third-party content and trademarks remain with their respective owners.
 
@@ -70,4 +67,4 @@ Suggested attribution: *AzureArcBRTips by Fabio Rodrigues Vieira Costa, https://
 
 ## Related project
 
-[Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) provides a complementary point-in-time assessment. This repository focuses on the agent and extension workbook.
+[Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) is a separate repository for point-in-time Azure Arc security assessments.
