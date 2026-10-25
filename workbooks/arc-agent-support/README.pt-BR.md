@@ -4,7 +4,7 @@
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ffabiotreze%2FAzureArcBRTips%2Fmain%2Ftemplates%2Farc-agent-support-azuredeploy.json)
 
-> ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [disclaimer](../../README.md) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
+> ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
 
 Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. Responde três perguntas:
 
@@ -43,11 +43,11 @@ Nenhuma lista de versões fica fixa no código: a referência é lida do Azure e
 - **Azure CLI**: `az deployment group create -g <resource-group> --template-uri https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/main/templates/arc-agent-support-azuredeploy.json`
 - **Manual**: Workbooks → New → *Advanced Editor* (`</>`) → cole [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json) → Apply → Save.
 
-**Permissões:** Reader nas assinaturas / management group.
+**Permissões:** Reader nas assinaturas / management group para consultar os dados. Implantar o template ARM ou salvar o workbook exige permissões adicionais para implantar/criar ou atualizar o recurso de workbook. As consultas são somente leitura; a implantação cria um recurso.
 
 ## Validação
 
-[`scripts/Test-ArcAgentSupportWorkbook.ps1`](../../scripts/Test-ArcAgentSupportWorkbook.ps1) lê o workbook e executa todas as queries, todos os valores de filtro, variações de parâmetros e o detalhamento de todas as extensões, checando mais de 20 regras de lógica (somente leitura):
+[`scripts/Test-ArcAgentSupportWorkbook.ps1`](../../scripts/Test-ArcAgentSupportWorkbook.ps1) lê o workbook e executa todas as queries, todos os valores de filtro, variações de parâmetros e o detalhamento de todas as extensões, checando mais de 20 regras de lógica (somente leitura). Exige PowerShell 7+, Az.Accounts e Az.ResourceGraph. Execute a partir da raiz do repositório:
 
 ```powershell
 Connect-AzAccount

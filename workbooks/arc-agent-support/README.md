@@ -4,7 +4,7 @@
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ffabiotreze%2FAzureArcBRTips%2Fmain%2Ftemplates%2Farc-agent-support-azuredeploy.json)
 
-> ⚠️ **Personal, independent project – not an official Microsoft tool.** Provided *as is*, without warranty; see the repository [disclaimer](../../README.md). Support status is an **estimate** (Azure APIs do not expose release dates) – validate against the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). You are responsible for how you use it.
+> ⚠️ **Personal, independent project – not an official Microsoft tool.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Support status is an **estimate** (Azure APIs do not expose release dates) – validate against the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). You are responsible for how you use it.
 
 Azure Monitor workbook for Azure Arc-enabled servers. It answers three questions:
 
@@ -43,11 +43,11 @@ No version list is hard-coded: the reference is read live from Azure (auto-upgra
 - **Azure CLI**: `az deployment group create -g <resource-group> --template-uri https://raw.githubusercontent.com/fabiotreze/AzureArcBRTips/main/templates/arc-agent-support-azuredeploy.json`
 - **Manual**: Workbooks → New → *Advanced Editor* (`</>`) → paste [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json) → Apply → Save.
 
-**Permissions:** Reader on the subscriptions / management group.
+**Permissions:** Reader on the subscriptions / management group to query data. Deploying the ARM template or saving the workbook requires additional permissions to deploy/create or update the workbook resource. Queries are read-only; deployment creates a resource.
 
 ## Validation
 
-[`scripts/Test-ArcAgentSupportWorkbook.ps1`](../../scripts/Test-ArcAgentSupportWorkbook.ps1) reads the workbook and runs every query, every filter value, parameter variations and all extension drill-downs, checking 20+ logical invariants (read-only):
+[`scripts/Test-ArcAgentSupportWorkbook.ps1`](../../scripts/Test-ArcAgentSupportWorkbook.ps1) reads the workbook and runs every query, every filter value, parameter variations and all extension drill-downs, checking 20+ logical invariants (read-only). Requires PowerShell 7+, Az.Accounts and Az.ResourceGraph. Run from the repository root:
 
 ```powershell
 Connect-AzAccount

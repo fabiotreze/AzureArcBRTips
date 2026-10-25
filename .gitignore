@@ -1,0 +1,5 @@
+.DS_Store
+
+# Local validation reports can contain confidential environment data.
+/wb-test/
+/workbook-test/
