@@ -182,8 +182,12 @@ function Run-Scenario([string]$scenario, [hashtable]$over) {
         }
         if ($data.ContainsKey('au-detail')) {
             $tol = [int](Resolve-Text '{AutoUpgradeTolerance}' $pv)
-            $bad = @($data['au-detail'] | Where-Object { $_.UpgradeHealth -eq 'On track' -and ($_.AutoUpgrade -ne 'Enabled' -or (Num $_.VersionsBehind) -gt $tol) })
-            Check $scenario 'Auto-upgrade: On track => Enabled and behind <= tolerance' ($bad.Count -eq 0) "$($bad.Count) rows"
+            $bad = @($data['au-detail'] | Where-Object { $_.UpgradeHealth -eq 'On track' -and ($_.AutoUpgrade -ne 'Enabled' -or $_.ConnectionStatus -ne 'Connected' -or $_.LastAttemptStatus -eq 'Failed' -or (Num $_.VersionsBehind) -gt $tol) })
+            Check $scenario 'Auto-upgrade: On track => Enabled, connected, no failed attempt, behind <= tolerance' ($bad.Count -eq 0) "$($bad.Count) rows"
+            $bad = @($data['au-detail'] | Where-Object { $_.AutoUpgrade -eq 'Enabled' -and $_.LastAttemptStatus -eq 'Failed' -and $_.AgentVersion -and $_.UpgradeHealth -ne 'Failing' })
+            Check $scenario 'Auto-upgrade: failed last attempt => Failing' ($bad.Count -eq 0) "$($bad.Count) rows"
+            $bad = @($data['au-detail'] | Where-Object { $_.AutoUpgrade -eq 'Enabled' -and $_.ConnectionStatus -ne 'Connected' -and $_.LastAttemptStatus -ne 'Failed' -and $_.AgentVersion -and $_.UpgradeHealth -ne 'Blocked (not connected)' })
+            Check $scenario 'Auto-upgrade: offline without failed attempt => Blocked' ($bad.Count -eq 0) "$($bad.Count) rows"
             $bad = @($data['au-detail'] | Where-Object { $_.UpgradeHealth -like 'Disabled*' -and $_.AutoUpgrade -eq 'Enabled' })
             Check $scenario 'Auto-upgrade: Disabled (eligible) => not Enabled' ($bad.Count -eq 0) "$($bad.Count) rows"
         }
