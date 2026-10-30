@@ -8,11 +8,11 @@
 
 Azure Monitor workbook for Azure Arc-enabled servers. It answers three questions:
 
-1. Are my **Connected Machine agents on a supported – and secure – version**?
+1. Are my **Connected Machine agents likely within the support window and above the configured minimum version**?
 2. Is **automatic agent upgrade** enabled and working?
 3. **What must be fixed**, and on which servers?
 
-No version list is hard-coded: the reference is read live from Azure (auto-upgrade target set by Azure, Hybrid Compute catalog APIs, Resource Graph, Advisor, Policy). Bilingual UI (English / Português). Read-only.
+Support is estimated from sequential release numbers, not verified release dates; being above the configured minimum is not proof that all security fixes are installed. No version list is hard-coded: the reference is read live from Azure (auto-upgrade target set by Azure, Hybrid Compute catalog APIs, Resource Graph, Advisor, Policy). Bilingual UI (English / Português). Read-only.
 
 ## Sections
 
@@ -31,10 +31,10 @@ No version list is hard-coded: the reference is read live from Azure (auto-upgra
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| SupportWindow | 12 releases | Microsoft supports agent versions released within the last year (~monthly releases) |
-| AutoUpgradeTolerance | 1 | Automatic upgrade keeps the agent within one version of latest |
+| SupportWindow | 12 releases | Heuristic only: approximates the official last-12-months policy using sequential release numbers; verify release dates in the agent release notes |
+| AutoUpgradeTolerance | 1 | Within one release of the reference; *On track* also requires connectivity and no failed last attempt |
 | MinAutoUpgradeVersion | 1.57 | Automatic agent upgrade is available from agent 1.57 |
-| **SecurityFloorVersion** | **1.61** | Agents below it carry known local elevation-of-privilege CVEs (CVE-2025-49692, CVE-2025-26627, CVE-2025-55316, CVE-2026-26117) – same criterion as [Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) |
+| **SecurityFloorVersion** | **1.61** | Configurable minimum based on previously identified local elevation-of-privilege CVEs (CVE-2025-49692, CVE-2025-26627, CVE-2025-55316, CVE-2026-26117); being at/above it does **not** certify security. Review new security fixes and this threshold regularly |
 | LatestOverride | (empty) | Force the latest version when no Azure signal is available |
 
 ## Deploy
