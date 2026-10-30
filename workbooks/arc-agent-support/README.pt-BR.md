@@ -8,11 +8,11 @@
 
 Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. Responde três perguntas:
 
-1. Meus **Connected Machine agents estão numa versão suportada – e segura**?
+1. Meus **Connected Machine agents provavelmente estão dentro da janela de suporte e acima do mínimo configurado**?
 2. O **upgrade automático do agent** está habilitado e funcionando?
 3. **O que precisa ser corrigido** e em quais servidores?
 
-Nenhuma lista de versões fica fixa no código: a referência é lida do Azure em tempo real (alvo do upgrade automático, APIs de catálogo do Hybrid Compute, Resource Graph, Advisor, Policy). Interface bilíngue (English / Português). Somente leitura.
+O suporte é estimado por número de releases sequenciais, não por datas verificadas; estar acima do mínimo configurado não comprova a instalação de todas as correções de segurança. Nenhuma lista de versões fica fixa no código: a referência é lida do Azure em tempo real (alvo do upgrade automático, APIs de catálogo do Hybrid Compute, Resource Graph, Advisor, Policy). Interface bilíngue (English / Português). Somente leitura.
 
 ## Seções
 
@@ -31,10 +31,10 @@ Nenhuma lista de versões fica fixa no código: a referência é lida do Azure e
 
 | Parâmetro | Padrão | Significado |
 |---|---|---|
-| SupportWindow | 12 releases | A Microsoft suporta versões do agent lançadas no último ano (~releases mensais) |
-| AutoUpgradeTolerance | 1 | O upgrade automático mantém o agent a até uma versão da latest |
+| SupportWindow | 12 releases | Apenas heurística: aproxima a política oficial dos últimos 12 meses pelo número sequencial de releases; confirme as datas nas notas de versão do agent |
+| AutoUpgradeTolerance | 1 | Até uma release atrás da referência; *On track* também exige conectividade e ausência de falha na última tentativa |
 | MinAutoUpgradeVersion | 1.57 | Upgrade automático disponível a partir do agent 1.57 |
-| **SecurityFloorVersion** | **1.61** | Agents abaixo dela têm CVEs conhecidos de elevação de privilégio local (CVE-2025-49692, CVE-2025-26627, CVE-2025-55316, CVE-2026-26117) – mesmo critério do [Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) |
+| **SecurityFloorVersion** | **1.61** | Mínimo configurável baseado em CVEs locais já identificados (CVE-2025-49692, CVE-2025-26627, CVE-2025-55316, CVE-2026-26117); estar acima dele **não** atesta segurança. Revise regularmente novas correções e esse limite |
 | LatestOverride | (vazio) | Força a versão latest quando não há sinal do Azure |
 
 ## Deploy
