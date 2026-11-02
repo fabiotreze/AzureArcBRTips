@@ -8,6 +8,8 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
+[!\[Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ffabiotreze%2FAzureArcBRTips%2Fmain%2Ftemplates%2Farc-sql-payg-readiness-azuredeploy.json)
+
 ## What it answers
 - Which Arc-enabled SQL Server instances are already PAYG, which are not, and which license types are in use (LicenseOnly, Paid, PAYG).
 - What the official `manage-payg-transition.ps1` script **would** convert, and which hosts need attention first (🔴 🟠 🟢 priority).
