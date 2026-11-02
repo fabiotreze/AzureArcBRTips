@@ -6,36 +6,40 @@
 
 > ⚠️ **Personal, independent project – not an official Microsoft tool.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Support status is an **estimate** (Azure APIs do not expose release dates) – validate against the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). You are responsible for how you use it.
 
-Azure Monitor workbook for Azure Arc-enabled servers. It answers three questions:
+Azure Monitor workbook for Azure Arc-enabled servers. **Current version: 4.6.4** (see the [CHANGELOG](CHANGELOG.md)). It answers three questions:
 
 1. Are my **Connected Machine agents likely within the support window and above the configured minimum version**?
 2. Is **automatic agent upgrade** enabled and working?
 3. **What must be fixed**, and on which servers?
 
-Support is estimated from sequential release numbers, not verified release dates; being above the configured minimum is not proof that all security fixes are installed. No version list is hard-coded: the reference is read live from Azure (auto-upgrade target set by Azure, Hybrid Compute catalog APIs, Resource Graph, Advisor, Policy). Bilingual UI (English / Português). Read-only.
+Support is estimated from sequential release numbers, not verified release dates; being above the configured minimum is not proof that all security fixes are installed. No version list is hard-coded: the reference is read live from Azure (auto-upgrade target set by Azure, Hybrid Compute catalog APIs, Resource Graph, Advisor, Policy). The catalog list API is non-deterministic, so the workbook merges several calls, never relies on it alone, and gets downloads by exact version. Bilingual UI (English / Português). Read-only.
 
 ## Sections
 
 | # | Section | What it shows |
 |---|---|---|
-| 1 | Overview | Latest / Supported / Out of support / Unknown / **Below security floor**, connectivity, auto-upgrade |
-| 2 | Distribution | Versions, connection status, auto-upgrade health |
-| 3 | Azure Advisor | Blockers (expired / disconnected) and agent recommendations, with freshness check |
-| 4 | Server inventory | One row per server, below-floor and out-of-support first |
-| 5 | Automatic agent upgrade | Eligibility, health (On track / Lagging / Failing / Blocked), last attempt |
-| 6 | Latest reference & manual upgrade paths | Latest per OS and its source; next step and download per installed version |
-| 7 | Azure Policy | Policy compliance of Arc-enabled servers |
-| 8 | Extensions | All extensions: auto-upgrade coverage, versions vs. versions published by Azure, issues grouped by cause |
+| 1 | Overview | Banner when servers are disconnected / expired; *Fleet status* and *Version & upgrade* tiles (Latest / Supported / Out of support / **Below security floor** / auto-upgrade); **Servers that need action** with the reason |
+| 2 | Distribution | Versions, connection status, auto-upgrade health (charts are optional: *Show distribution charts*, off by default) |
+| 3 | Azure Advisor | Blockers (expired / disconnected) and agent recommendations, with a link to the impacted resources in Advisor and a freshness check |
+| 4 | Server inventory | One row per server (up to 1000), below-floor and out-of-support first |
+| 5 | Automatic agent upgrade | Eligibility (agent 1.67+), health (On track / Lagging / Failing / Blocked), last attempt |
+| 6 | Latest reference & manual upgrade paths | Latest per OS and its source; next step per installed version; agent download by exact version (latest pre-selected) |
+| 7 | Azure Policy | Only agent / automatic-upgrade policies, with an explicit message when none is assigned |
+| 8 | Extensions | All extensions: auto-upgrade coverage, versions vs. versions published by Azure, issues grouped by cause with every affected server |
+
+Controls: *Show guide* adds the legend, methodology and official sources. *Show changelog* (Edit mode) shows the editorial history inside the workbook.
 
 ## Rules (editable in Edit mode)
 
 | Parameter | Default | Meaning |
 |---|---|---|
 | SupportWindow | 12 releases | Heuristic only: approximates the official last-12-months policy using sequential release numbers; verify release dates in the agent release notes |
-| AutoUpgradeTolerance | 1 | Within one release of the reference; *On track* also requires connectivity and no failed last attempt |
-| MinAutoUpgradeVersion | 1.57 | Automatic agent upgrade is available from agent 1.57 |
-| **SecurityFloorVersion** | **1.61** | Configurable minimum based on previously identified local elevation-of-privilege CVEs (CVE-2025-49692, CVE-2025-26627, CVE-2025-55316, CVE-2026-26117); being at/above it does **not** certify security. Review new security fixes and this threshold regularly |
-| LatestOverride | (empty) | Force the latest version when no Azure signal is available |
+| AutoUpgradeTolerance | 1 | Heuristic, not a documented guarantee (Microsoft rolls automatic upgrades out in batches and retries failures); *On track* also requires connectivity and no failed last attempt |
+| MinAutoUpgradeVersion | 1.67 | Automatic agent upgrade requires agent 1.67 or later (Windows: PowerShell execution policy RemoteSigned; Linux: cron service) |
+| **SecurityFloorVersion** | **1.61** | Configurable minimum based on public CVE records (CVE-2026-26117 affects agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 and CVE-2025-55316 as in Arc Posture Review); applied to every OS; being at/above it does **not** certify security. Review new security fixes and this threshold regularly |
+| LatestOverride | (empty) | Force the latest version (for example one already in the release notes) when Azure does not report it yet |
+
+*Latest* is the highest version Azure reports and can lag the newest release.
 
 ## Deploy
 
@@ -47,14 +51,21 @@ Support is estimated from sequential release numbers, not verified release dates
 
 ## Validation
 
-[`scripts/Test-ArcAgentSupportWorkbook.ps1`](../../scripts/Test-ArcAgentSupportWorkbook.ps1) reads the workbook and runs every query, every filter value, parameter variations and all extension drill-downs, checking 20+ logical invariants (read-only). Requires PowerShell 7+, Az.Accounts and Az.ResourceGraph. Run from the repository root:
+[`scripts/Test-ArcWorkbookQueries.ps1`](../../scripts/Test-ArcWorkbookQueries.ps1) reads the workbook, resolves its parameters the way the portal does and runs every query of every tab against your tenant (read-only). It reports status, rows, duration, HTTP 429 throttling and truncation per query. Requires PowerShell 7+, Az.Accounts, Az.ResourceGraph and Reader on the subscriptions. Run from the repository root:
 
 ```powershell
-Connect-AzAccount
-./scripts/Test-ArcAgentSupportWorkbook.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Mode Matrix -OutFolder ./wb-test
+Connect-AzAccount -Tenant <tenant-id>
+# offline lint (no Azure call)
+./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -DryRun
+# every filter value one at a time + the first 3 extension drill-downs
+./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Language EN -FilterCombos OneFactor -ExtensionDrill 3
+# open each tab like the portal (all its queries at once) with the optional charts on – reproduces HTTP 429
+./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Burst -SetParam @{ ShowCharts = 'Yes' }
 ```
 
-> Test reports contain environment data – treat them as confidential and never attach them to issues.
+Results go to `./workbook-test-results` (excluded by `.gitignore`). With the charts on, the Overview tab runs 10 Resource Graph queries at once; the script retries an occasional HTTP 429 automatically.
+
+> Test reports contain environment data – treat them as confidential and never attach them to issues or commits.
 
 ## Related
 

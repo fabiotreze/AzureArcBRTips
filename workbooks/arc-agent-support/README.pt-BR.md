@@ -6,36 +6,40 @@
 
 > ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
 
-Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. Responde três perguntas:
+Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.4** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
 
 1. Meus **Connected Machine agents provavelmente estão dentro da janela de suporte e acima do mínimo configurado**?
 2. O **upgrade automático do agent** está habilitado e funcionando?
 3. **O que precisa ser corrigido** e em quais servidores?
 
-O suporte é estimado por número de releases sequenciais, não por datas verificadas; estar acima do mínimo configurado não comprova a instalação de todas as correções de segurança. Nenhuma lista de versões fica fixa no código: a referência é lida do Azure em tempo real (alvo do upgrade automático, APIs de catálogo do Hybrid Compute, Resource Graph, Advisor, Policy). Interface bilíngue (English / Português). Somente leitura.
+O suporte é estimado por número de releases sequenciais, não por datas verificadas; estar acima do mínimo configurado não comprova a instalação de todas as correções de segurança. Nenhuma lista de versões fica fixa no código: a referência é lida do Azure em tempo real (alvo do upgrade automático, APIs de catálogo do Hybrid Compute, Resource Graph, Advisor, Policy). A API de listagem do catálogo não é determinística; por isso o workbook combina várias chamadas, nunca depende só dela e obtém os downloads pela versão exata. Interface bilíngue (English / Português). Somente leitura.
 
 ## Seções
 
 | # | Seção | O que mostra |
 |---|---|---|
-| 1 | Visão geral | Latest / Supported / Out of support / Unknown / **Abaixo do piso de segurança**, conectividade, upgrade automático |
-| 2 | Distribuição | Versões, status de conexão, saúde do upgrade automático |
-| 3 | Azure Advisor | Bloqueios (expirados / desconectados) e recomendações do agent, com verificação de atualidade |
-| 4 | Inventário | Uma linha por servidor, abaixo do piso e fora de suporte primeiro |
-| 5 | Upgrade automático | Elegibilidade, saúde (On track / Lagging / Failing / Blocked), última tentativa |
-| 6 | Referência de latest e upgrade manual | Latest por SO e sua origem; próximo passo e download por versão instalada |
-| 7 | Azure Policy | Conformidade de políticas dos servidores Arc |
-| 8 | Extensões | Todas as extensões: cobertura de upgrade automático, versões vs. publicadas pelo Azure, problemas agrupados por causa |
+| 1 | Visão geral | Aviso quando há servidores desconectados / expirados; tiles de *Situação da frota* e *Versão e upgrade* (Latest / Supported / Out of support / **Abaixo do piso de segurança** / upgrade automático); **Servidores que precisam de ação** com o motivo |
+| 2 | Distribuição | Versões, status de conexão, saúde do upgrade automático (gráficos opcionais: *Mostrar gráficos de distribuição*, desligado por padrão) |
+| 3 | Azure Advisor | Bloqueios (expirados / desconectados) e recomendações do agent, com link para os recursos afetados no Advisor e verificação de atualidade |
+| 4 | Inventário | Uma linha por servidor (até 1000), abaixo do piso e fora de suporte primeiro |
+| 5 | Upgrade automático | Elegibilidade (agent 1.67+), saúde (On track / Lagging / Failing / Blocked), última tentativa |
+| 6 | Referência de latest e upgrade manual | Latest por SO e sua origem; próximo passo por versão instalada; download do agent pela versão exata (latest já selecionada) |
+| 7 | Azure Policy | Apenas políticas do agent / upgrade automático, com mensagem explícita quando não há nenhuma atribuída |
+| 8 | Extensões | Todas as extensões: cobertura de upgrade automático, versões vs. publicadas pelo Azure, problemas agrupados por causa com todos os servidores afetados |
+
+Controles: *Mostrar guia* exibe a legenda, a metodologia e as fontes oficiais. *Exibir histórico* (modo Edit) mostra o histórico editorial dentro do workbook.
 
 ## Regras (editáveis no modo Edit)
 
 | Parâmetro | Padrão | Significado |
 |---|---|---|
 | SupportWindow | 12 releases | Apenas heurística: aproxima a política oficial dos últimos 12 meses pelo número sequencial de releases; confirme as datas nas notas de versão do agent |
-| AutoUpgradeTolerance | 1 | Até uma release atrás da referência; *On track* também exige conectividade e ausência de falha na última tentativa |
-| MinAutoUpgradeVersion | 1.57 | Upgrade automático disponível a partir do agent 1.57 |
-| **SecurityFloorVersion** | **1.61** | Mínimo configurável baseado em CVEs locais já identificados (CVE-2025-49692, CVE-2025-26627, CVE-2025-55316, CVE-2026-26117); estar acima dele **não** atesta segurança. Revise regularmente novas correções e esse limite |
-| LatestOverride | (vazio) | Força a versão latest quando não há sinal do Azure |
+| AutoUpgradeTolerance | 1 | Heurística, não uma garantia documentada (a Microsoft libera os upgrades automáticos em lotes e repete as falhas); *On track* também exige conectividade e ausência de falha na última tentativa |
+| MinAutoUpgradeVersion | 1.67 | O upgrade automático exige agent 1.67 ou superior (Windows: execution policy do PowerShell RemoteSigned; Linux: serviço cron) |
+| **SecurityFloorVersion** | **1.61** | Mínimo configurável baseado em registros públicos de CVE (CVE-2026-26117 afeta agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 e CVE-2025-55316 como no Arc Posture Review); aplicado a todos os SOs; estar acima dele **não** atesta segurança. Revise regularmente novas correções e esse limite |
+| LatestOverride | (vazio) | Força a versão latest (por exemplo, uma já listada nas notas de versão) quando o Azure ainda não a reporta |
+
+*Latest* é a maior versão que o Azure reporta e pode ficar atrás da release mais recente.
 
 ## Deploy
 
@@ -47,14 +51,21 @@ O suporte é estimado por número de releases sequenciais, não por datas verifi
 
 ## Validação
 
-[`scripts/Test-ArcAgentSupportWorkbook.ps1`](../../scripts/Test-ArcAgentSupportWorkbook.ps1) lê o workbook e executa todas as queries, todos os valores de filtro, variações de parâmetros e o detalhamento de todas as extensões, checando mais de 20 regras de lógica (somente leitura). Exige PowerShell 7+, Az.Accounts e Az.ResourceGraph. Execute a partir da raiz do repositório:
+[`scripts/Test-ArcWorkbookQueries.ps1`](../../scripts/Test-ArcWorkbookQueries.ps1) lê o workbook, resolve os parâmetros como o portal faz e executa todas as queries de todas as abas no seu tenant (somente leitura). Informa, por query, status, linhas, duração, throttling HTTP 429 e truncamento. Exige PowerShell 7+, Az.Accounts, Az.ResourceGraph e Reader nas assinaturas. Execute a partir da raiz do repositório:
 
 ```powershell
-Connect-AzAccount
-./scripts/Test-ArcAgentSupportWorkbook.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Mode Matrix -OutFolder ./wb-test
+Connect-AzAccount -Tenant <tenant-id>
+# lint offline (sem chamada ao Azure)
+./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -DryRun
+# cada valor de filtro isoladamente + os 3 primeiros detalhamentos de extensão
+./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Language PT -FilterCombos OneFactor -ExtensionDrill 3
+# abre cada aba como o portal (todas as queries ao mesmo tempo) com os gráficos opcionais ligados – reproduz HTTP 429
+./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Burst -SetParam @{ ShowCharts = 'Yes' }
 ```
 
-> Os relatórios de teste contêm dados do ambiente – trate como confidenciais e nunca anexe em issues.
+Os resultados vão para `./workbook-test-results` (excluído pelo `.gitignore`). Com os gráficos ligados, a aba Visão geral executa 10 queries do Resource Graph ao mesmo tempo; o script repete automaticamente um HTTP 429 ocasional.
+
+> Os relatórios de teste contêm dados do ambiente – trate como confidenciais e nunca anexe em issues ou commits.
 
 ## Relacionados
 
