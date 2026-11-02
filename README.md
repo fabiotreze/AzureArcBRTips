@@ -14,6 +14,7 @@ A collection of **projects, workbooks, scripts, deployment templates and practic
 | Project | Purpose | Documentation |
 |---|---|---|
 | Arc Agent Support Workbook | Agent version compliance, automatic upgrade health, Advisor, Policy and extensions | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
+| SQL Server enabled by Azure Arc PAYG Readiness Workbook | PAYG readiness, license type, ESU, CSP consent and connectivity review for SQL Server enabled by Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
 
 The catalog lists projects currently available in this repository. Future projects will be added as they are published. Project versions are independent; the workbook's version is not a version for the entire repository.
 
@@ -68,12 +69,3 @@ Suggested attribution: *AzureArcBRTips by Fabio Rodrigues Vieira Costa, https://
 ## Related project
 
 [Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) is a separate repository for point-in-time Azure Arc security assessments.
-
-## Workbooks
-
-| Project | What it does | Docs |
-|---|---|---|
-| Azure Arc – Agent Support / Version Compliance | Connected Machine agent version, support status and auto-upgrade review | [Folder](workbooks/arc-agent-support) |
-| SQL Server enabled by Azure Arc – PAYG Readiness | PAYG readiness, license type, ESU, CSP consent and connectivity review for SQL Server enabled by Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
-
-Workbook files: `workbooks/arc-agent-support-workbook.json` and `workbooks/arc-sql-payg-readiness-workbook.json`.

@@ -14,6 +14,7 @@ Uma coleção de **projetos, workbooks, scripts, templates de implantação e or
 | Projeto | Finalidade | Documentação |
 |---|---|---|
 | Arc Agent Support Workbook | Conformidade de versões do agent, saúde do upgrade automático, Advisor, Policy e extensões | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
+| Workbook de prontidão PAYG – SQL Server habilitado pelo Azure Arc | Prontidão para PAYG, tipo de licença, ESU, consentimento CSP e conectividade do SQL Server habilitado pelo Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
 
 O catálogo lista os projetos disponíveis atualmente neste repositório. Novos projetos serão adicionados conforme forem publicados. Cada projeto tem versionamento independente; a versão do workbook não representa uma versão de todo o repositório.
 
@@ -68,12 +69,3 @@ Atribuição sugerida: *AzureArcBRTips por Fabio Rodrigues Vieira Costa, https:/
 ## Projeto relacionado
 
 [Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) é um repositório separado para avaliações pontuais de segurança do Azure Arc.
-
-## Workbooks
-
-| Projeto | O que faz | Documentação |
-|---|---|---|
-| Azure Arc – Suporte / Conformidade de versão do Agent | Versão do Connected Machine agent, situação de suporte e revisão de atualização automática | [Pasta](workbooks/arc-agent-support) |
-| SQL Server habilitado pelo Azure Arc – Prontidão PAYG | Prontidão para PAYG, tipo de licença, ESU, consentimento CSP e conectividade do SQL Server habilitado pelo Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
-
-Arquivos dos workbooks: `workbooks/arc-agent-support-workbook.json` e `workbooks/arc-sql-payg-readiness-workbook.json`.
