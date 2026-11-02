@@ -11,7 +11,7 @@ workbooks/<project>/README.md                # English guide
 workbooks/<project>/README.pt-BR.md          # Portuguese (Brazil) guide
 workbooks/<project>/CHANGELOG.md             # per-project versions (independent of the repo)
 templates/<project>-azuredeploy.json         # ARM template embedding the workbook ("Deploy to Azure" button)
-scripts/                                      # shared tooling (Test-ArcWorkbookQueries.ps1, ...)
+scripts/                                      # shared tooling (Test-ArcWorkbookQueries.ps1 and its offline mock tests Test-ArcWorkbookQueries.Tests.ps1, which must pass after any change to the harness)
 README.md / README.pt-BR.md                  # root: "Project catalog" table, one row per project
 ```
 Current projects: `arc-agent-support` (Connected Machine agent compliance) and `arc-sql-payg-readiness` (SQL Server enabled by Azure Arc – PAYG readiness).
@@ -28,7 +28,7 @@ Current projects: `arc-agent-support` (Connected Machine agent compliance) and `
 9. **Never push.** Prepare commits locally; the owner pushes (account differences exist). Never change history that was already pushed.
 10. **Dated facts.** Anything that can change (an API returning a version, support dates, prices) is written with "verified on <date>" and a source, never as a timeless statement.
 11. **Describe overrides exactly as implemented.** `LatestOverride`, when filled, takes priority over every other source (it is not a maximum); banners, parameter descriptions, methodology text and READMEs must say so and tell the reader to update or clear it on each release.
-12. **PowerShell safety.** `[regex]::Replace(input, pattern, replacement, 1)` treats `1` as RegexOptions.IgnoreCase, not a count; use `[regex]::new(pattern).Replace(input, replacement, 1)`. Scripts that rewrite files must back up first and say what they changed.
+12. **PowerShell safety.** `[regex]::Replace(input, pattern, replacement, 1)` treats `1` as RegexOptions.IgnoreCase, not a count; use `[regex]::new(pattern).Replace(input, replacement, 1)`. Scripts that rewrite files must back up first and say what they changed. Scripts and tests must not depend on the console encoding: compare accented text through the UTF-8 CSV or use ASCII tokens.
 
 ## Workbook design limits (learned in testing)
 - Azure Resource Graph throttles at about **15 queries per 5 seconds per user**. Keep **≤ 8–10 ARG queries visible per tab**; hide inactive tabs with conditional visibility (hidden items do not run).
