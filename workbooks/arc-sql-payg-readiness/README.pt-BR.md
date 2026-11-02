@@ -51,6 +51,8 @@ A aba *Como usar* tem botões que levam direto a cada aba e links para o script,
 - 18 queries do Azure Resource Graph executadas em um tenant de teste em português e inglês: **18/18 OK, 0 falhas**.
 - Throttling: cada aba executa no máximo 8 queries (o Azure Resource Graph permite cerca de 15 a cada 5 segundos por usuário). Um teste de estresse trocando de aba em sequência gerou algumas respostas HTTP 429 que se recuperaram na nova tentativa.
 - Scripts de teste: [`scripts/Test-ArcWorkbookQueries.ps1`](../../scripts/Test-ArcWorkbookQueries.ps1).
+- O validador aplica `-SetParam` antes da resolução dos parâmetros dependentes e termina com **1** para falhas de consulta, tokens não resolvidos ou falhas de parâmetro; caso contrário, **0**. As falhas de parâmetro aparecem no CSV e no resumo final em vermelho. Testes de regressão offline com mocks: `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1` (a partir da raiz do repositório).
+- Parâmetros que aguardam apenas valores exportados pela seleção de linha de consultas aparecem como **Skipped (aguarda seleção)**, sem reprovar a execução normal; os nomes exportados são descobertos pelos metadados das consultas. A validação de drill-down continua rigorosa, e tokens não resolvidos que não venham da seleção continuam reprovando a execução.
 - Um laboratório pequeno não comprova o comportamento em escala. Valide no seu ambiente antes de usar os resultados em decisões.
 
 ## Documentação oficial

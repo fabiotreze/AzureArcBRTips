@@ -51,6 +51,8 @@ The *How to use* tab has buttons that jump to each tab and links to the script, 
 - 18 Azure Resource Graph queries run against a test tenant in Portuguese and English: **18/18 OK, 0 failures**.
 - Throttling: each tab runs at most 8 queries (Azure Resource Graph allows about 15 per 5 seconds per user). A stress test that switched tabs back to back produced a few HTTP 429 responses that recovered on retry.
 - Test scripts: [`scripts/Test-ArcWorkbookQueries.ps1`](../../scripts/Test-ArcWorkbookQueries.ps1).
+- The validator applies `-SetParam` before resolving dependent parameters and exits **1** for query failures, unresolved tokens or parameter failures; otherwise **0**. Parameter failures appear in the CSV and the red final summary. Offline mock regression tests: `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1` (from the repository root).
+- Parameters awaiting only query row-selection exports are reported as **Skipped (aguarda seleção)** without failing normal execution; export names are discovered from query metadata. Drill-down validation remains strict, and unresolved non-selection tokens still fail.
 - A small lab does not prove behavior at scale. Validate in your own environment before using the results for decisions.
 
 ## Official documentation

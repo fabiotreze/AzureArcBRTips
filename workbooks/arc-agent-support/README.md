@@ -65,6 +65,10 @@ Connect-AzAccount -Tenant <tenant-id>
 
 Results go to `./workbook-test-results` (excluded by `.gitignore`). With the charts on, the Overview tab runs 10 Resource Graph queries at once; the script retries an occasional HTTP 429 automatically.
 
+`-SetParam` values take effect before dependent parameters are resolved. Query failures, unresolved tokens and parameter failures produce exit code **1**; success produces **0**. Parameter failures appear in the CSV and the red final summary. Run the offline mock regression tests with `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1`.
+
+During normal execution, parameters awaiting only values exported by query row selection are reported as **Skipped (aguarda seleção)** in the CSV and summary, without failing the run. Export names are discovered from query metadata. `-ExtensionDrill` supplies selection values and validates the parameter queries; a real failure or an unresolved non-selection token still produces exit code **1**.
+
 > Test reports contain environment data – treat them as confidential and never attach them to issues or commits.
 
 ## Related
