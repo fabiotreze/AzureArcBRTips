@@ -6,7 +6,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
 
-Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.7** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
+Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.8** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
 
 1. Meus **Connected Machine agents provavelmente estão dentro da janela de suporte e acima do mínimo configurado**?
 2. O **upgrade automático do agent** está habilitado e funcionando?

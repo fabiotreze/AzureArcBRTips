@@ -6,7 +6,7 @@
 
 > ⚠️ **Personal, independent project – not an official Microsoft tool.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Support status is an **estimate** (Azure APIs do not expose release dates) – validate against the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). You are responsible for how you use it.
 
-Azure Monitor workbook for Azure Arc-enabled servers. **Current version: 4.6.7** (see the [CHANGELOG](CHANGELOG.md)). It answers three questions:
+Azure Monitor workbook for Azure Arc-enabled servers. **Current version: 4.6.8** (see the [CHANGELOG](CHANGELOG.md)). It answers three questions:
 
 1. Are my **Connected Machine agents likely within the support window and above the configured minimum version**?
 2. Is **automatic agent upgrade** enabled and working?

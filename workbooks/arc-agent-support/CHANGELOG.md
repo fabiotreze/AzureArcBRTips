@@ -1,6 +1,7 @@
 # Changelog – Arc Agent Support Workbook
 |Version|Date|Description|
 |---|---|---|
+|v4.6.8|2026-11-02|**Row limits:** the *extension servers*, *auto-upgrade attempts*, *extensions*, *policy* and *Advisor summary* tables now show up to 1000 rows (portal default is 250), so large fleets are not cut silently. No query changed.|
 |v4.6.7|2026-11-02|**Latest override has priority over every other source** (it is not a maximum): when filled, it is the reference version even if the catalog API or the Azure auto-upgrade target report a higher one. Banner, parameter description and methodology text corrected; update or clear the field after each release. No query changed.|
 |v4.6.6|2026-11-02|**Override banner highlighted:** warning-style box with heading, effect and how to clear it (EN/PT). No query changed.|
 |v4.6.5|2026-11-02|**Manual latest reference:** *Latest override* now defaults to 1.69 (agent release notes) because the catalog API (`osType/agentVersions/latest`) returned 1.68 in every registered api-version (verified on 2026-11-02); bilingual banner while the override is set. No query changed.|
