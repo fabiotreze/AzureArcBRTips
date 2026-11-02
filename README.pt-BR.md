@@ -68,3 +68,12 @@ Atribuição sugerida: *AzureArcBRTips por Fabio Rodrigues Vieira Costa, https:/
 ## Projeto relacionado
 
 [Arc Posture Review](https://github.com/fabiotreze/arc-posture-review) é um repositório separado para avaliações pontuais de segurança do Azure Arc.
+
+## Workbooks
+
+| Projeto | O que faz | Documentação |
+|---|---|---|
+| Azure Arc – Suporte / Conformidade de versão do Agent | Versão do Connected Machine agent, situação de suporte e revisão de atualização automática | [Pasta](workbooks/arc-agent-support) |
+| SQL Server habilitado pelo Azure Arc – Prontidão PAYG | Prontidão para PAYG, tipo de licença, ESU, consentimento CSP e conectividade do SQL Server habilitado pelo Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
+
+Arquivos dos workbooks: `workbooks/arc-agent-support-workbook.json` e `workbooks/arc-sql-payg-readiness-workbook.json`.
