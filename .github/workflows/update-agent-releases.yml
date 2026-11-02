@@ -1,11 +1,9 @@
-# Keeps workbooks/arc-agent-support/agent-releases.json current. Workbooks read it at run time.
+# Keeps workbooks/arc-agent-support/agent-releases.json current. No workbook reads it today; it is kept as a reference calendar. Scheduled runs are disabled - run it manually when needed.
 # Sources: Microsoft Learn release notes + the Microsoft agent download host (see scripts/Update-AgentReleases.ps1).
 # The file is committed only when the calendar changes. On any source error the job fails and the file stays as it was.
 name: Update agent release calendar
 
 on:
-  schedule:
-    - cron: '23 */6 * * *'
   workflow_dispatch:
 
 permissions:
