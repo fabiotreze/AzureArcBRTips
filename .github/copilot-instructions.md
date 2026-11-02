@@ -20,12 +20,15 @@ Current projects: `arc-agent-support` (Connected Machine agent compliance) and `
 1. **Bilingual.** Every user-facing doc exists in English and Portuguese (pt-BR). Change one, change the other in the same commit.
 2. **Independent versions.** A project version is not a repo version. Update, together: the workbook's editorial changelog (inside the JSON), `workbooks/<project>/CHANGELOG.md`, the "Current version" line in both project READMEs, and the ARM template.
 3. **Do not hand-edit workbook JSON** (150–370 KB). Change it with a script or ask for the change to be generated; never let a tool reformat or truncate it. Always validate it parses as JSON afterwards.
-4. **The ARM template is generated from the workbook.** After any workbook change, regenerate `templates/<project>-azuredeploy.json` (clone the existing template, replace `serializedData`; keep a unique workbook ID per project) and commit both together.
+4. **The ARM template is generated from the workbook.** After any workbook change, regenerate `templates/<project>-azuredeploy.json` (clone the existing template, replace `serializedData`; set contentVersion to the project version; workbookId stays [newGuid()]) and commit both together.
 5. **Catalog.** A new or renamed project needs one row in the root `README.md` ("Project catalog" table, not a loose section) and one in `README.pt-BR.md`, with English · Português · Changelog links.
 6. **Files:** UTF-8 without BOM; Markdown tables start after a blank line; relative links only; no secrets, subscription IDs, tenant IDs or tokens anywhere (examples use placeholders).
 7. **Facts need a source.** Licensing, support and API statements must be checked against Microsoft Learn (or the cited script/CVE record) and linked. If something could not be verified, write "not verified" instead of asserting it. Do not copy Microsoft documentation text; summarize and link.
 8. **Read-only by design.** Workbooks only read (Azure Resource Graph / ARM GET). Never add actions that change customer resources.
 9. **Never push.** Prepare commits locally; the owner pushes (account differences exist). Never change history that was already pushed.
+10. **Dated facts.** Anything that can change (an API returning a version, support dates, prices) is written with "verified on <date>" and a source, never as a timeless statement.
+11. **Describe overrides exactly as implemented.** `LatestOverride`, when filled, takes priority over every other source (it is not a maximum); banners, parameter descriptions, methodology text and READMEs must say so and tell the reader to update or clear it on each release.
+12. **PowerShell safety.** `[regex]::Replace(input, pattern, replacement, 1)` treats `1` as RegexOptions.IgnoreCase, not a count; use `[regex]::new(pattern).Replace(input, replacement, 1)`. Scripts that rewrite files must back up first and say what they changed.
 
 ## Workbook design limits (learned in testing)
 - Azure Resource Graph throttles at about **15 queries per 5 seconds per user**. Keep **≤ 8–10 ARG queries visible per tab**; hide inactive tabs with conditional visibility (hidden items do not run).

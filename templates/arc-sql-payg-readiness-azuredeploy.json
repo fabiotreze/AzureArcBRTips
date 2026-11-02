@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "4.6.4.0",
+  "contentVersion": "2.2.2.0",
   "parameters": {
     "workbookDisplayName": {
       "type": "string",

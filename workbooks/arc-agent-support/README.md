@@ -6,7 +6,7 @@
 
 > ⚠️ **Personal, independent project – not an official Microsoft tool.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Support status is an **estimate** (Azure APIs do not expose release dates) – validate against the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). You are responsible for how you use it.
 
-Azure Monitor workbook for Azure Arc-enabled servers. **Current version: 4.6.4** (see the [CHANGELOG](CHANGELOG.md)). It answers three questions:
+Azure Monitor workbook for Azure Arc-enabled servers. **Current version: 4.6.7** (see the [CHANGELOG](CHANGELOG.md)). It answers three questions:
 
 1. Are my **Connected Machine agents likely within the support window and above the configured minimum version**?
 2. Is **automatic agent upgrade** enabled and working?
@@ -37,9 +37,9 @@ Controls: *Show guide* adds the legend, methodology and official sources. *Show 
 | AutoUpgradeTolerance | 1 | Heuristic, not a documented guarantee (Microsoft rolls automatic upgrades out in batches and retries failures); *On track* also requires connectivity and no failed last attempt |
 | MinAutoUpgradeVersion | 1.67 | Automatic agent upgrade requires agent 1.67 or later (Windows: PowerShell execution policy RemoteSigned; Linux: cron service) |
 | **SecurityFloorVersion** | **1.61** | Configurable minimum based on public CVE records (CVE-2026-26117 affects agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 and CVE-2025-55316 as in Arc Posture Review); applied to every OS; being at/above it does **not** certify security. Review new security fixes and this threshold regularly |
-| LatestOverride | (empty) | Force the latest version (for example one already in the release notes) when Azure does not report it yet |
+| LatestOverride | 1.69 | Manual reference taken from the agent release notes. When filled it takes priority over every other source (it is not a maximum), even if Azure reports a higher version: update or clear it after each release |
 
-*Latest* is the highest version Azure reports and can lag the newest release.
+Without an override, *Latest* is the highest version Azure reports and can lag the newest release.
 
 ## Deploy
 

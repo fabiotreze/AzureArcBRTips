@@ -6,7 +6,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
 
-Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.4** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
+Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.7** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
 
 1. Meus **Connected Machine agents provavelmente estão dentro da janela de suporte e acima do mínimo configurado**?
 2. O **upgrade automático do agent** está habilitado e funcionando?
@@ -37,9 +37,9 @@ Controles: *Mostrar guia* exibe a legenda, a metodologia e as fontes oficiais. *
 | AutoUpgradeTolerance | 1 | Heurística, não uma garantia documentada (a Microsoft libera os upgrades automáticos em lotes e repete as falhas); *On track* também exige conectividade e ausência de falha na última tentativa |
 | MinAutoUpgradeVersion | 1.67 | O upgrade automático exige agent 1.67 ou superior (Windows: execution policy do PowerShell RemoteSigned; Linux: serviço cron) |
 | **SecurityFloorVersion** | **1.61** | Mínimo configurável baseado em registros públicos de CVE (CVE-2026-26117 afeta agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 e CVE-2025-55316 como no Arc Posture Review); aplicado a todos os SOs; estar acima dele **não** atesta segurança. Revise regularmente novas correções e esse limite |
-| LatestOverride | (vazio) | Força a versão latest (por exemplo, uma já listada nas notas de versão) quando o Azure ainda não a reporta |
+| LatestOverride | 1.69 | Referência manual das notas de versão do agent. Quando preenchido, tem prioridade sobre todas as outras fontes (não é um máximo), mesmo que o Azure reporte uma versão maior: atualize ou limpe a cada release |
 
-*Latest* é a maior versão que o Azure reporta e pode ficar atrás da release mais recente.
+Sem override, *Latest* é a maior versão que o Azure reporta e pode ficar atrás da release mais recente.
 
 ## Deploy
 
