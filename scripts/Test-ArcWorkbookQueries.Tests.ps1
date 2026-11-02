@@ -3,6 +3,8 @@
 .SYNOPSIS
   Offline regression tests with mocked Azure commands; no Azure connection or Pester required.
   Testes de regressao offline com mocks; sem conexao ao Azure ou dependencia do Pester.
+  Status assertions use UTF-8 CSV; console checks use ASCII markers only.
+  Status validado pelo CSV UTF-8; verificacoes do console usam apenas marcadores ASCII.
 .EXAMPLE
   pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1
 #>
@@ -249,7 +251,7 @@ try {
       $process.WaitForExit()
       $output = $stdout.GetAwaiter().GetResult() + $stderr.GetAwaiter().GetResult()
       $csv = @(Get-ChildItem -LiteralPath $caseRoot -Filter 'results_*.csv')
-      $rows = if ($csv.Count) { @(Import-Csv -LiteralPath $csv[0].FullName) } else { @() }
+      $rows = if ($csv.Count) { @(Import-Csv -LiteralPath $csv[0].FullName -Encoding utf8) } else { @() }
       $problems = @()
       if ($process.ExitCode -ne $test.Exit) { $problems += "exit=$($process.ExitCode), expected=$($test.Exit)" }
       if ($test.Status -and -not @($rows | Where-Object Status -eq $test.Status).Count) { $problems += "missing $($test.Status) record" }
@@ -265,7 +267,7 @@ try {
       if ($test.Skipped) {
         $skipped = @($rows | Where-Object { $_.Kind -eq 'Parameter' -and $_.Status -eq 'Skipped (aguarda seleção)' })
         if ($skipped.Count -ne $test.Skipped) { $problems += "skipped=$($skipped.Count), expected=$($test.Skipped)" }
-        if (-not $output.Contains('Skipped (aguarda seleção)')) { $problems += 'skipped status missing from summary' }
+        if (-not $output.Contains('--- Awaiting row selection /')) { $problems += 'row-selection summary missing' }
       }
       if ($test.Exit -eq 0 -and @($rows | Where-Object { $_.Status -in 'FAILED', 'UnresolvedTokens' }).Count) {
         $problems += 'success case contains failures'
