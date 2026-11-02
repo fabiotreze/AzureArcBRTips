@@ -17,6 +17,13 @@
 
   Requirements: PowerShell 7+, Az.Accounts, Az.ResourceGraph, Reader on the subscriptions. Read-only: nothing is modified.
 
+  -SetParam overrides are applied before dependent parameters are resolved.
+  Exit codes: 1 for failed queries, unresolved tokens or parameter failures; otherwise 0.
+  Parameter failures are included in the CSV and the red final summary.
+  Parameters awaiting exported row-selection values are reported as skipped, not failed.
+  Drill-down parameter resolution remains strict after simulated selection.
+  Saida: 1 para falhas de consulta/parametro ou tokens nao resolvidos; caso contrario 0.
+
 .EXAMPLE
   Connect-AzAccount -Tenant <tenant-id>
   ./Test-ArcWorkbookQueries.ps1 -WorkbookPath ./arc-sql-payg-readiness-workbook.json -Language PT -Burst
@@ -154,25 +161,53 @@ function Format-ParamValue {
   ($Values | ForEach-Object { "$quote$_$quote" }) -join $delim
 }
 
+function Invoke-ParameterQuery {
+  param($Param, [hashtable]$P, [string[]]$Subs, [switch]$AllowSelectionSkip)
+  $query = Expand-Tokens $Param.query $P
+  $unresolved = @([regex]::Matches($query, '\{([A-Za-z][A-Za-z0-9_]*)\}') | ForEach-Object Value | Select-Object -Unique)
+  if ($unresolved.Count) {
+    $unknown = @($unresolved | Where-Object { -not $selectionParameters.ContainsKey($_.Substring(1, $_.Length - 2)) })
+    $skipped = $AllowSelectionSkip -and -not $unknown.Count
+    return [pscustomobject]@{
+      Ok = $false; Value = $null; N429 = 0; Skipped = $skipped; Unresolved = ($unresolved -join ' ')
+      Error = $(if ($skipped) { '' } else { "Unresolved parameter tokens: $($unresolved -join ' ')" })
+    }
+  }
+  if ($Param.queryType -eq 12) { Invoke-WithRetry { Invoke-ArmQuery -Json $query } }
+  else { Invoke-WithRetry { (Invoke-Arg -Query $query -Subs $Subs).Rows } }
+}
+
+function Add-ParameterIssue {
+  param($Param, $Result, [string]$Tab, [string]$Scenario)
+  $status = if ($Result.Skipped) { 'Skipped (aguarda seleção)' } else { 'FAILED' }
+  if ($Result.Skipped) { Write-Host "  parameter $($Param.name): $status - $($Result.Unresolved)" }
+  else { Write-Warning "Parameter $($Param.name) failed: $($Result.Error)" }
+  $results.Add([pscustomobject]@{
+    Scenario = $Scenario; Tab = $Tab; Item = $Param.name; Kind = 'Parameter'
+    QueryChars = $Param.query.Length; Status = $status; Rows = $null; Truncated = $false
+    DurationMs = 0; N429 = $Result.N429; Unresolved = [string]$Result.Unresolved; Error = $Result.Error
+  })
+}
+
 function Resolve-Parameters {
   param([hashtable]$Override = @{}, [string[]]$Subs)
   $P = @{}
   $P['Language'] = $Language
+  foreach ($k in $Override.Keys) { $P[$k] = [string]$Override[$k] }
   $options = @{}     # param name -> all option values (for filter combos)
   foreach ($pi in (Get-Flat -Items $wb.items | Where-Object { $_.Item.type -eq 9 })) {
     foreach ($prm in $pi.Item.content.parameters) {
       $name = $prm.name
-      if ($Override.ContainsKey($name)) { $P[$name] = $Override[$name]; continue }
+      if ($Override.ContainsKey($name)) { continue }
       if ($prm.type -eq 6) { $P[$name] = ($Subs -join ','); continue }
       if ($name -eq 'Language') { continue }
       if ($prm.query -and -not $DryRun) {
         if ($pi.Tab -ne 'Always') { continue }                      # lazy parameters resolve inside their tab
-        $res = if ($prm.queryType -eq 12) { Invoke-WithRetry { Invoke-ArmQuery -Json (Expand-Tokens $prm.query $P) } }
-               else { Invoke-WithRetry { (Invoke-Arg -Query (Expand-Tokens $prm.query $P) -Subs $Subs).Rows } }
-        if (-not $res.Ok) { Write-Warning "Parameter $name failed: $($res.Error)"; $P[$name] = ''; continue }
+        $res = Invoke-ParameterQuery -Param $prm -P $P -Subs $Subs -AllowSelectionSkip
+        if (-not $res.Ok) { Add-ParameterIssue -Param $prm -Result $res -Tab $pi.Tab -Scenario 'parameters'; continue }
         $rows = @($res.Value)
         $first = if ($rows.Count) { ($rows[0].PSObject.Properties | Select-Object -First 1).Name } else { $null }
-        $vals = if ($first) { @($rows | ForEach-Object { [string]$_.$first }) } else { @() }
+        $vals = @(if ($first) { $rows | ForEach-Object { [string]$_.$first } })
         Write-Host ('  parameter {0}: {1} value(s)' -f $name, $vals.Count)
         if ($prm.type -eq 2) {
           $options[$name] = $vals
@@ -192,7 +227,6 @@ function Resolve-Parameters {
       }
     }
   }
-  $P['Language'] = $Language
   [pscustomobject]@{ P = $P; Options = $options }
 }
 
@@ -205,7 +239,7 @@ function Invoke-OneItem {
   $unresolved = [regex]::Matches($q, '\{([A-Za-z][A-Za-z0-9_]*)\}') | ForEach-Object { $_.Value } | Select-Object -Unique
   $rec = [ordered]@{ Scenario = $Scenario; Tab = $Tab; Item = $name; Kind = $(if ($isArm) { 'ARM' } else { 'ARG' }); QueryChars = $q.Length
                      Status = 'Skipped'; Rows = $null; Truncated = $false; DurationMs = 0; N429 = 0; Unresolved = ($unresolved -join ' '); Error = '' }
-  if ($DryRun) { $rec.Status = $(if ($unresolved) { 'UnresolvedTokens' } else { 'DryRunOK' }); $results.Add([pscustomobject]$rec); return }
+  if ($DryRun -or $unresolved) { $rec.Status = $(if ($unresolved) { 'UnresolvedTokens' } else { 'DryRunOK' }); $results.Add([pscustomobject]$rec); return }
   $res = if ($isArm) { Invoke-WithRetry { Invoke-ArmQuery -Json $q } } else { Invoke-WithRetry { Invoke-Arg -Query $q -Subs $Subs } }
   $sw.Stop(); $rec.DurationMs = [int]$sw.ElapsedMilliseconds; $rec.N429 = $res.N429
   if ($res.Ok) {
@@ -221,19 +255,30 @@ function Invoke-OneItem {
 function Invoke-Tab {
   param([string]$Tab, $Flat, [hashtable]$P, [string[]]$Subs, [string]$Scenario)
   $P['SelectedTab'] = $Tab
-  $queue = @($Flat | Where-Object { ($_.Tab -eq 'Always' -or $_.Tab -eq $Tab) -and $_.Item.type -eq 3 -and (Test-Visible $_.Item $P) })
   # lazy (in-tab) parameters
-  foreach ($pi in ($Flat | Where-Object { $_.Tab -eq $Tab -and $_.Item.type -eq 9 })) {
+  foreach ($pi in ($Flat | Where-Object { $Tab -ne 'Always' -and $_.Tab -eq $Tab -and $_.Item.type -eq 9 })) {
     foreach ($prm in $pi.Item.content.parameters) {
-      if ($DryRun -or -not $prm.query) { continue }
-      $res = if ($prm.queryType -eq 12) { Invoke-WithRetry { Invoke-ArmQuery -Json (Expand-Tokens $prm.query $P) } } else { Invoke-WithRetry { (Invoke-Arg -Query (Expand-Tokens $prm.query $P) -Subs $Subs).Rows } }
+      if ($DryRun -or -not $prm.query -or $SetParam.ContainsKey($prm.name)) { continue }
+      $res = Invoke-ParameterQuery -Param $prm -P $P -Subs $Subs -AllowSelectionSkip
       if ($res.Ok) { $rows = @($res.Value); $first = if ($rows.Count) { ($rows[0].PSObject.Properties | Select-Object -First 1).Name } ; $P[$prm.name] = if ($first) { [string]$rows[0].$first } else { '' } }
+      else { $P.Remove($prm.name); Add-ParameterIssue -Param $prm -Result $res -Tab $Tab -Scenario $Scenario }
     }
   }
+  $queue = @($Flat | Where-Object { ($_.Tab -eq 'Always' -or $_.Tab -eq $Tab) -and $_.Item.type -eq 3 -and (Test-Visible $_.Item $P) })
   if ($Burst -and -not $DryRun) {
+    $items = @(
+      foreach ($q in $queue) {
+        $text = Expand-Tokens $q.Item.content.query $P
+        if ($text -match '\{([A-Za-z][A-Za-z0-9_]*)\}') {
+          [void](Invoke-OneItem -Tab $Tab -Item $q.Item -P $P -Subs $Subs -Scenario ($Scenario + '|burst'))
+        } else {
+          [pscustomobject]@{ Name = $q.Item.name; IsArm = ($q.Item.content.queryType -eq 12); Text = $text }
+        }
+      }
+    )
+    if (-not $items.Count) { return }
     $tok = (Get-AzAccessToken -ResourceUrl 'https://management.azure.com').Token
     if ($tok -is [securestring]) { $tok = [System.Net.NetworkCredential]::new('', $tok).Password }
-    $items = @($queue | ForEach-Object { [pscustomobject]@{ Name = $_.Item.name; IsArm = ($_.Item.content.queryType -eq 12); Text = (Expand-Tokens $_.Item.content.query $P) } })
     Write-Host ("  burst on tab {0}: {1} queries at the same time" -f $Tab, $items.Count)
     $out = $items | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
       $it = $_; $token = $using:tok; $subs = $using:Subs; $max = $using:MaxRetries
@@ -283,11 +328,18 @@ if (-not $DryRun) {
 } else { if (-not $Subscriptions) { $Subscriptions = @('00000000-0000-0000-0000-000000000000') } }
 
 $flat = @(Get-Flat -Items $wb.items)
+$selectionParameters = @{}
+foreach ($query in ($flat | Where-Object { $_.Item.type -eq 3 })) {
+  $content = $query.Item.content
+  foreach ($export in $content.exportedParameters) {
+    if ($export.fieldName -and $export.parameterName) { $selectionParameters[$export.parameterName] = $true }
+  }
+  if ($content.exportFieldName -and $content.exportParameterName) { $selectionParameters[$content.exportParameterName] = $true }
+}
 $tabs = @($flat | Where-Object { $_.Tab -ne 'Always' } | Select-Object -ExpandProperty Tab -Unique)
 if (-not $tabs) { $tabs = @('Always') }
-$base = Resolve-Parameters -Subs $Subscriptions
-foreach ($k in @($SetParam.Keys)) { $base.P[$k] = [string]$SetParam[$k] }
-Write-Host "Workbook: $WorkbookPath | tabs: $($tabs -join ', ') | language: $Language | subscriptions: $($Subscriptions.Count)"
+$base = Resolve-Parameters -Override $SetParam -Subs $Subscriptions
+Write-Host "Workbook: $WorkbookPath | tabs: $($tabs -join ', ') | language: $($base.P['Language']) | subscriptions: $($Subscriptions.Count)"
 
 foreach ($t in $tabs) { Invoke-Tab -Tab $t -Flat $flat -P ($base.P.Clone()) -Subs $Subscriptions -Scenario 'default' }
 
@@ -317,9 +369,11 @@ if ($ExtensionDrill -gt 0 -and -not $DryRun) {
       $P = $base.P.Clone(); $P['SelectedTab'] = 'Extensions'
       $P['ExtPublisher'] = [string]$r.Publisher; $P['ExtType'] = [string]$r.ExtensionType; $P['ExtLocation'] = [string]$r.Location; $P['ExtTargetVersion'] = 'latest'
       foreach ($n in 'ExtAvailable','ExtAvailableJson') {
+        if ($SetParam.ContainsKey($n)) { continue }
         $pdef = ($flat | Where-Object { $_.Item.type -eq 9 } | ForEach-Object { $_.Item.content.parameters } | Where-Object name -eq $n | Select-Object -First 1)
-        $x = Invoke-WithRetry { Invoke-ArmQuery -Json (Expand-Tokens $pdef.query $P) }
-        $P[$n] = if ($x.Ok) { (@($x.Value | ForEach-Object { $_.value; $_.v }) | Where-Object { $_ }) -join ',' } else { '' }
+        $x = Invoke-ParameterQuery -Param $pdef -P $P -Subs $Subscriptions
+        if ($x.Ok) { $P[$n] = (@($x.Value | ForEach-Object { $_.value; $_.v }) | Where-Object { $_ }) -join ',' }
+        else { $P.Remove($n); Add-ParameterIssue -Param $pdef -Result $x -Tab 'Extensions' -Scenario "drill:$($P['ExtType'])" }
       }
       foreach ($q in ($flat | Where-Object { $_.Tab -eq 'Extensions' -and $_.Item.type -eq 3 -and (Test-Visible $_.Item $P) })) {
         [void](Invoke-OneItem -Tab 'Extensions' -Item $q.Item -P $P -Subs $Subscriptions -Scenario "drill:$($P['ExtType'])")
@@ -340,7 +394,17 @@ $all | Where-Object { $_.Scenario -like 'default*' } | Group-Object Tab | ForEac
                      Got429 = ($_.Group | Where-Object { $_.N429 -gt 0 }).Count; MaxMs = ($_.Group | Measure-Object DurationMs -Maximum).Maximum
                      Empty = ($_.Group | Where-Object { $_.Status -like 'OK*' -and $_.Rows -eq 0 }).Count; Truncated = ($_.Group | Where-Object Truncated).Count }
 } | Format-Table -AutoSize
+$waiting = @($all | Where-Object Status -eq 'Skipped (aguarda seleção)')
+if ($waiting.Count) {
+  Write-Host '--- Awaiting row selection / Aguarda seleção ---'
+  Write-Host ($waiting | Select-Object Scenario, Tab, Item, Status, Unresolved | Format-Table -AutoSize | Out-String)
+}
 $bad = @($all | Where-Object { $_.Status -in 'FAILED','UnresolvedTokens' })
-if ($bad.Count) { Write-Host 'PROBLEMS:' -ForegroundColor Red; $bad | Select-Object Scenario, Tab, Item, Status, Unresolved, Error | Format-List } else { Write-Host 'No failed queries.' -ForegroundColor Green }
+if ($bad.Count) {
+  Write-Host 'PROBLEMS:' -ForegroundColor Red
+  Write-Host ($bad | Select-Object Scenario, Tab, Kind, Item, Status, Unresolved, Error | Format-List | Out-String) -ForegroundColor Red
+} else { Write-Host 'No failed queries or parameter failures.' -ForegroundColor Green }
 $t429 = ($all | Measure-Object N429 -Sum).Sum
 Write-Host "Total 429 responses observed: $t429  (0 expected for -Burst per tab; if > 0 reduce queries per tab or stagger)"
+if ($bad.Count) { exit 1 }
+exit 0
