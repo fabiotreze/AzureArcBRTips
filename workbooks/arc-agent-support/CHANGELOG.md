@@ -1,6 +1,7 @@
 # Changelog – Arc Agent Support Workbook
 |Version|Date|Description|
 |---|---|---|
+|v4.6.9|2026-11-03|**Revision tracking:** new editorial row references the currently published Azure revision `8fcdca84b78947658b3772b694036d0d`; missing historical IDs are explicitly marked *Not recovered / Não recuperada*. Corrected the before-save workflow (EN/PT), synchronized the deployment template and updated the guides. No query changed; GitHub publication does not update the deployed workbook.|
 |v4.6.8|2026-11-02|**Row limits:** the *extension servers*, *auto-upgrade attempts*, *extensions*, *policy* and *Advisor summary* tables now show up to 1000 rows (portal default is 250), so large fleets are not cut silently. No query changed.|
 |v4.6.7|2026-11-02|**Latest override has priority over every other source** (it is not a maximum): when filled, it is the reference version even if the catalog API or the Azure auto-upgrade target report a higher one. Banner, parameter description and methodology text corrected; update or clear the field after each release. No query changed.|
 |v4.6.6|2026-11-02|**Override banner highlighted:** warning-style box with heading, effect and how to clear it (EN/PT). No query changed.|
@@ -26,3 +27,17 @@
 |v3.1.0|2026-10-25|- **Fix**: ParserFailure in *Official latest vs fleet*.<br>- **Latest model**: catalog API proved paged/incomplete (did not return 1.68) – latest now = max(Azure auto-upgrade target, catalog API, optional fleet max, optional override) with *LatestSource* column.<br>- Versions behind = sequential minor distance; per-machine catalog join simplified (no row explosion).<br>- Policy: per-machine de-duplication, initiative reference ID as readable name.|
 |v3.0.0|2026-10-25|- **Official source of truth**: latest/catalog read from ARM the agent catalog API per OS (Windows/Linux) instead of the fleet maximum.<br>- Versions behind = count of newer official releases; catalog match column (listed / older / newer / gap) and catalog sanity check.<br>- Auto-upgrade: eligibility (min version parameter), health (On track / Lagging / Failing / Blocked), desired vs official latest, last attempt details.<br>- New sections: Azure Advisor (Arc recommendations, cross-check with version status), Azure Policy compliance, VM extensions, data freshness.<br>- Dynamic OS and connection-status filters; all thresholds exposed as parameters; KPI tiles consolidated in one query.<br>- Fix: notes/changelog were permanently hidden (referenced non-existent parameters).|
 |v2.1.0|2026-08-25|Fleet-based latest detection (superseded).|
+
+## Azure revision tracking
+
+The embedded editorial history uses **Previous published revision**: the Azure revision published immediately before a new editorial update. Azure assigns revision IDs automatically on save; they are not editorial version numbers, resource IDs or Git commits.
+
+1. Before publishing, read the current revision from the target workbook's Azure revision history.
+2. Add the new editorial row with UTC date/time, version, description and that current revision ID.
+3. Keep workbook JSON, deployment template, guides and this changelog synchronized.
+4. Save/publish to Azure and verify the new content and revision. Use that new ID for the next update.
+5. Publish the matching files to GitHub. A GitHub push alone does not update Azure.
+
+**Not recovered / Não recuperada** identifies older IDs that were not recorded and could not be recovered from the available Azure history. Existing recorded IDs are preserved. The recorded IDs refer to the reference deployment; other deployments have their own resource and revision IDs.
+
+**Português:** antes de publicar, consulte a revisão atual no histórico do workbook no Azure e registre esse ID na nova linha editorial, com data/hora UTC, versão e descrição. Sincronize JSON, template, guias e changelog. Após salvar/publicar no Azure, confira o conteúdo e o novo ID, que será usado na próxima atualização. Publique os arquivos correspondentes no GitHub; o push não atualiza o Azure. IDs históricos não recuperados são identificados explicitamente, sem inventar valores. Os IDs registrados pertencem à implantação de referência.

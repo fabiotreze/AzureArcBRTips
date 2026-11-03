@@ -4,9 +4,11 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.2.2 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** somente leitura (Azure Resource Graph; nada é alterado no seu ambiente)
+**Versão:** 2.2.3 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** somente leitura (Azure Resource Graph; nada é alterado no seu ambiente)
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
+
+Para publicar, siga o [fluxo de registro de revisões](CHANGELOG.md#azure-revision-tracking). Registre a revisão atualmente publicada no Azure na nova linha editorial **antes** de salvar; o Azure gera a próxima revisão automaticamente. Publicar no GitHub, por si só, não atualiza um workbook implantado.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Ffabiotreze%2FAzureArcBRTips%2Fmain%2Ftemplates%2Farc-sql-payg-readiness-azuredeploy.json)
 

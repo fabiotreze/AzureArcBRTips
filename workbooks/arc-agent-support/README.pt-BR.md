@@ -6,7 +6,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
 
-Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.8** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
+Workbook do Azure Monitor para servidores habilitados pelo Azure Arc. **Versão atual: 4.6.9** (veja o [CHANGELOG](CHANGELOG.md)). Responde três perguntas:
 
 1. Meus **Connected Machine agents provavelmente estão dentro da janela de suporte e acima do mínimo configurado**?
 2. O **upgrade automático do agent** está habilitado e funcionando?
@@ -28,6 +28,8 @@ O suporte é estimado por número de releases sequenciais, não por datas verifi
 | 8 | Extensões | Todas as extensões: cobertura de upgrade automático, versões vs. publicadas pelo Azure, problemas agrupados por causa com todos os servidores afetados |
 
 Controles: *Mostrar guia* exibe a legenda, a metodologia e as fontes oficiais. *Exibir histórico* (modo Edit) mostra o histórico editorial dentro do workbook.
+
+Para publicar, siga o [fluxo de registro de revisões](CHANGELOG.md#azure-revision-tracking). Registre a revisão atualmente publicada no Azure na nova linha editorial **antes** de salvar; o Azure gera a próxima revisão automaticamente. Publicar no GitHub, por si só, não atualiza um workbook implantado.
 
 ## Regras (editáveis no modo Edit)
 
