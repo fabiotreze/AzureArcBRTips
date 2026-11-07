@@ -6,7 +6,9 @@
 
 For a suspected vulnerability in this repository, **do not open a public issue** or post exploit details in a pull request.
 
-If private vulnerability reporting is enabled, use **Security → Report a vulnerability** on [GitHub](https://github.com/fabiotreze/AzureArcBRTips/security). If the option is unavailable, contact the maintainer through a private channel you already trust to arrange secure disclosure. Do not post the vulnerability publicly to request contact.
+Use GitHub's [private vulnerability report form](https://github.com/fabiotreze/AzureArcBRTips/security/advisories/new), also available under **Security → Advisories → Report a vulnerability**. Private vulnerability reporting was verified as enabled on 2026-11-06. See [GitHub's configuration guide](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository).
+
+If the form is unavailable, do not move the report to a public issue or pull request. Arrange disclosure only through a trusted private channel already known to you; otherwise, withhold sensitive details until a private channel is available.
 
 Provide the affected project, file and version or commit, impact, and sanitized reproduction steps privately. Never include access tokens, credentials, tenant data or environment reports.
 
@@ -22,7 +24,9 @@ Review artifacts before use, apply least privilege and keep exports and validati
 
 Para suspeitas de vulnerabilidade neste repositório, **não abra issue pública** nem publique detalhes de exploração em pull requests.
 
-Se o reporte privado estiver habilitado, use **Security → Report a vulnerability** no [GitHub](https://github.com/fabiotreze/AzureArcBRTips/security). Se a opção não estiver disponível, procure o mantenedor por um canal privado de confiança que você já conheça para combinar a divulgação segura. Não publique a vulnerabilidade para solicitar contato.
+Use o [formulário privado de reporte de vulnerabilidades do GitHub](https://github.com/fabiotreze/AzureArcBRTips/security/advisories/new), também disponível em **Security → Advisories → Report a vulnerability**. O recurso foi verificado como habilitado em 2026-11-06. Consulte o [guia de configuração do GitHub](https://docs.github.com/en/code-security/how-tos/report-and-fix-vulnerabilities/configure-vulnerability-reporting/configure-for-a-repository).
+
+Se o formulário estiver indisponível, não transfira o relato para uma issue ou pull request pública. Combine a divulgação somente por um canal privado de confiança que você já conheça; caso contrário, aguarde um canal privado disponível antes de compartilhar detalhes sensíveis.
 
 Envie em privado o projeto, arquivo e versão ou commit afetados, o impacto e os passos de reprodução sem dados sensíveis. Nunca inclua tokens, credenciais, dados do tenant ou relatórios do ambiente.
 

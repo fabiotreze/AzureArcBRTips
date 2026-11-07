@@ -10,7 +10,8 @@
        header is the publication date. Versions after the newest one in the release notes are probed too, so a build is
        detected as soon as Microsoft publishes it, before the notes page is updated.
 
-  The result is written to a small JSON file that workbooks can read at run time (raw.githubusercontent.com sends CORS headers).
+  The result is written to a JSON reference calendar. No current workbook reads this file;
+  updating it does not change workbook compliance rules or reference versions.
   The file is rewritten only when the calendar changes. If a source cannot be read or the data looks inconsistent, the script
   fails and leaves the existing file untouched. Read-only against Microsoft; no credentials needed.
 

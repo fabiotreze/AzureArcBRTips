@@ -79,6 +79,11 @@ if ($Worker) {
     [Console]::WriteLine("ARM_PATH=$Path")
     if ($Case -eq 'selection-drill-failure' -and $Path -like '/selected/*') { throw 'Mock selected extension failure' }
     if ($Path -like '/fail-*') { throw "Mock error: $Path" }
+    if ($Case -eq 'arm-array-paged-aggregate') {
+      $body = @{ value = @(@{ properties = @{ version = $(if ($Path -like '/catalog*') { '1.68' } else { '1.69' }) } }) }
+      if ($Path -like '/catalog*') { $body.nextLink = 'https://management.azure.com/next' }
+      return [pscustomobject]@{ StatusCode = 200; Content = ($body | ConvertTo-Json -Depth 10) }
+    }
     if ($Case -like 'arm-paging-*') {
       $body = @{ value = @(@{ value = 'first' }) }
       if ($Path -like '/catalog*' -or $Case -eq 'arm-paging-cycle') { $body.nextLink = 'https://management.azure.com/next' }
@@ -136,8 +141,24 @@ if ($Worker) {
     }
     { $_ -like 'arm-paging-*' } {
       $query = New-ArmQuery '/catalog'
-      if ($Case -ne 'arm-paging-get') { $query = $query.Replace('"GET"', '"GETARRAY"') }
+      if ($Case -ne 'arm-paging-get') {
+        $query = $query.Replace('"GET"', '"GETARRAY"')
+        if ($Case -ne 'arm-paging-envelope') { $query = $query.Replace('"tablePath":"$.value"', '"tablePath":"$[*]"') }
+      }
       $items = @([pscustomobject]@{ type = 3; name = 'arm'; content = @{ queryType = 12; query = $query } })
+    }
+    'arm-array-single-page' {
+      $query = (New-ArmQuery '/single').Replace('"GET"', '"GETARRAY"').Replace('"tablePath":"$.value"', '"tablePath":"$[*]"')
+      $parameters = @(New-Parameter 'Catalog' $query '' 12)
+      $items = @(New-Query 'observe:{Catalog}')
+    }
+    { $_ -in 'arm-array-aggregate','arm-array-paged-aggregate' } {
+      $query = New-ArmQuery $(if ($Case -eq 'arm-array-paged-aggregate') { '/catalog' } else { '/single' }) | ConvertFrom-Json -Depth 20
+      $query.method = 'GETARRAY'
+      $query.transformers[0].settings.tablePath = '$'
+      $query.transformers[0].settings.columns[0].path = '$[*].properties.version'
+      $parameters = @(New-Parameter 'Catalog' ($query | ConvertTo-Json -Depth 20 -Compress) '' 12)
+      $items = @(New-Query 'observe:{Catalog}')
     }
     'failed-query' { $items = @(New-Query 'fail-query') }
     'failed-query-whitespace' { $items = @(New-Query 'fail-whitespace') }
@@ -286,7 +307,11 @@ $cases = @(
   @{ Name = 'nested-language'; Exit = 0; Forbidden = 'ARG_CALL=fail-hidden' },
   @{ Name = 'arm-paging-get'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'arm-paging-array'; Exit = 0; Rows = 2 },
+  @{ Name = 'arm-paging-envelope'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'arm-paging-cycle'; Exit = 1; Status = 'FAILED' },
+  @{ Name = 'arm-array-single-page'; Exit = 0; Observed = '1.69' },
+  @{ Name = 'arm-array-aggregate'; Exit = 0; Observed = '1.69' },
+  @{ Name = 'arm-array-paged-aggregate'; Exit = 0; Observed = '1.68,1.69' },
   @{ Name = 'failed-query'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'failed-query-whitespace'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'unresolved-dry'; Exit = 1; Status = 'UnresolvedTokens' },
@@ -424,6 +449,16 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness') {
     }
   }
   if ($project -eq 'arc-agent-support') {
+    $catalog = ($parameters | Where-Object name -eq 'ExtAvailable').query | ConvertFrom-Json -Depth 50
+    $catalogJson = ($parameters | Where-Object name -eq 'ExtAvailableJson').query | ConvertFrom-Json -Depth 50
+    if ($catalog.transformers[0].settings.tablePath -ne '$[*]' -or
+        $catalogJson.transformers[0].settings.columns[0].path -ne '$[*].properties.version') {
+      throw 'Extension GETARRAY transformers must read the root array.'
+    }
+    $detailQuery = ($items | Where-Object name -eq 'ext-detail').content.query
+    if ($detailQuery -notmatch "case\(availCount == 0, 'Unknown" -or $detailQuery.Contains('Auto-upgrade will move it')) {
+      throw 'Extension upgrade outlook must preserve catalog uncertainty and avoid upgrade guarantees.'
+    }
     if (@($parameters | Where-Object name -match '^Released(Windows|Linux)[234]$').Count) { throw 'Unstable agent list samples returned.' }
     foreach ($name in 'ReleasedWindows','ReleasedLinux') {
       $arm = ($parameters | Where-Object name -eq $name).query | ConvertFrom-Json -Depth 50

@@ -9,7 +9,7 @@ Version: ${input:version:e.g. 2.3.0}
 What changed (one line, English): ${input:change:Short summary}
 
 Do the following, in order, and report each step:
-1. Check that these exist and list any that are missing: `workbooks/${input:project}-workbook.json`, `workbooks/${input:project}/README.md`, `README.pt-BR.md`, `CHANGELOG.md`, `templates/${input:project}-azuredeploy.json`.
+1. Check that these exist and list any that are missing: `workbooks/${input:project}-workbook.json`, `workbooks/${input:project}/README.md`, `workbooks/${input:project}/README.pt-BR.md`, `workbooks/${input:project}/CHANGELOG.md`, `templates/${input:project}-azuredeploy.json`.
 2. Do NOT edit the workbook JSON. If it needs a change, write a script and ask me to run it.
 3. Update `workbooks/${input:project}/CHANGELOG.md` with a new top entry for the version and date (today), and the "Current version" line in both project READMEs.
 4. Make sure the root `README.md` and `README.pt-BR.md` "Project catalog" tables have one row for this project (add if missing, same format as the other rows).

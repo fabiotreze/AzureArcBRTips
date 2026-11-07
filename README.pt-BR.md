@@ -25,7 +25,7 @@ O catálogo lista os projetos disponíveis atualmente neste repositório. Novos 
 3. Revise o código e os templates de implantação antes de executar.
 4. Teste fora de produção e avalie custos do Azure e políticas da organização.
 
-Para o workbook atual, o [guia do projeto](workbooks/arc-agent-support/README.pt-BR.md) contém o botão **Deploy to Azure**, a importação manual, as regras configuráveis e os comandos de validação. Suas consultas são somente leitura, mas implantá-lo ou salvá-lo cria ou atualiza um recurso de workbook. Não presuma que projetos futuros serão somente leitura; confira o comportamento documentado em cada projeto.
+Para cada workbook, os guias vinculados no [catálogo de projetos](#catálogo-de-projetos) contêm o botão **Deploy to Azure**, a importação manual, as regras configuráveis e os comandos de validação. As consultas dos workbooks atuais são somente leitura, mas implantar ou salvar um workbook cria ou atualiza um recurso de workbook. Não presuma que projetos futuros serão somente leitura; confira o comportamento documentado em cada projeto.
 
 ## Estrutura
 

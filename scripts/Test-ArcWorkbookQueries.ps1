@@ -1,11 +1,14 @@
 <#
 .SYNOPSIS
-  End-to-end test harness for Azure Workbooks (.workbook JSON) that use Azure Resource Graph (ARG) and ARM (queryType 12).
+  Query validation harness for Azure Workbooks (.workbook JSON) that use Azure Resource Graph (ARG) and ARM (queryType 12).
 
 .DESCRIPTION
   Reads a workbook file, resolves supported static, ARG-backed and ARM-backed parameters,
-  parameters), then runs every query of every tab / section against YOUR tenant and writes a CSV + summary:
-  status, row count, duration, 429 count, retries, truncation (1000 rows), error text.
+  then runs visible queries across all tabs / sections against YOUR tenant and writes a CSV + summary:
+  status, row count, duration, 429 count, retries, completeness, error text.
+  ARG pages are collected up to 10,000 rows. Response metadata determines completeness;
+  partial results are INCOMPLETE and fail the run, including when continuation is unavailable.
+  This validates queries and simulated selections, not portal rendering or actual navigation clicks.
 
   Modes
     -DryRun        No Azure call. Parses, resolves tokens, evaluates visibility, counts queries per tab (offline lint).
@@ -25,7 +28,7 @@
   Parameter failures are included in the CSV and the red final summary.
   Parameters awaiting exported row-selection values are reported as skipped, not failed.
   Drill-down parameter resolution remains strict after simulated selection.
-  Saida: 1 para falhas de consulta/parametro ou tokens nao resolvidos; caso contrario 0.
+  Saida: 1 para falhas de consulta/parametro, resultados incompletos ou tokens nao resolvidos; caso contrario 0.
 
 .EXAMPLE
   Connect-AzAccount -Tenant <tenant-id>
@@ -168,21 +171,27 @@ function Invoke-ArmQuery {
     }
     if ($pages.Count -ge 100 -and $next) { throw 'ARM paging exceeded 100 pages.' }
   } while ($next)
-  if ($pages.Count -gt 1) {
-    $body = [pscustomobject]@{ value = @($pages | ForEach-Object { $_.value }) }
+  if ($q.method -eq 'GETARRAY') {
+    foreach ($page in $pages) {
+      if (-not $page.PSObject.Properties['value']) { throw 'ARM GETARRAY requires a value array on every page.' }
+    }
+    $body = @($pages | ForEach-Object { $_.value })
   }
   $tr = $q.transformers | Select-Object -First 1
   $tp = $tr.settings.tablePath
   $rows = @()
+  if ($q.method -eq 'GETARRAY' -and $tp -eq '$.value') { throw 'GETARRAY returns a root array; use $[*], not $.value.' }
   if ($tp -eq '$.value') { $rows = @($body.value) }
+  elseif ($tp -eq '$[*]') { $rows = @($body) }
   elseif ($tp -match '^\$\.value\[\?\(@\.agentVersion >= ''(.*)''\)\]$') {
     $min = $Matches[1]; $rows = @($body.value | Where-Object { $_.agentVersion -ge $min })
-  } elseif ($tp -eq '$') { $rows = @($body) }
-  else { $rows = @($body.value) }
+  } elseif ($tp -eq '$') { $rows = @(,$body) }
+  else { throw "Unsupported ARM table JSONPath: $tp" }
   $out = foreach ($r in $rows) {
     $o = [ordered]@{}
     foreach ($c in $tr.settings.columns) {
       $path = $c.path -replace '^\$\.', ''
+      if ($c.path -eq '$[*].properties.version') { $o[$c.columnid] = @($body | ForEach-Object { $_.properties.version }) -join ','; continue }
       if ($path -like 'value[[]*].*') { $o[$c.columnid] = @($body.value | ForEach-Object { ($_ | Select-Object -ExpandProperty properties).version }) -join ','; continue }
       $cur = $r; foreach ($seg in $path.Split('.')) { if ($null -ne $cur) { $cur = $cur.$seg } }
       $o[$c.columnid] = $cur

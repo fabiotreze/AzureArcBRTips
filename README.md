@@ -25,7 +25,7 @@ The catalog lists projects currently available in this repository. Future projec
 3. Review the code and any deployment template before running it.
 4. Test outside production and assess Azure costs and organizational policies.
 
-For the current workbook, the [project guide](workbooks/arc-agent-support/README.md) includes the **Deploy to Azure** button, manual import, configurable rules and validation commands. Its queries are read-only, but deploying or saving it creates or updates a workbook resource. Do not assume future projects are read-only; check each project's documented behavior.
+For each workbook, the guides linked in the [project catalog](#project-catalog) include the **Deploy to Azure** button, manual import, configurable rules and validation commands. The current workbooks' queries are read-only, but deploying or saving a workbook creates or updates a workbook resource. Do not assume future projects are read-only; check each project's documented behavior.
 
 ## Repository
 
