@@ -31,6 +31,7 @@ if ($Worker) {
   function Invoke-RestMethod { throw 'HTTP requests are disabled in tests' }
   function Search-AzGraph {
     param($Query, $First, $Subscription, $SkipToken, $ErrorAction)
+    if ($Query -eq 'fail-whitespace') { throw ('Mock error:' + (' ' * 500) + 'details') }
     if ($Query -like 'fail-*') { [Console]::WriteLine("FAILED_PARAMETER_QUERY=$Query"); throw "Mock error: $Query" }
     if ($Query -like 'derive:*') {
       [pscustomobject]@{ value = $Query.Substring(7) }
@@ -40,6 +41,9 @@ if ($Worker) {
       [pscustomobject]@{ value = $Query.Substring(8) }
     } elseif ($Query -eq 'extensions') {
       [pscustomobject]@{ Publisher = 'MockPublisher'; ExtensionType = 'MockType'; Location = 'MockLocation' }
+    } elseif ($Query -eq 'choices') {
+      [pscustomobject]@{ value = 'first'; selected = $false }
+      [pscustomobject]@{ value = 'chosen'; selected = $true }
     } elseif ($Case -like 'workbook-*') {
       [pscustomobject]@{ value = '1.69' }
     } elseif ($Query -ne 'empty') {
@@ -47,10 +51,39 @@ if ($Worker) {
     }
   }
   function Invoke-AzRestMethod {
-    param($Method, $Path, $ErrorAction)
+    param($Method, $Path, $Payload, $ErrorAction)
+    if ($Path -like '/providers/Microsoft.ResourceGraph/resources?*') {
+      $request = $Payload | ConvertFrom-Json
+      $query = $request.query
+      [Console]::WriteLine("ARG_CALL=$query")
+      $data = @(Search-AzGraph -Query $query)
+      $total = $data.Count; $truncated = $false; $skip = $null
+      switch ($query) {
+        'paged' {
+          $data = if ($request.options.'$skipToken') { @(@{ value = 'third' }) } else { @(@{ value = 'first' }, @{ value = 'second' }) }
+          $total = 3
+          if (-not $request.options.'$skipToken') { $skip = 'page2'; $truncated = $true }
+        }
+        'incomplete' { $total = 1001; $truncated = $true }
+        'exact-cap' {
+          $offset = [int]$request.options.'$skipToken'
+          $data = @(1..1000 | ForEach-Object { @{ value = $offset + $_ } }); $total = 10000
+          if ($offset -lt 9000) { $skip = [string]($offset + 1000); $truncated = $true }
+        }
+        'repeated-token' { $total = 10000; $skip = 'repeat'; $truncated = $true }
+      }
+      $body = @{ count = $data.Count; totalRecords = $total; data = $data; resultTruncated = $truncated }
+      if ($skip) { $body.'$skipToken' = $skip }
+      return [pscustomobject]@{ StatusCode = 200; Content = ($body | ConvertTo-Json -Depth 20) }
+    }
     [Console]::WriteLine("ARM_PATH=$Path")
     if ($Case -eq 'selection-drill-failure' -and $Path -like '/selected/*') { throw 'Mock selected extension failure' }
     if ($Path -like '/fail-*') { throw "Mock error: $Path" }
+    if ($Case -like 'arm-paging-*') {
+      $body = @{ value = @(@{ value = 'first' }) }
+      if ($Path -like '/catalog*' -or $Case -eq 'arm-paging-cycle') { $body.nextLink = 'https://management.azure.com/next' }
+      return [pscustomobject]@{ StatusCode = 200; Content = ($body | ConvertTo-Json -Depth 10) }
+    }
     [pscustomobject]@{
       StatusCode = 200
       Content = '{"osType":"windows","agentVersion":"1.69","downloadLink":"https://example.com/agent","value":[{"value":"1.69","agentVersion":"1.69","properties":{"version":"1.69"}}]}'
@@ -77,7 +110,37 @@ if ($Worker) {
   switch ($Case) {
     'success' { $items = @(New-Query 'ok') }
     'empty-success' { $items = @(New-Query 'empty') }
+    'arg-paged' { $items = @(New-Query 'paged') }
+    'arg-incomplete' { $items = @(New-Query 'incomplete') }
+    'arg-exact-cap' { $items = @(New-Query 'exact-cap') }
+    'arg-repeated-token' { $items = @(New-Query 'repeated-token') }
+    'arg-parameter-incomplete' { $parameters = @(New-Parameter 'Incomplete' 'incomplete') }
+    'cached-query' {
+      $items = @((New-Query 'ok' 'first'), (New-Query 'ok' 'second'))
+      $arguments.CacheQueries = $true
+    }
+    'subset-combinations' {
+      $parameters = @([pscustomobject]@{
+        name = 'OsFilter'; type = 2; multiSelect = $true; quote = "'"; delimiter = ','
+        value = @('value::all'); jsonData = '["windows","linux"]'; typeSettings = @{ selectAllValue = 'All' }
+      })
+      $items = @(New-Query 'observe:{OsFilter}')
+      $arguments.FilterCombos = 'Subsets'
+    }
+    'nested-language' {
+      $items = @([pscustomobject]@{
+        type = 12; conditionalVisibility = @{ parameterName = 'Language'; comparison = 'isEqualTo'; value = 'EN' }
+        content = @{ items = @(New-Query 'fail-hidden') }
+      })
+      $arguments.Language = 'PT'
+    }
+    { $_ -like 'arm-paging-*' } {
+      $query = New-ArmQuery '/catalog'
+      if ($Case -ne 'arm-paging-get') { $query = $query.Replace('"GET"', '"GETARRAY"') }
+      $items = @([pscustomobject]@{ type = 3; name = 'arm'; content = @{ queryType = 12; query = $query } })
+    }
     'failed-query' { $items = @(New-Query 'fail-query') }
+    'failed-query-whitespace' { $items = @(New-Query 'fail-whitespace') }
     'unresolved-dry' { $items = @(New-Query '{Missing}'); $arguments.DryRun = $true }
     'unresolved-live' { $items = @(New-Query '{Missing}') }
     'unresolved-burst' { $items = @(New-Query '{Missing}'); $arguments.Burst = $true }
@@ -96,6 +159,19 @@ if ($Worker) {
     'scalar-arm' {
       $parameters = @(New-Parameter 'Derived' (New-ArmQuery '/ok') $null 12)
       $items = @(New-Query 'observe:{Derived}')
+    }
+    'selected-dropdown' {
+      $parameters = @([pscustomobject]@{ name = 'Choice'; type = 2; query = 'choices'; queryType = 1 })
+      $items = @(New-Query 'observe:{Choice}')
+    }
+    'lazy-selected-dropdown' {
+      $items = @([pscustomobject]@{
+        type = 12; conditionalVisibility = @{ parameterName = 'SelectedTab'; comparison = 'isEqualTo'; value = 'MockTab' }
+        content = @{ items = @(
+          [pscustomobject]@{ type = 9; content = @{ parameters = @([pscustomobject]@{ name = 'Choice'; type = 2; query = 'choices'; queryType = 1 }) } },
+          (New-Query 'observe:{Choice}')
+        ) }
+      })
     }
     'global-arg-failure' { $parameters = @(New-Parameter 'GlobalFailure' 'fail-global') }
     'global-arm-failure' { $parameters = @(New-Parameter 'GlobalFailure' (New-ArmQuery '/fail-global') $null 12) }
@@ -200,13 +276,27 @@ if ($Worker) {
 $cases = @(
   @{ Name = 'success'; Exit = 0 },
   @{ Name = 'empty-success'; Exit = 0 },
+  @{ Name = 'arg-paged'; Exit = 0; Rows = 3 },
+  @{ Name = 'arg-incomplete'; Exit = 1; Status = 'INCOMPLETE' },
+  @{ Name = 'arg-exact-cap'; Exit = 0; Rows = 10000 },
+  @{ Name = 'arg-repeated-token'; Exit = 1; Status = 'FAILED' },
+  @{ Name = 'arg-parameter-incomplete'; Exit = 1; Parameter = 'Incomplete' },
+  @{ Name = 'cached-query'; Exit = 0; Required = 'ARG_CALL=ok'; RequiredCount = 1; CacheHits = 1 },
+  @{ Name = 'subset-combinations'; Exit = 0; Required = "OBSERVED='windows','linux'"; QueryCount = 5 },
+  @{ Name = 'nested-language'; Exit = 0; Forbidden = 'ARG_CALL=fail-hidden' },
+  @{ Name = 'arm-paging-get'; Exit = 1; Status = 'FAILED' },
+  @{ Name = 'arm-paging-array'; Exit = 0; Rows = 2 },
+  @{ Name = 'arm-paging-cycle'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'failed-query'; Exit = 1; Status = 'FAILED' },
+  @{ Name = 'failed-query-whitespace'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'unresolved-dry'; Exit = 1; Status = 'UnresolvedTokens' },
   @{ Name = 'unresolved-live'; Exit = 1; Status = 'UnresolvedTokens' },
   @{ Name = 'unresolved-burst'; Exit = 1; Status = 'UnresolvedTokens' },
   @{ Name = 'override-dependent'; Exit = 0; Observed = '1.70' },
   @{ Name = 'scalar-arg'; Exit = 0; Observed = '1.69' },
   @{ Name = 'scalar-arm'; Exit = 0; Observed = '1.69' },
+  @{ Name = 'selected-dropdown'; Exit = 0; Observed = 'chosen' },
+  @{ Name = 'lazy-selected-dropdown'; Exit = 0; Observed = 'chosen' },
   @{ Name = 'global-arg-failure'; Exit = 1; Parameter = 'GlobalFailure' },
   @{ Name = 'global-arm-failure'; Exit = 1; Parameter = 'GlobalFailure' },
   @{ Name = 'parameter-dependency-failure'; Exit = 1; Parameter = 'Dependent'; Status = 'UnresolvedTokens' },
@@ -223,8 +313,8 @@ $cases = @(
   @{ Name = 'selection-drill-unresolved'; Exit = 1; Skipped = 2; Parameter = 'ExtAvailable'; Scenario = 'drill:MockType' },
   @{ Name = 'workbook-agent-dry-pt'; Exit = 0; Status = 'DryRunOK'; Forbidden = '<Red>' },
   @{ Name = 'workbook-agent-dry-en'; Exit = 0; Status = 'DryRunOK'; Forbidden = '<Red>' },
-  @{ Name = 'workbook-agent-default-pt'; Exit = 0; Status = 'OK'; Skipped = 2; Forbidden = '<Red>' },
-  @{ Name = 'workbook-agent-default-en'; Exit = 0; Status = 'OK'; Skipped = 2; Forbidden = '<Red>' },
+  @{ Name = 'workbook-agent-default-pt'; Exit = 0; Status = 'OK'; Forbidden = '<Red>' },
+  @{ Name = 'workbook-agent-default-en'; Exit = 0; Status = 'OK'; Forbidden = '<Red>' },
   @{ Name = 'workbook-sql-dry-pt'; Exit = 0; Status = 'DryRunOK'; Forbidden = '<Red>' },
   @{ Name = 'workbook-sql-dry-en'; Exit = 0; Status = 'DryRunOK'; Forbidden = '<Red>' },
   @{ Name = 'workbook-sql-default-pt'; Exit = 0; Status = 'OK'; Forbidden = '<Red>' },
@@ -255,6 +345,9 @@ try {
       $problems = @()
       if ($process.ExitCode -ne $test.Exit) { $problems += "exit=$($process.ExitCode), expected=$($test.Exit)" }
       if ($test.Status -and -not @($rows | Where-Object Status -eq $test.Status).Count) { $problems += "missing $($test.Status) record" }
+      if ($test.Rows -and -not @($rows | Where-Object { [int]$_.Rows -eq $test.Rows }).Count) { $problems += "missing row count $($test.Rows)" }
+      if ($test.QueryCount -and $rows.Count -ne $test.QueryCount) { $problems += "queries=$($rows.Count), expected=$($test.QueryCount)" }
+      if ($test.CacheHits -and @($rows | Where-Object CacheHit -eq 'True').Count -ne $test.CacheHits) { $problems += 'incorrect cache hit count' }
       if ($test.Observed -and $output -notmatch "(?m)^OBSERVED=$([regex]::Escape($test.Observed))\r?$") {
         $actual = [regex]::Match($output, '(?m)^OBSERVED=.*').Value.Trim()
         $problems += "expected OBSERVED=$($test.Observed); actual $actual"
@@ -269,7 +362,7 @@ try {
         if ($skipped.Count -ne $test.Skipped) { $problems += "skipped=$($skipped.Count), expected=$($test.Skipped)" }
         if (-not $output.Contains('--- Awaiting row selection /')) { $problems += 'row-selection summary missing' }
       }
-      if ($test.Exit -eq 0 -and @($rows | Where-Object { $_.Status -in 'FAILED', 'UnresolvedTokens' }).Count) {
+      if ($test.Exit -eq 0 -and @($rows | Where-Object { $_.Status -in 'FAILED', 'UnresolvedTokens', 'INCOMPLETE' }).Count) {
         $problems += 'success case contains failures'
       }
       if ($test.Parameter) {
@@ -295,4 +388,71 @@ try {
 }
 Write-Host "$($cases.Count - $failed)/$($cases.Count) mock tests passed."
 if ($failed) { exit 1 }
+function Get-WorkbookItems($Items) {
+  foreach ($item in $Items) {
+    $item
+    if ($item.type -eq 12) { Get-WorkbookItems $item.content.items }
+  }
+}
+foreach ($project in 'arc-agent-support','arc-sql-payg-readiness') {
+  $path = Join-Path $PSScriptRoot "..\workbooks\$project-workbook.json"
+  $templatePath = Join-Path $PSScriptRoot "..\templates\$project-azuredeploy.json"
+  $raw = [IO.File]::ReadAllText($path)
+  $workbook = $raw | ConvertFrom-Json -Depth 100
+  $template = Get-Content -LiteralPath $templatePath -Raw -Encoding utf8 | ConvertFrom-Json -Depth 100
+  $embedded = $template.resources[0].properties.serializedData | ConvertFrom-Json -Depth 100
+  if (($embedded | ConvertTo-Json -Depth 100 -Compress) -cne ($workbook | ConvertTo-Json -Depth 100 -Compress)) {
+    throw "Embedded workbook mismatch: $project"
+  }
+  foreach ($file in $path,$templatePath) {
+    $bytes = [IO.File]::ReadAllBytes($file)
+    if ($bytes[0] -eq 239 -and $bytes[1] -eq 187 -and $bytes[2] -eq 191) { throw "Unexpected UTF-8 BOM: $file" }
+  }
+  $items = @(Get-WorkbookItems $workbook.items)
+  $parameters = @($items | Where-Object type -eq 9 | ForEach-Object { $_.content.parameters })
+  $names = @($parameters.name) + @($items | Where-Object type -eq 3 | ForEach-Object {
+    $_.content.exportedParameters.parameterName; $_.content.exportParameterName
+  })
+  foreach ($match in [regex]::Matches($raw, '\{([A-Za-z][A-Za-z0-9_]*)\}')) {
+    if ($match.Groups[1].Value -notin $names) { throw "Undefined parameter in ${project}: $($match.Value)" }
+  }
+  $tabs = @($workbook.items | Where-Object type -eq 12 | ForEach-Object { $_.conditionalVisibility } |
+    Where-Object parameterName -eq 'SelectedTab' | ForEach-Object value)
+  foreach ($link in $items | Where-Object type -eq 11 | ForEach-Object { $_.content.links }) {
+    if ($link.linkTarget -eq 'parameter' -and $link.cellValue -eq 'SelectedTab' -and $link.subTarget -notin $tabs) {
+      throw "Broken tab target in ${project}: $($link.subTarget)"
+    }
+  }
+  if ($project -eq 'arc-agent-support') {
+    if (@($parameters | Where-Object name -match '^Released(Windows|Linux)[234]$').Count) { throw 'Unstable agent list samples returned.' }
+    foreach ($name in 'ReleasedWindows','ReleasedLinux') {
+      $arm = ($parameters | Where-Object name -eq $name).query | ConvertFrom-Json -Depth 50
+      if ($arm.method -ne 'GET' -or $arm.path -notlike '*/agentVersions/latest') { throw "Expected exact latest endpoint: $name" }
+    }
+    foreach ($name in 'ext-detail','ext-available') {
+      $query = ($items | Where-Object name -eq $name).content.query
+      if (-not $query.Contains("location =~ '{ExtLocation}'")) { throw "Missing regional filter: $name" }
+    }
+    if (-not ($items | Where-Object name -eq 'extensions').content.query.Contains('by Publisher, ExtensionType, location')) {
+      throw 'Extension grouping lost its region.'
+    }
+  } else {
+    $estimators = @($items | Where-Object { $_.type -eq 3 -and $_.content.query.Contains('| extend CoreEstimate = case(') })
+    if ($estimators.Count -ne 7) { throw 'Unexpected SQL estimator count.' }
+    foreach ($item in $estimators) {
+      if (-not $item.content.query.Contains("iff(SqlVersionMajor == 'SQL Server 2025', 32, 24)") -or
+          -not $item.content.query.Contains('min_of(RawCores, StandardCoreLimit)') -or
+          -not $item.content.query.Contains("TopEdition == 'Not identified' or isnull(RawCores)")) {
+        throw "SQL capacity regression: $($item.name)"
+      }
+    }
+    $architectureQuery = ($items | Where-Object name -eq 'architecture_options').content.query
+    if ($architectureQuery -match 'Standard m[aá]x\.? 24' -or
+        -not $architectureQuery.Contains('not a billing cap') -or
+        -not $architectureQuery.Contains('teto de cobran')) {
+      throw 'Architecture recommendations must not describe Standard capacity as a billing cap.'
+    }
+  }
+  Write-Host "PASS workbook invariants: $project"
+}
 exit 0

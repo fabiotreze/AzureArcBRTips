@@ -1,6 +1,8 @@
 # Changelog – Arc Agent Support Workbook
+
 |Version|Date|Description|
 |---|---|---|
+|v4.7.0|2026-11-06|**Exact references and regional comparisons / Referências exatas e comparações regionais:** unstable paged agent lists replaced by exact latest/version lookups, with optional download-only overrides. Extension rows/drill-down retain region and extension catalogs use GETARRAY. Shared harness uses ARG REST metadata, fails incomplete results, preserves ancestor visibility, honors selected dropdown defaults, supports exhaustive non-empty multi-select subsets and all offered extension targets, and records identical-query cache hits. Referências exatas, downloads opcionais, comparações por região e validação de completude, subconjuntos e versões-alvo.|
 |v4.6.9|2026-11-03|**Revision tracking:** new editorial row references the currently published Azure revision `8fcdca84b78947658b3772b694036d0d`; missing historical IDs are explicitly marked *Not recovered / Não recuperada*. Corrected the before-save workflow (EN/PT), synchronized the deployment template and updated the guides. No query changed; GitHub publication does not update the deployed workbook.|
 |v4.6.8|2026-11-02|**Row limits:** the *extension servers*, *auto-upgrade attempts*, *extensions*, *policy* and *Advisor summary* tables now show up to 1000 rows (portal default is 250), so large fleets are not cut silently. No query changed.|
 |v4.6.7|2026-11-02|**Latest override has priority over every other source** (it is not a maximum): when filled, it is the reference version even if the catalog API or the Azure auto-upgrade target report a higher one. Banner, parameter description and methodology text corrected; update or clear the field after each release. No query changed.|

@@ -1,5 +1,11 @@
 # Changelog – SQL Server enabled by Azure Arc – PAYG Readiness Workbook
 
+## 2.3.0 – 2026-11-06
+- **Core-capacity approximation:** Standard uses 24 cores through SQL Server 2022 and 32 for SQL Server 2025, based on the machine's Standard instances. Unknown editions/core counts are not reported as zero. Capacity is explicitly not a licensing requirement or billing meter.
+- Per-host architecture recommendations no longer describe Standard capacity as a PAYG billing cap; VM and physical-host guidance is consistent with the estimate methodology in EN/PT.
+- Host inventory/review queries preserve `id` for ARG pagination. Shared harness validates completeness, inherited visibility and multi-select subsets; deployment guides explain reusing the workbook GUID.
+- **Português:** aproximação de capacidade Standard por versão; valores desconhecidos preservados; capacidade separada de cobrança/licenciamento também nas recomendações por host; `id` nas grades por host; validador e guias EN/PT atualizados. Fontes oficiais verificadas em 2026-11-06.
+
 ## 2.2.3 – 2026-11-03
 - **Revision tracking:** new editorial row references the currently published Azure revision `ead30319b3554eca9eed11985b6bcd31`; missing historical IDs are explicitly marked *Not recovered / Não recuperada*, preserving the recorded IDs through 2.1.
 - Corrected the before-save workflow (EN/PT), synchronized the deployment template and updated the guides.

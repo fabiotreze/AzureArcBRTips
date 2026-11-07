@@ -4,7 +4,7 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 > **Personal, unofficial project.** It is not a Microsoft product and not an official licensing tool. Core numbers are estimates, not meters. Confirm entitlement with your licensing process and charges in Cost Management. See [DISCLAIMER](../../DISCLAIMER.md).
 
-**Version:** 2.2.3 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only (Azure Resource Graph; nothing is changed in your environment)
+**Version:** 2.3.0 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only (Azure Resource Graph; nothing is changed in your environment)
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -16,7 +16,9 @@ For publication, follow the [revision tracking workflow](CHANGELOG.md#azure-revi
 - Which Arc-enabled SQL Server instances are already PAYG, which are not, and which license types are in use (LicenseOnly, Paid, PAYG).
 - What the official `manage-payg-transition.ps1` script **would** convert, and which hosts need attention first (🔴 🟠 🟢 priority).
 - What is missing before a safe transition: SQL extension, ESU gap (SQL Server 2014/2016), **CSP consent for recurring PAYG billing**, connectivity (check-in older than 30 days), pCore versus billing plan alignment, auto-deploy tags.
-- An estimate of cores per instance (per OSE: minimum 4, Standard maximum 24, free editions 0) and VM versus physical signals.
+- A per-host core-capacity approximation (minimum 4; Standard 24 through SQL Server 2022 and 32 for 2025; free editions 0), with unknown values preserved, and VM versus physical signals. This is not a licensing requirement or billing meter.
+
+The Standard limits describe [engine compute capacity](https://learn.microsoft.com/sql/sql-server/compute-capacity-limits-by-edition-of-sql-server), not a universal billing cap. Mixed hosts use the limit of their Standard instances, not a Developer instance's version. Reconcile physical-host and VM licensing separately using [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing) and Cost Management. Verified on 2026-11-06.
 
 ## Quick path
 1. **Summary**: footprint, license mix, versions, support status.
@@ -49,6 +51,14 @@ The *How to use* tab has buttons that jump to each tab and links to the script, 
 2. Open the **Advanced Editor** (`</>`), choose **Gallery Template**, paste the content of [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json) and select **Apply**.
 3. Select **Save**, choose the subscription, resource group and region.
 
+For an **ARM update**, reuse the existing resource GUID:
+
+```azurecli
+az deployment group create --resource-group <resource-group> --template-file templates/arc-sql-payg-readiness-azuredeploy.json --parameters workbookId=<existing-workbook-guid>
+```
+
+The default `newGuid()` creates a new workbook when omitted; see [ARM behavior](https://learn.microsoft.com/azure/azure-resource-manager/templates/template-functions-string#newguid) (verified on 2026-11-06). Back up the current resource before updating. For reproducibility with remote templates, replace `main` with the reviewed commit SHA. Retain the previous template and the same GUID for rollback.
+
 ## Validation performed
 - 18 Azure Resource Graph queries run against a test tenant in Portuguese and English: **18/18 OK, 0 failures**.
 - Throttling: each tab runs at most 8 queries (Azure Resource Graph allows about 15 per 5 seconds per user). A stress test that switched tabs back to back produced a few HTTP 429 responses that recovered on retry.
@@ -56,6 +66,10 @@ The *How to use* tab has buttons that jump to each tab and links to the script, 
 - The validator applies `-SetParam` before resolving dependent parameters and exits **1** for query failures, unresolved tokens or parameter failures; otherwise **0**. Parameter failures appear in the CSV and the red final summary. Offline mock regression tests: `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1` (from the repository root).
 - Parameters awaiting only query row-selection exports are reported as **Skipped (aguarda seleção)** without failing normal execution; export names are discovered from query metadata. Drill-down validation remains strict, and unresolved non-selection tokens still fail.
 - A small lab does not prove behavior at scale. Validate in your own environment before using the results for decisions.
+
+The harness uses ARG REST pagination metadata; **INCOMPLETE** results fail validation, including in Burst mode. Host-level inventory/review queries retain `id` for continuation tokens. A 10,000-row grid setting does not guarantee that the data source returned every record. See [ARG pagination](https://learn.microsoft.com/azure/governance/resource-graph/concepts/work-with-data) and [workbook limits](https://learn.microsoft.com/azure/azure-monitor/visualize/workbooks-limits) (verified on 2026-11-06).
+
+Run `-DryRun`, normal mode and `-Burst` in both languages with an explicit `-Subscriptions <subscription-id>` scope. Test every tab and quick-path button in the portal too; API tests do not verify rendering or navigation.
 
 ## Official documentation
 - [Manage SQL Server license and billing](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing)
