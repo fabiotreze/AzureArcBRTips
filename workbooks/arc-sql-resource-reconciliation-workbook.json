@@ -1,0 +1,754 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "crossComponentResources": [
+          "{Subscription}"
+        ],
+        "parameters": [
+          {
+            "id": "1ae31bb9-91a8-47ef-bc58-6eb3b77871e1",
+            "version": "KqlParameterItem/1.0",
+            "name": "Subscription",
+            "label": "Subscription(s)",
+            "type": 6,
+            "isRequired": true,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::all"
+              ],
+              "includeAll": false,
+              "showDefault": false
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "value": [
+              "value::all"
+            ]
+          },
+          {
+            "isRequired": true,
+            "name": "Language",
+            "value": "PT",
+            "id": "reconciliation-language",
+            "type": 2,
+            "jsonData": "[{\"value\":\"EN\",\"label\":\"English\"},{\"value\":\"PT\",\"label\":\"Português\"}]"
+          },
+          {
+            "value": "Relationships",
+            "type": 1,
+            "name": "SelectedTab",
+            "isHiddenWhenLocked": true,
+            "id": "reconciliation-tab"
+          },
+          {
+            "jsonData": "[\"No\",\"Yes\"]",
+            "name": "ShowChangelog",
+            "value": "No",
+            "id": "reconciliation-history",
+            "type": 2,
+            "isHiddenWhenLocked": true
+          }
+        ],
+        "style": "pills",
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources"
+      },
+      "name": "Global-Parameters"
+    },
+    {
+      "type": 1,
+      "name": "intro-EN",
+      "content": {
+        "json": "# Azure Arc SQL - Resource Reconciliation\n**Version 1.2.3.** Personal, independent project; not an official Microsoft tool. See [disclaimer](https://github.com/fabiotreze/AzureArcBRTips/blob/main/DISCLAIMER.md). Queries only read ARG; deploying/saving changes a workbook resource. This view lists technical exceptions and unresolved evidence, not confirmed orphan resources or licensing noncompliance."
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "Language",
+        "value": "EN"
+      }
+    },
+    {
+      "type": 1,
+      "name": "intro-PT",
+      "content": {
+        "json": "# Azure Arc SQL - Reconciliação de recursos\n**Versão 1.2.3.** Projeto pessoal e independente; não é ferramenta oficial da Microsoft. Veja o [aviso legal](https://github.com/fabiotreze/AzureArcBRTips/blob/main/DISCLAIMER.md). As consultas apenas leem ARG; implantar/salvar altera um recurso de workbook. A visão lista exceções técnicas e evidências inconclusivas, não órfãos confirmados ou irregularidades de licenciamento."
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "Language",
+        "value": "PT"
+      }
+    },
+    {
+      "content": {
+        "style": "tabs",
+        "version": "LinkItem/1.0",
+        "links": [
+          {
+            "linkTarget": "parameter",
+            "cellValue": "SelectedTab",
+            "id": "relationships",
+            "subTarget": "Relationships",
+            "linkLabel": "Relationships / Relacionamentos"
+          },
+          {
+            "linkTarget": "parameter",
+            "cellValue": "SelectedTab",
+            "id": "connectivity",
+            "subTarget": "Connectivity",
+            "linkLabel": "Connectivity / Conectividade"
+          },
+          {
+            "linkTarget": "parameter",
+            "cellValue": "SelectedTab",
+            "id": "fci",
+            "subTarget": "FCI",
+            "linkLabel": "FCI"
+          },
+          {
+            "linkTarget": "parameter",
+            "cellValue": "SelectedTab",
+            "id": "ag",
+            "subTarget": "AG",
+            "linkLabel": "Availability Groups / Grupos de disponibilidade"
+          },
+          {
+            "linkTarget": "parameter",
+            "cellValue": "SelectedTab",
+            "id": "licenses",
+            "subTarget": "Licenses",
+            "linkLabel": "Licenses / Licenças"
+          },
+          {
+            "linkTarget": "parameter",
+            "cellValue": "SelectedTab",
+            "id": "guide",
+            "subTarget": "Guide",
+            "linkLabel": "Validation guide / Guia de validação"
+          }
+        ]
+      },
+      "type": 11,
+      "name": "tabs"
+    },
+    {
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "items": [
+          {
+            "type": 1,
+            "name": "relationships-note-EN",
+            "content": {
+              "json": "Only missing or unexpected relationships are listed. Known Azure VM containers are excluded; absent parents remain candidates because their scope cannot be confirmed."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "EN"
+            }
+          },
+          {
+            "type": 1,
+            "name": "relationships-note-PT",
+            "content": {
+              "json": "Somente relações ausentes ou inesperadas são listadas. Contêineres Azure VM conhecidos são excluídos; pais ausentes permanecem candidatos porque seu escopo não pode ser confirmado."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "PT"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| extend expectedId=tolower(tostring(properties.containerResourceId))\n| extend containerKind=case(isempty(expectedId),'Missing',expectedId contains '/providers/microsoft.hybridcompute/machines/','Arc Machine',expectedId contains '/providers/microsoft.compute/virtualmachines/','Azure VM','Other')\n| join kind=leftouter (Resources | where type in~ ('microsoft.hybridcompute/machines') | project expectedId=tolower(id),foundId=id) on expectedId\n| where isempty(foundId) or containerKind in ('Missing','Other')\n| project id,category='Container',resourceName=name,serviceType=tostring(properties.serviceType),sqlVersion=tostring(properties.version),edition=tostring(properties.edition),sqlStatus=tostring(properties.status),provisioningState=tostring(properties.provisioningState),lastInventoryUploadTime=todatetime(properties.lastInventoryUploadTime),lastUsageUploadTime=todatetime(properties.lastUsageUploadTime),inventoryAgeDays=datetime_diff('day',now(),todatetime(properties.lastInventoryUploadTime)),resourceId=id,parentResourceId=expectedId,containerKind,finding=case(containerKind=='Missing','Missing containerResourceId',containerKind=='Other','Unknown container type','Container absent from ARG'),rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=iff(isnotempty(expectedId),strcat('https://portal.azure.com/#resource',expectedId),'')\n| order by resourceId asc",
+              "size": 0,
+              "title": "SQL Instance -> Container exceptions / Pendências para validação",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "16dba18b-f65f-4a8e-9f24-981a25751969"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type in~ ('microsoft.azurearcdata/sqlserverinstances/databases','microsoft.azurearcdata/sqlserverinstances/availabilitygroups')\n| extend childKind=iff(type =~ 'microsoft.azurearcdata/sqlserverinstances/databases','Database','AvailabilityGroup')\n| extend childMarker=iff(childKind=='Database','/databases/','/availabilitygroups/')\n| extend cut=indexof(tolower(id),childMarker)\n| extend parentResourceId=iff(cut>=0,substring(id,0,cut),'')\n| extend joinKey=tolower(parentResourceId)\n| join kind=leftouter (Resources | where type =~ 'microsoft.azurearcdata/sqlserverinstances' | project joinKey=tolower(id),existingParentId=id,containerId=tolower(tostring(properties.containerResourceId))) on joinKey\n| where containerId !contains '/providers/microsoft.compute/virtualmachines/'\n| join kind=leftouter (Resources | where type =~ 'microsoft.hybridcompute/machines' | project containerId=tolower(id),containerMachineId=id) on containerId\n| where isempty(parentResourceId) or isempty(existingParentId) or isempty(containerId) or isempty(containerMachineId)\n| project id,category=childKind,resourceName=name,resourceId=id,parentResourceId,containerResourceId=containerId,correlationId=tostring(properties.availabilityGroupId),serverName=tostring(properties.serverName),primaryReplica=tostring(properties.info.primaryReplica),clusterType=tostring(properties.info.clusterTypeDescription),isDistributed=tostring(properties.info.isDistributed),isContained=tostring(properties.info.isContained),health=tostring(properties.info.synchronizationHealthDescription),collectionTimestamp=todatetime(properties.collectionTimestamp),finding=case(isempty(parentResourceId),'Malformed child ID',isempty(existingParentId),'Parent instance absent from ARG',isempty(containerId),'Parent instance has no container','Parent instance container absent from ARG'),rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=iff(isnotempty(parentResourceId),strcat('https://portal.azure.com/#resource',parentResourceId),'')\n| order by resourceId asc",
+              "size": 0,
+              "title": "Database / Availability Group -> SQL Instance or host exceptions (includes dependents of orphan instances) / Exceções de pai ou host (inclui dependentes de instâncias órfãs)",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "e334d31a-5cfc-4007-b1b1-99446ea82cef"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances/databases'\n| extend cut=indexof(tolower(id),'/databases/')\n| where cut >= 0\n| extend joinKey=tolower(substring(id,0,cut))\n| summarize databaseCount=count(), sampleDatabases=make_set(name,5) by joinKey\n| join kind=inner (Resources | where type =~ 'microsoft.azurearcdata/sqlserverinstances' | project joinKey=tolower(id),parentResourceId=id,instanceName=name,containerId=tolower(tostring(properties.containerResourceId)),sqlStatus=tostring(properties.status),lastInventoryUploadTime=todatetime(properties.lastInventoryUploadTime)) on joinKey\n| where containerId !contains '/providers/microsoft.compute/virtualmachines/'\n| join kind=inner (Resources | where type =~ 'microsoft.hybridcompute/machines' | project containerId=tolower(id),hostMachine=name,hostMachineId=id,hostStatus=tostring(properties.status),hostLastStatusChange=todatetime(properties.lastStatusChange),hostProxyConfigured=isnotempty(tostring(properties.agentConfiguration.proxyUrl))) on containerId\n| join kind=leftouter (Resources | where type =~ 'microsoft.hybridcompute/machines/extensions' | where tostring(properties.publisher) =~ 'Microsoft.AzureData' and tostring(properties.type) in~ ('WindowsAgent.SqlServer','LinuxAgent.SqlServer') | extend ecut=indexof(tolower(id),'/extensions/') | where ecut >= 0 | extend containerId=tolower(substring(id,0,ecut)) | summarize sqlExtensionCount=count(), sqlExtensionSucceeded=countif(tostring(properties.provisioningState) =~ 'Succeeded') by containerId) on containerId\n| extend sqlExtensionCount=coalesce(sqlExtensionCount,long(0)), sqlExtensionSucceeded=coalesce(sqlExtensionSucceeded,long(0))\n| extend hostConnected=hostStatus =~ 'Connected'\n| where not(hostConnected) or sqlExtensionCount == 0 or sqlExtensionSucceeded == 0\n| extend finding=case(not(hostConnected),strcat('Host Arc machine not Connected (',hostStatus,')'),sqlExtensionCount == 0,'SQL extension absent on host','SQL extension not Succeeded on host')\n| project id=parentResourceId,category='DatabaseHost',resourceName=instanceName,databaseCount,sampleDatabases,resourceId=parentResourceId,parentResourceId=hostMachineId,hostMachine,hostStatus,hostLastStatusChange,hostProxyConfigured,sqlExtensionCount,sqlExtensionSucceeded,sqlStatus,lastInventoryUploadTime,finding,rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',parentResourceId),parentPortalUrl=strcat('https://portal.azure.com/#resource',hostMachineId)\n| order by resourceId asc",
+              "size": 0,
+              "title": "Databases on disconnected host or without active SQL extension / Databases em host desconectado ou sem extensão SQL ativa",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "7c1d6e52-3b1a-4f0e-9a43-5d2b8e6f0a11"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData' and tostring(properties.type) in~ ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend cut=indexof(tolower(id),'/extensions/')\n| extend parentResourceId=iff(cut>=0,substring(id,0,cut),'')\n| extend joinKey=tolower(parentResourceId)\n| join kind=leftouter (Resources | where type =~ 'microsoft.hybridcompute/machines' | project joinKey=tolower(id),matchingMachineId=id) on joinKey\n| where isempty(parentResourceId) or isempty(matchingMachineId)\n| project id,category='SQLExtension',resourceName=name,extensionVersion=tostring(properties.typeHandlerVersion),publisher=tostring(properties.publisher),extensionType=tostring(properties.type),provisioningState=tostring(properties.provisioningState),resourceId=id,parentResourceId,finding=iff(isempty(parentResourceId),'Malformed extension ID','Parent Arc machine absent from ARG'),rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=iff(isnotempty(parentResourceId),strcat('https://portal.azure.com/#resource',parentResourceId),'')\n| order by resourceId asc",
+              "size": 0,
+              "title": "SQL extension (Windows/Linux) -> Arc Machine exceptions / Pendências para validação",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "a9fc509f-e2ee-40a9-a099-588f17703c0a"
+          }
+        ],
+        "groupType": "editable"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "SelectedTab",
+        "value": "Relationships"
+      },
+      "type": 12,
+      "name": "tab-group-Relationships"
+    },
+    {
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "items": [
+          {
+            "type": 1,
+            "name": "connectivity-note-EN",
+            "content": {
+              "json": "Instances with a status other than Connected (the inventory upload timestamp is shown for context only, not judged), and SQL extensions (Windows or Linux) that report a non-Healthy status or upload problem (plugin-level statuses inside an otherwise Healthy message are not judged). Connection mode (direct, proxy, Private Link, gateway) is not judged as an exception. Instances whose Arc machine is absent appear in Relationships."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "EN"
+            }
+          },
+          {
+            "type": 1,
+            "name": "connectivity-note-PT",
+            "content": {
+              "json": "Instâncias com status diferente de Connected (o horário do último inventário é só contexto, não é julgado), e extensões SQL (Windows ou Linux) com status não Healthy ou problema de upload (status de plugin dentro de uma mensagem Healthy não é julgado). O modo de conexão (direto, proxy, Private Link, gateway) não é tratado como exceção. Instâncias sem máquina Arc aparecem em Relacionamentos."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "PT"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| extend containerId=tolower(tostring(properties.containerResourceId))\n| where containerId !contains '/providers/microsoft.compute/virtualmachines/'\n| join kind=inner (Resources | where type =~ 'microsoft.hybridcompute/machines' | project containerId=tolower(id),hostMachine=name,hostMachineId=id,hostStatus=tostring(properties.status)) on containerId\n| extend sqlStatus=tostring(properties.status),lastInventoryUploadTime=todatetime(properties.lastInventoryUploadTime),lastUsageUploadTime=todatetime(properties.lastUsageUploadTime)\n| extend statusIssue=isempty(sqlStatus) or sqlStatus !~ 'Connected'\n| where statusIssue\n| project id,category='InstanceFreshness',resourceName=name,sqlStatus,hostMachine,hostStatus,lastInventoryUploadTime,lastUsageUploadTime,provisioningState=tostring(properties.provisioningState),resourceId=id,parentResourceId=hostMachineId,finding=strcat('SQL instance status ',iff(isempty(sqlStatus),'(missing)',sqlStatus)),rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=strcat('https://portal.azure.com/#resource',hostMachineId)\n| order by resourceId asc",
+              "size": 0,
+              "title": "SQL instance status other than Connected on existing Arc machine / Status da instância diferente de Connected em máquina Arc existente",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "b3a7e9d0-5c21-4e68-8f14-2a9d6c0b7e35"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.hybridcompute/machines/extensions'\n| where tostring(properties.publisher) =~ 'Microsoft.AzureData' and tostring(properties.type) in~ ('WindowsAgent.SqlServer','LinuxAgent.SqlServer')\n| extend cut=indexof(tolower(id),'/extensions/')\n| extend parentResourceId=iff(cut>=0,substring(id,0,cut),'')\n| extend provisioningState=tostring(properties.provisioningState),statusMessage=tostring(properties.instanceView.status.message)\n| extend notHealthy=isnotempty(statusMessage) and statusMessage !contains 'Healthy'\n| extend uploadIssue=statusMessage contains 'uploadStatus' and statusMessage !contains 'uploadStatus : OK'\n| where provisioningState !~ 'Succeeded' or notHealthy or uploadIssue\n| project id,category='SQLExtensionHealth',resourceName=name,extensionType=tostring(properties.type),extensionVersion=tostring(properties.typeHandlerVersion),provisioningState,statusSnippet=substring(statusMessage,0,300),resourceId=id,parentResourceId,finding=case(provisioningState !~ 'Succeeded',strcat('Extension provisioning ',iff(isempty(provisioningState),'(missing)',provisioningState)),notHealthy,'Extension status message is not Healthy','Upload status is not OK'),rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=iff(isnotempty(parentResourceId),strcat('https://portal.azure.com/#resource',parentResourceId),'')\n| order by resourceId asc",
+              "size": 0,
+              "title": "SQL extension health or upload exceptions / Exceções de saúde ou upload da extensão SQL",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "d41f8a62-9e07-4b53-a6c8-1f3e5b7d9c20"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| extend containerId=tolower(tostring(properties.containerResourceId))\n| where containerId !contains '/providers/microsoft.compute/virtualmachines/'\n| join kind=inner (Resources | where type =~ 'microsoft.hybridcompute/machines' | project containerId=tolower(id),hostMachine=name,hostMachineId=id,hostStatus=tostring(properties.status)) on containerId\n| join kind=leftouter (Resources | where type =~ 'microsoft.hybridcompute/machines/extensions' | where tostring(properties.publisher) =~ 'Microsoft.AzureData' and tostring(properties.type) in~ ('WindowsAgent.SqlServer','LinuxAgent.SqlServer') | extend ecut=indexof(tolower(id),'/extensions/') | where ecut >= 0 | extend containerId=tolower(substring(id,0,ecut)) | summarize sqlExtensionCount=count() by containerId) on containerId\n| where isnull(sqlExtensionCount) or sqlExtensionCount == 0\n| project id,category='InstanceWithoutExtension',resourceName=name,sqlStatus=tostring(properties.status),hostMachine,hostStatus,lastInventoryUploadTime=todatetime(properties.lastInventoryUploadTime),resourceId=id,parentResourceId=hostMachineId,finding='SQL extension absent on the host machine',rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=strcat('https://portal.azure.com/#resource',hostMachineId)\n| order by resourceId asc",
+              "size": 0,
+              "title": "SQL instance remains but host has no SQL extension / Instância permanece mas o host não tem extensão SQL",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "a1d4b8c6-7f02-4e39-9b5a-6c2e8f0d1a77"
+          }
+        ],
+        "groupType": "editable"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "SelectedTab",
+        "value": "Connectivity"
+      },
+      "type": 12,
+      "name": "tab-group-Connectivity"
+    },
+    {
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "items": [
+          {
+            "type": 1,
+            "name": "fci-note-EN",
+            "content": {
+              "json": "Only incomplete metadata, unmatched references or projection differences are listed. Consolidated/node classification is a heuristic, not verified against your environment. Hostnames may differ from Arc resource names. FCI inventory reflects upload time; state differences can be transient."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "EN"
+            }
+          },
+          {
+            "type": 1,
+            "name": "fci-note-PT",
+            "content": {
+              "json": "Somente metadados incompletos, referências sem correspondência ou diferenças de projeção são listados. A classificação consolidado/nó é heurística, não verificada no seu ambiente. Hostnames podem diferir dos nomes dos recursos Arc. O inventário FCI reflete a coleta; diferenças podem ser transitórias."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "PT"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| extend clusterId=tostring(properties.failoverCluster.id)\n| where isnotempty(clusterId)\n| extend hostNames=properties.failoverCluster.hostNames,sqlInstanceIds=properties.failoverCluster.sqlInstanceIds,nodeIPAddresses=properties.failoverCluster.hostIPAddresses\n| extend projection=case(array_length(hostNames)>0 or array_length(sqlInstanceIds)>0,'Consolidated',array_length(nodeIPAddresses)>0,'Node','Incomplete')\n| where projection == 'Incomplete'\n| project clusterId,networkName=tostring(properties.failoverCluster.networkName),instanceId=id,resourceName=name,projection,containerResourceId=tostring(properties.containerResourceId),hostNames,sqlInstanceIds,nodeIPAddresses,sqlStatus=tostring(properties.status),provisioningState=tostring(properties.provisioningState),lastInventoryUploadTime=todatetime(properties.lastInventoryUploadTime),lastUsageUploadTime=todatetime(properties.lastUsageUploadTime),resourceGroup,subscriptionId\n| order by clusterId asc,instanceId asc",
+              "size": 0,
+              "title": "FCI incomplete metadata / Metadados FCI incompletos",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "3b4f2ecb-004b-4ef0-a417-5a2e298ad050"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| where array_length(properties.failoverCluster.hostNames)>0\n| mv-expand hostName=properties.failoverCluster.hostNames to typeof(string)\n| extend hostKey=strcat(tolower(subscriptionId),'|',tolower(resourceGroup),'|',tolower(hostName))\n| extend expectedMachineResourceId=strcat('/subscriptions/',subscriptionId,'/resourceGroups/',resourceGroup,'/providers/Microsoft.HybridCompute/machines/',hostName)\n| join kind=leftouter (Resources | where type =~ 'microsoft.hybridcompute/machines' | project hostKey=strcat(tolower(subscriptionId),'|',tolower(resourceGroup),'|',tolower(name)),matchingMachineId=id,machineStatus=tostring(properties.status)) on hostKey\n| where isempty(matchingMachineId)\n| project id,category='FCIHostNameNotMatched',clusterId=tostring(properties.failoverCluster.id),networkName=tostring(properties.failoverCluster.networkName),resourceId=id,expectedHostName=hostName,parentResourceId=expectedMachineResourceId,subscriptionId,resourceGroup,finding='Host name not matched in same subscription/resource group',rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),parentPortalUrl=strcat('https://portal.azure.com/#resource',expectedMachineResourceId)\n| order by resourceId asc",
+              "size": 0,
+              "title": "FCI declared hosts not matched in same scope / Pendências para validação",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "17c3d428-8287-4120-9ec4-ac3d6000501c"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| where array_length(properties.failoverCluster.sqlInstanceIds)>0\n| mv-expand sqlInstanceId=properties.failoverCluster.sqlInstanceIds to typeof(string)\n| extend referencedId=tolower(sqlInstanceId)\n| join kind=leftouter (Resources | where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/' | project referencedId=tolower(id),matchingSqlInstanceId=id) on referencedId\n| where isempty(matchingSqlInstanceId)\n| project id,category='FCISqlInstance',clusterId=tostring(properties.failoverCluster.id),networkName=tostring(properties.failoverCluster.networkName),resourceId=id,referencedSqlInstanceId=sqlInstanceId,finding='Referenced SQL instance absent from ARG',rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),referencedPortalUrl=strcat('https://portal.azure.com/#resource',sqlInstanceId)\n| order by resourceId asc",
+              "size": 0,
+              "title": "FCI referenced SQL instances absent from ARG / Pendências para validação",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "7425b7f5-08d5-409b-9658-a6762e50ffb5"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| extend fc=properties.failoverCluster\n| where isnotempty(fc.id)\n| extend clusterId=tostring(fc.id),networkName=tostring(fc.networkName),hasHostNames=array_length(fc.hostNames)>0,hasHostIPs=array_length(fc.hostIPAddresses)>0,hasSqlInstanceIds=array_length(fc.sqlInstanceIds)>0\n| extend projectionType=case(hasHostNames or hasSqlInstanceIds,'Consolidated',hasHostIPs,'Node','Review')\n| summarize projectionCount=count(),consolidatedProjectionCount=countif(projectionType=='Consolidated'),nodeProjectionCount=countif(projectionType=='Node'),declaredHosts=make_set_if(fc.hostNames,projectionType=='Consolidated'),declaredSqlInstanceIds=make_set_if(fc.sqlInstanceIds,projectionType=='Consolidated'),nodeResources=make_set_if(name,projectionType=='Node'),consolidatedResources=make_set_if(name,projectionType=='Consolidated'),containers=make_set(tostring(properties.containerResourceId)),latestInventory=max(todatetime(properties.lastInventoryUploadTime)),latestUsage=max(todatetime(properties.lastUsageUploadTime)),provisioningStates=make_set(tostring(properties.provisioningState)),sqlStatuses=make_set(tostring(properties.status)),missingStatus=countif(isempty(tostring(properties.status))),missingProvisioning=countif(isempty(tostring(properties.provisioningState))),failedProvisioning=countif(tostring(properties.provisioningState) =~ 'Failed') by clusterId,networkName,subscriptionId,resourceGroup\n| extend validationResult=case(failedProvisioning>0,'FCI projection provisioning failed',missingStatus>0 or missingProvisioning>0,'FCI status metadata missing',consolidatedProjectionCount==0,'Consolidated FCI projection not found',nodeProjectionCount==0,'FCI node projections not found',array_length(provisioningStates)>1,'Provisioning state differs across projections',array_length(sqlStatuses)>1,'SQL status differs across projections','FCI projections present')\n| extend severity=case(validationResult=='FCI projections present','Info','Review')\n| where severity != 'Info'\n| extend rpValidation='Pending'\n| order by severity desc,networkName asc",
+              "size": 0,
+              "title": "FCI summary by clusterId / Pendências para validação",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "73e58111-1301-42d2-9b1f-3e2d36a9bc65"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| where isnotempty(properties.failoverCluster.id) and array_length(properties.failoverCluster.hostNames)>0\n| mv-expand hostName=properties.failoverCluster.hostNames to typeof(string)\n| extend nodeKey=strcat(tolower(tostring(properties.failoverCluster.id)),'|',tolower(tostring(split(hostName,'.')[0])))\n| join kind=leftouter (Resources | where type =~ 'microsoft.azurearcdata/sqlserverinstances' | where isnotempty(properties.failoverCluster.id) and not(array_length(properties.failoverCluster.hostNames)>0 or array_length(properties.failoverCluster.sqlInstanceIds)>0) and array_length(properties.failoverCluster.hostIPAddresses)>0 | project nodeKey=strcat(tolower(tostring(properties.failoverCluster.id)),'|',tolower(tostring(split(tostring(split(tostring(properties.containerResourceId),'/')[-1]),'.')[0]))),nodeProjectionId=id) on nodeKey\n| where isempty(nodeProjectionId)\n| project id,category='FCINodeProjection',clusterId=tostring(properties.failoverCluster.id),networkName=tostring(properties.failoverCluster.networkName),resourceId=id,declaredHost=hostName,subscriptionId,resourceGroup,finding='Declared FCI host has no node projection',rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id)\n| order by resourceId asc",
+              "size": 0,
+              "title": "FCI declared host without node projection / Host declarado na FCI sem projeção de nó",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "e8c2a7f1-6b34-4d90-b5a1-3c7e9d2f4a60"
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances'\n| where tolower(tostring(properties.containerResourceId)) !contains '/providers/microsoft.compute/virtualmachines/'\n| where isnotempty(properties.failoverCluster.id) and not(array_length(properties.failoverCluster.hostNames)>0 or array_length(properties.failoverCluster.sqlInstanceIds)>0) and array_length(properties.failoverCluster.hostIPAddresses)>0\n| extend clusterKey=tolower(tostring(properties.failoverCluster.id)),nodeHost=tolower(tostring(split(tostring(split(tostring(properties.containerResourceId),'/')[-1]),'.')[0]))\n| join kind=leftouter (Resources | where type =~ 'microsoft.azurearcdata/sqlserverinstances' | where isnotempty(properties.failoverCluster.id) and array_length(properties.failoverCluster.hostNames)>0 | mv-expand hostName=properties.failoverCluster.hostNames to typeof(string) | summarize declaredHosts=make_set(tolower(tostring(split(hostName,'.')[0]))) by clusterKey=tolower(tostring(properties.failoverCluster.id))) on clusterKey\n| where isnull(declaredHosts) or not(set_has_element(declaredHosts,nodeHost))\n| project id,category='FCINodeContainer',clusterId=tostring(properties.failoverCluster.id),networkName=tostring(properties.failoverCluster.networkName),resourceId=id,parentResourceId=tostring(properties.containerResourceId),declaredHosts,subscriptionId,resourceGroup,finding=iff(isnull(declaredHosts),'No consolidated FCI projection declares this node','Node container is not among the declared FCI hosts'),rpValidation='Pending',resourcePortalUrl=strcat('https://portal.azure.com/#resource',id)\n| order by resourceId asc",
+              "size": 0,
+              "title": "FCI node projection not declared by the cluster / Projeção de nó não declarada pelo cluster",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "f5a9c3d8-2e71-4b06-8c4d-7a1b0e6f9d33"
+          }
+        ],
+        "groupType": "editable"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "SelectedTab",
+        "value": "FCI"
+      },
+      "type": 12,
+      "name": "tab-group-FCI"
+    },
+    {
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "items": [
+          {
+            "type": 1,
+            "name": "ag-note-EN",
+            "content": {
+              "json": "Only missing health/provisioning metadata, unhealthy states or conflicting projections are listed. Correlation uses AG ID, not display name; a missing ID is kept per resource. Matching projections do not prove all replicas were discovered."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "EN"
+            }
+          },
+          {
+            "type": 1,
+            "name": "ag-note-PT",
+            "content": {
+              "json": "Somente saúde/provisionamento ausentes, estados não saudáveis ou projeções divergentes são listados. A correlação usa ID do AG, não nome; ID ausente é preservado por recurso. Projeções concordantes não comprovam descoberta de todas as réplicas."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "PT"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type =~ 'microsoft.azurearcdata/sqlserverinstances/availabilitygroups'\n| extend childCut=indexof(tolower(id),'/availabilitygroups/')\n| extend instanceId=iff(childCut>=0,tolower(substring(id,0,childCut)),''),availabilityGroupId=tostring(properties.availabilityGroupId),serverName=tostring(properties.serverName),collectionTimestamp=todatetime(properties.collectionTimestamp),primaryReplica=tostring(properties.info.primaryReplica),clusterType=tostring(properties.info.clusterTypeDescription),synchronizationHealth=toupper(tostring(properties.info.synchronizationHealthDescription)),provisioningState=tostring(properties.provisioningState)\n| join kind=leftouter (Resources | where type =~ 'microsoft.azurearcdata/sqlserverinstances' | project instanceId=tolower(id),parentContainerId=tolower(tostring(properties.containerResourceId))) on instanceId\n| where parentContainerId !contains '/providers/microsoft.compute/virtualmachines/'\n| extend correlationKey=iff(isempty(availabilityGroupId),tolower(id),tolower(availabilityGroupId))\n| summarize projectionCount=count(),projectedServers=make_set(serverName),parentInstanceIds=make_set(instanceId),latestCollection=max(collectionTimestamp),primaryReplicas=make_set(primaryReplica),clusterTypes=make_set(clusterType),healthStates=make_set(synchronizationHealth),provisioningStates=make_set(provisioningState),resourceIds=make_set(id),missingHealth=countif(isempty(synchronizationHealth)),unrecognizedHealth=countif(isnotempty(synchronizationHealth) and synchronizationHealth !in ('HEALTHY','NOT_HEALTHY','PARTIALLY_HEALTHY')),missingPrimary=countif(isempty(primaryReplica)),missingProvisioning=countif(isempty(provisioningState)),failedProvisioning=countif(provisioningState =~ 'Failed') by correlationKey,availabilityGroupId,subscriptionId\n| extend availabilityGroup=correlationKey\n| extend hasUnhealthy=set_has_element(healthStates,'NOT_HEALTHY') or set_has_element(healthStates,'PARTIALLY_HEALTHY'),hasUnknownHealth=missingHealth>0 or unrecognizedHealth>0\n| extend validationResult=case(isempty(availabilityGroupId),'Missing availabilityGroupId',hasUnhealthy,'AG reports unhealthy or partially healthy',failedProvisioning>0,'AG provisioning failed',missingProvisioning>0,'AG provisioning metadata missing',hasUnknownHealth,'AG health requires review',missingPrimary>0,'AG primary replica metadata missing',array_length(healthStates)>1,'AG health differs across projections',array_length(primaryReplicas)>1,'Primary replica differs across projections','AG projections consistent and health reported healthy')\n| extend severity=case(validationResult=='AG projections consistent and health reported healthy','Info',validationResult=='AG reports unhealthy or partially healthy','Warning','Review')\n| where severity != 'Info'\n| extend rpValidation='Pending'\n| project rpValidation,severity,availabilityGroup,availabilityGroupId,projectionCount,projectedServers,primaryReplicas,clusterTypes,healthStates,latestCollection,provisioningStates,validationResult,subscriptionId,parentInstanceIds,resourceIds\n| order by severity desc,availabilityGroup asc",
+              "size": 0,
+              "title": "Availability Group health and projection summary / Pendências para validação",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "e5b62541-4899-4d84-99a6-c4bee6825d79"
+          }
+        ],
+        "groupType": "editable"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "SelectedTab",
+        "value": "AG"
+      },
+      "type": 12,
+      "name": "tab-group-AG"
+    },
+    {
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "items": [
+          {
+            "type": 1,
+            "name": "license-note-EN",
+            "content": {
+              "json": "Only incomplete SQL license metadata or explicit non-Succeeded provisioning is listed. Paid/PAYG and Activated/Deactivated are not failures by themselves. Missing optional provisioningState is not a failure. ESU entitlement and estate coverage cannot be established by this query."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "EN"
+            }
+          },
+          {
+            "type": 1,
+            "name": "license-note-PT",
+            "content": {
+              "json": "Somente metadados de licença SQL incompletos ou provisionamento explicitamente diferente de Succeeded são listados. Paid/PAYG e Activated/Deactivated não são falhas por si só. provisioningState opcional ausente não é falha. Esta consulta não comprova direitos ESU ou cobertura do ambiente."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "PT"
+            }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\n| where type in~ ('microsoft.azurearcdata/sqlserverlicenses','microsoft.azurearcdata/sqlserveresulicenses')\n| extend licenseResourceType=case(type =~ 'microsoft.azurearcdata/sqlserverlicenses','SQL Server License / pCore',type =~ 'microsoft.azurearcdata/sqlserveresulicenses','SQL Server ESU License','Other')\n| extend billingPlan=tostring(properties.billingPlan),activationState=tostring(properties.activationState),licenseCategory=tostring(properties.licenseCategory),physicalCores=toint(properties.physicalCores),scopeType=tostring(properties.scopeType)\n| extend finding=case(isnotempty(tostring(properties.provisioningState)) and tostring(properties.provisioningState) !~ 'Succeeded','Provisioning not succeeded',type =~ 'microsoft.azurearcdata/sqlserverlicenses' and (isempty(billingPlan) or isempty(activationState) or isempty(scopeType) or isnull(physicalCores)),'SQL license metadata incomplete','')\n| where isnotempty(finding)\n| project finding,rpValidation='Pending',validationType='Licensing / billing review',severity='Review',licenseResourceType,resourceName=name,billingPlan,activationState,licenseCategory,physicalCores,scopeType,status=tostring(properties.state),provisioningState=tostring(properties.provisioningState),resourceGroup,subscriptionId,resourceId=id,resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),recommendedValidation=case(type =~ 'microsoft.azurearcdata/sqlserverlicenses','Validate billing plan, activation state, physical cores, scope and intended SQL estate coverage','Validate ESU scope, eligible SQL versions, core counts, entitlement and billing')\n| order by licenseResourceType asc,billingPlan asc,resourceGroup asc,resourceName asc",
+              "size": 0,
+              "title": "License metadata exceptions / Exceções de metadados de licenças",
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "gridSettings": {
+                "filter": true,
+                "sortBy": [],
+                "rowLimit": 1000,
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+              },
+              "crossComponentResources": [
+                "{Subscription}"
+              ]
+            },
+            "name": "ab248443-fa5d-4773-ba4b-297abb76a4f6"
+          }
+        ],
+        "groupType": "editable"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "SelectedTab",
+        "value": "Licenses"
+      },
+      "type": 12,
+      "name": "tab-group-Licenses"
+    },
+    {
+      "content": {
+        "version": "NotebookGroup/1.0",
+        "items": [
+          {
+            "type": 1,
+            "name": "guide-EN",
+            "content": {
+              "json": "## Validate before remediation\n- Child and parent GET return 200: both exist; validate the relationship, not just existence.\n- Child 200 and parent 404: strong candidate only after verifying ID, API version, permissions and scope.\n- Both 404: possible stale ARG evidence.\n- Any 403, timeout or transient failure: inconclusive.\nOrphan candidates: an instance whose Arc machine is absent from ARG, and the databases and availability groups below it, which are dependent resources. Microsoft documents removing the SQL extension (WindowsAgent.SqlServer or LinuxAgent.SqlServer), the SQL Server - Azure Arc resource and dependent resources as separate steps; resources remaining after only the machine was removed was observed in a tested environment and is not documented here as a guarantee (verified on 2026-11-06: [disconnect SQL Server from Azure Arc](https://learn.microsoft.com/sql/sql-server/azure-arc/delete-from-azure-arc)).\n\nNo delete/update action is provided. Empty grids do not certify compliance. Do not publish credentials or environment exports.\n\nSources verified on 2026-11-06: [ARG strategy](https://learn.microsoft.com/azure/governance/resource-graph/choose-query-strategy), [FCI](https://learn.microsoft.com/sql/sql-server/azure-arc/support-for-fci), [SQL license API](https://learn.microsoft.com/rest/api/arcdata/sql-server-licenses/get)."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "EN"
+            }
+          },
+          {
+            "type": 1,
+            "name": "guide-PT",
+            "content": {
+              "json": "## Validar antes de corrigir\n- GET do filho e pai retornam 200: ambos existem; valide a relação, não somente existência.\n- Filho 200 e pai 404: candidato forte somente após conferir ID, API, permissões e escopo.\n- Ambos 404: possível evidência ARG desatualizada.\n- Qualquer 403, timeout ou falha transitória: inconclusivo.\nCandidatos a órfãos: instância cuja máquina Arc não existe no ARG e os bancos e grupos de disponibilidade abaixo dela, que são recursos dependentes. A Microsoft documenta a remoção da extensão SQL (WindowsAgent.SqlServer ou LinuxAgent.SqlServer), do recurso SQL Server - Azure Arc e dos recursos dependentes como etapas separadas; recursos que permanecem quando só a máquina foi removida foram observados em ambiente de teste e não são documentados aqui como garantia (verificado em 2026-11-06: [desconectar o SQL Server do Azure Arc](https://learn.microsoft.com/sql/sql-server/azure-arc/delete-from-azure-arc)).\n\nNão há ação de exclusão/alteração. Grades vazias não certificam conformidade. Não publique credenciais ou exportações do ambiente.\n\nFontes verificadas em 2026-11-06: [estratégia ARG](https://learn.microsoft.com/azure/governance/resource-graph/choose-query-strategy), [FCI](https://learn.microsoft.com/sql/sql-server/azure-arc/support-for-fci), [API de licenças SQL](https://learn.microsoft.com/rest/api/arcdata/sql-server-licenses/get)."
+            },
+            "conditionalVisibility": {
+              "comparison": "isEqualTo",
+              "parameterName": "Language",
+              "value": "PT"
+            }
+          }
+        ],
+        "groupType": "editable"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "SelectedTab",
+        "value": "Guide"
+      },
+      "type": 12,
+      "name": "tab-group-Guide"
+    },
+    {
+      "content": {
+        "json": "## Changelog / Histórico\n\n| Version / Versão | Date / Data | Change / Alteração |\n| --- | --- | --- |\n| 1.2.3 | 2026-11-06 | Extension health no longer flags plugin or component statuses inside an otherwise Healthy message (noise on healthy hosts). Saúde da extensão não sinaliza mais status de plugin/componente em mensagem Healthy. Portal validation pending / Validação no portal pendente. |\n| 1.2.2 | 2026-11-06 | Removed the stale-inventory check and its threshold parameter (false positives on healthy hosts); instance status check kept. Removida a verificação de inventário antigo e seu parâmetro de limite (falsos positivos em hosts saudáveis). Portal validation pending / Validação no portal pendente. |\n| 1.2.1 | 2026-11-06 | Added FCI declared host without node projection, node projection not declared by the cluster, and instance whose host has no SQL extension. Hosts FCI sem projeção de nó, nó não declarado pelo cluster e instância cujo host não tem extensão SQL. Portal validation pending / Validação no portal pendente. |\n| 1.2.0 | 2026-11-06 | Orphan detection now includes databases and AGs of instances whose Arc machine is gone; Linux SQL extension; new Connectivity tab (instance status, stale inventory, extension health/upload). Detecção de órfãos inclui bancos e AGs de instâncias sem máquina Arc; extensão SQL Linux; nova aba Conectividade. Portal validation pending / Validação no portal pendente. |\n| 1.1.0 | 2026-11-06 | Added databases on disconnected host or without active SQL extension (grouped per SQL instance). Databases em host desconectado ou sem extensão SQL ativa (agrupado por instância SQL). Portal validation pending / Validação no portal pendente. |\n| 1.0.0 | 2026-11-06 | Initial repository integration, Arc scope, exception-only queries and bilingual navigation. Integração inicial, escopo Arc, consultas de exceções e navegação bilíngue. Portal validation pending / Validação no portal pendente. |"
+      },
+      "conditionalVisibility": {
+        "comparison": "isEqualTo",
+        "parameterName": "ShowChangelog",
+        "value": "Yes"
+      },
+      "type": 1,
+      "name": "changelog"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}

@@ -14,7 +14,7 @@ templates/<project>-azuredeploy.json         # ARM template embedding the workbo
 scripts/                                      # shared tooling (Test-ArcWorkbookQueries.ps1 and its offline mock tests Test-ArcWorkbookQueries.Tests.ps1, which must pass after any change to the harness)
 README.md / README.pt-BR.md                  # root: "Project catalog" table, one row per project
 ```
-Current projects: `arc-agent-support` (Connected Machine agent compliance) and `arc-sql-payg-readiness` (SQL Server enabled by Azure Arc – PAYG readiness).
+Current projects: `arc-agent-support` (Connected Machine agent compliance), `arc-sql-payg-readiness` (SQL Server enabled by Azure Arc – PAYG readiness) and `arc-sql-resource-reconciliation` (SQL resource relationship and metadata exceptions).
 
 ## Rules that always apply
 1. **Bilingual.** Every user-facing doc exists in English and Portuguese (pt-BR). Change one, change the other in the same commit.

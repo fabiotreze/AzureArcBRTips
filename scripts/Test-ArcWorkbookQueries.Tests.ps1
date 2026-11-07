@@ -419,7 +419,7 @@ function Get-WorkbookItems($Items) {
     if ($item.type -eq 12) { Get-WorkbookItems $item.content.items }
   }
 }
-foreach ($project in 'arc-agent-support','arc-sql-payg-readiness') {
+foreach ($project in 'arc-agent-support','arc-sql-payg-readiness','arc-sql-resource-reconciliation') {
   $path = Join-Path $PSScriptRoot "..\workbooks\$project-workbook.json"
   $templatePath = Join-Path $PSScriptRoot "..\templates\$project-azuredeploy.json"
   $raw = [IO.File]::ReadAllText($path)
@@ -471,7 +471,7 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness') {
     if (-not ($items | Where-Object name -eq 'extensions').content.query.Contains('by Publisher, ExtensionType, location')) {
       throw 'Extension grouping lost its region.'
     }
-  } else {
+  } elseif ($project -eq 'arc-sql-payg-readiness') {
     $estimators = @($items | Where-Object { $_.type -eq 3 -and $_.content.query.Contains('| extend CoreEstimate = case(') })
     if ($estimators.Count -ne 7) { throw 'Unexpected SQL estimator count.' }
     foreach ($item in $estimators) {
@@ -486,6 +486,33 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness') {
         -not $architectureQuery.Contains('not a billing cap') -or
         -not $architectureQuery.Contains('teto de cobran')) {
       throw 'Architecture recommendations must not describe Standard capacity as a billing cap.'
+    }
+  } else {
+    $queries = @($items | Where-Object type -eq 3)
+    if ($queries.Count -ne 15) { throw 'Expected fifteen reconciliation exception queries.' }
+    $allQueryText = ($queries | ForEach-Object { $_.content.query }) -join "`n"
+    if (-not $allQueryText.Contains('LinuxAgent.SqlServer') -or
+        -not $allQueryText.Contains('Parent instance container absent from ARG') -or
+        -not $allQueryText.Contains('Declared FCI host has no node projection') -or
+        -not $allQueryText.Contains('SQL extension absent on the host machine') -or
+        $allQueryText.Contains('{StaleDays}') -or
+        ($parameters | Where-Object name -eq 'StaleDays')) {
+      throw 'Reconciliation orphan and Linux extension coverage regressed, or the removed stale-inventory check returned.'
+    }
+    foreach ($query in $queries) {
+      if ($query.content.queryType -ne 1 -or $query.content.gridSettings.rowLimit -ne 1000) {
+        throw 'Reconciliation must use read-only ARG queries and explicit grid limits.'
+      }
+    }
+    $fci = $queries | Where-Object { $_.content.query.Contains('consolidatedProjectionCount') }
+    $ag = $queries | Where-Object { $_.content.query.Contains('hasUnhealthy=') }
+    $license = $queries | Where-Object { $_.content.query.Contains("validationType='Licensing / billing review'") }
+    if (-not $fci.content.query.Contains("| where severity != 'Info'") -or
+        -not $ag.content.query.Contains("| where severity != 'Info'") -or
+        -not $ag.content.query.Contains('by correlationKey,availabilityGroupId,subscriptionId') -or
+        -not $ag.content.query.Contains('missingHealth=countif(isempty(synchronizationHealth))') -or
+        -not $license.content.query.Contains('| where isnotempty(finding)')) {
+      throw 'Reconciliation exception-only filters or unknown-metadata preservation regressed.'
     }
   }
   Write-Host "PASS workbook invariants: $project"

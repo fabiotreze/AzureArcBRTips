@@ -15,6 +15,7 @@ A collection of **projects, workbooks, scripts, deployment templates and practic
 |---|---|---|
 | Arc Agent Support Workbook | Agent version compliance, automatic upgrade health, Advisor, Policy and extensions | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
 | SQL Server enabled by Azure Arc PAYG Readiness Workbook | PAYG readiness, license type, ESU, CSP consent and connectivity review for SQL Server enabled by Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
+| Azure Arc SQL Resource Reconciliation Workbook | Technical exceptions in SQL resource relationships, Arc connectivity and SQL extension health, FCI/AG projections and license metadata; candidates require direct provider validation | [English](workbooks/arc-sql-resource-reconciliation/README.md) · [Português](workbooks/arc-sql-resource-reconciliation/README.pt-BR.md) · [Changelog](workbooks/arc-sql-resource-reconciliation/CHANGELOG.md) |
 
 The catalog lists projects currently available in this repository. Future projects will be added as they are published. Project versions are independent; the workbook's version is not a version for the entire repository.
 
