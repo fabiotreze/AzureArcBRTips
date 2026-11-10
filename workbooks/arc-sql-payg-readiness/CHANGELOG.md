@@ -1,5 +1,9 @@
 # Changelog – SQL Server enabled by Azure Arc – PAYG Readiness Workbook
 
+## 2.4.2 – 2026-11-10
+- **SQL on Azure VMs tab:** the values `NotSet` (license type) and `Unknown` (edition), returned by the API in the lab tenant but not listed in the 2023-10-01 spec enum, are now shown as "Not reported" in the summary and review list; the tab note says so. Verified live: 28 SQL VMs returned in the lab, 4 of them with `NotSet`/`Unknown`. Portal rendering of the change not verified.
+- **Português:** aba SQL em VMs Azure: `NotSet` (licença) e `Unknown` (edição), retornados pela API no lab mas fora do enum do spec 2023-10-01, agora aparecem como "Not reported" no resumo e na lista; a nota informa isso. Verificado ao vivo: 28 SQL VMs no lab, 4 com `NotSet`/`Unknown`. Renderização no portal da mudança não verificada.
+
 ## 2.4.1 – 2026-11-10
 - **Text only (PAYG review tab):** the note now gives a reading order for the three tables, the priority rule applied by the query (High, Medium, OK), a column legend, and notes on hosts without an Arc machine and on free/test editions (the script does not filter by edition). No query changed. Portal rendering not verified.
 - **Português:** somente texto (aba Revisão PAYG): ordem de leitura das três tabelas, regra de prioridade da consulta (Alta, Média, OK), legenda das colunas e notas sobre hosts sem máquina Arc e edições gratuitas/teste (o script não filtra por edição). Nenhuma consulta alterada. Renderização no portal não verificada.

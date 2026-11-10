@@ -4,7 +4,7 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.4.1 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
+**Versão:** 2.4.2 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -38,7 +38,7 @@ A aba *Como usar* tem botões que levam direto a cada aba e links para o script,
 | Revisão PAYG / exportações | Prioridade por host, o que o script converteria, próxima ação, pendências |
 | Inventário completo / exportação | Evidências completas, exportáveis (grades até 10.000 linhas, com busca) |
 | Arquitetura / dimensionamento | Sinal VM x físico, estimativa de núcleos, opções pCore e virtualização ilimitada |
-| SQL em VMs Azure | `Microsoft.SqlVirtualMachine` (VMs do Azure, não Arc): tipo de licença PAYG / AHUB / DR por edição, lista de revisão das edições pagas. Software Assurance e vCores não são visíveis; DR é a réplica HA/DR gratuita. Fontes: [modelo de licença](https://learn.microsoft.com/azure/azure-sql/virtual-machines/windows/licensing-model-azure-hybrid-benefit-ahb-change) e spec de API 2023-10-01 (verificado em 10/11/2026); renderização no portal não verificada |
+| SQL em VMs Azure | `Microsoft.SqlVirtualMachine` (VMs do Azure, não Arc): tipo de licença PAYG / AHUB / DR por edição, lista de revisão das edições pagas. Software Assurance e vCores não são visíveis; DR é a réplica HA/DR gratuita; `NotSet` e `Unknown` retornados pela API aparecem como Not reported. Fontes: [modelo de licença](https://learn.microsoft.com/azure/azure-sql/virtual-machines/windows/licensing-model-azure-hybrid-benefit-ahb-change) e spec de API 2023-10-01 (verificado em 10/11/2026); renderização no portal não verificada |
 | Validações | ESU, consentimento CSP, conectividade, pCore, tags de implantação, extensão ausente |
 | Referências | Documentação oficial utilizada |
 
