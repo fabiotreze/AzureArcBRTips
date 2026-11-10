@@ -107,7 +107,7 @@ The workbook shows the initial classification. Direct provider (RP) reads are a 
 | FCI node and container inconsistent | FCI topology review | Yes (heuristic, host names compared without domain suffix) |
 | Several AG projections | Correlate by `availabilityGroupId` | Yes |
 | Several FCI projections | Correlate by `failoverCluster.id` | Yes |
-| SQL license, physical cores, ESU | Licensing/billing review | Limited: missing metadata or unfinished provisioning only |
+| SQL license, physical cores, ESU | Licensing/billing review | Limited: missing metadata or ESU license not active (`activationState`) only |
 | Resource group or subscription move | Relationship review | No: ARG cannot tell a move from an absence |
 
 | Direct provider result | Classification |

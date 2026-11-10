@@ -107,7 +107,7 @@ O workbook mostra a classificação inicial. A leitura direta no provedor (RP) �
 | Nó e contêiner da FCI inconsistentes | Revisão da topologia FCI | Sim (heurística, nomes comparados sem sufixo de domínio) |
 | Várias projeções de AG | Correlacionar por `availabilityGroupId` | Sim |
 | Várias projeções de FCI | Correlacionar por `failoverCluster.id` | Sim |
-| Licença SQL, núcleos físicos, ESU | Revisão de licenciamento/cobrança | Limitado: só metadados ausentes ou provisionamento inacabado |
+| Licença SQL, núcleos físicos, ESU | Revisão de licenciamento/cobrança | Limitado: só metadados ausentes ou licença ESU não ativa (`activationState`) |
 | Mudança de grupo de recursos ou assinatura | Revisão de relacionamento | Não: o ARG não distingue mudança de ausência |
 
 | Resultado direto no provedor | Classificação |
