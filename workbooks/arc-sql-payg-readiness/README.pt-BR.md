@@ -4,7 +4,7 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.4.3 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
+**Versão:** 2.4.4 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -34,7 +34,7 @@ A aba *Como usar* tem botões que levam direto a cada aba e links para o script,
 | Aba | Uso |
 |---|---|
 | Como usar | Objetivo, caminho rápido com links diretos, limites |
-| Resumo | Tiles (hosts com instância SQL, hosts sem máquina Arc no ARG, Arc desconectado, mix de licenças), versões, situação de suporte |
+| Resumo | Tiles (hosts com instância SQL, hosts com máquina Arc no ARG, instâncias sem máquina Arc (possivelmente residuais), Arc desconectado, mix de licenças), versões, situação de suporte |
 | Revisão PAYG / exportações | Prioridade por host, o que o script converteria, próxima ação, pendências |
 | Inventário completo / exportação | Evidências completas, exportáveis (grades até 10.000 linhas, com busca) |
 | Arquitetura / dimensionamento | Sinal VM x físico, estimativa de núcleos, opções pCore e virtualização ilimitada |

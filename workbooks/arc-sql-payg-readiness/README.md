@@ -4,7 +4,7 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 > **Personal, unofficial project.** It is not a Microsoft product and not an official licensing tool. Core numbers are estimates, not meters. Confirm entitlement with your licensing process and charges in Cost Management. See [DISCLAIMER](../../DISCLAIMER.md).
 
-**Version:** 2.4.3 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
+**Version:** 2.4.4 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -34,7 +34,7 @@ The *How to use* tab has buttons that jump to each tab and links to the script, 
 | Tab | Use it for |
 |---|---|
 | How to use | Purpose, quick path with direct links, limits |
-| Summary | Tiles (hosts with SQL instances, hosts without an Arc machine in ARG, Arc not connected, license mix), versions, support status |
+| Summary | Tiles (hosts with SQL instances, hosts with an Arc machine in ARG, instances without an Arc machine (possibly stale), Arc not connected, license mix), versions, support status |
 | PAYG review / exports | Per-host priority, what the script would convert, next action, reconciliation backlog |
 | Complete inventory / export | Full evidence, exportable (grids up to 10,000 rows, with search) |
 | Architecture / sizing | VM versus physical signal, core estimate, pCore and unlimited virtualization options |
