@@ -4,7 +4,7 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 > **Personal, unofficial project.** It is not a Microsoft product and not an official licensing tool. Core numbers are estimates, not meters. Confirm entitlement with your licensing process and charges in Cost Management. See [DISCLAIMER](../../DISCLAIMER.md).
 
-**Version:** 2.4.5 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
+**Version:** 2.4.6 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -59,7 +59,7 @@ Connect-AzAccount
 | Complete inventory / export | Full evidence, exportable (grids up to 10,000 rows, with search) |
 | Architecture / sizing | VM versus physical signal, core estimate, pCore and unlimited virtualization options |
 | SQL on Azure VMs | `Microsoft.SqlVirtualMachine` (Azure VMs, not Arc): license type PAYG / AHUB / DR by edition, paid-edition review list. Software Assurance and vCores are not visible; DR is the free HA/DR replica; `NotSet` and `Unknown` returned by the API are shown as Not reported. Sources: [license model](https://learn.microsoft.com/azure/azure-sql/virtual-machines/windows/licensing-model-azure-hybrid-benefit-ahb-change) and the 2023-10-01 API spec (verified on 2026-11-10); portal rendering not verified |
-| Validation | ESU, CSP consent, connectivity, pCore, auto-deploy tags, missing extension |
+| Validation | ESU, CSP consent, connectivity, pCore, auto-deploy tags, missing extension, PAYG change history (ARG `resourcechanges`) |
 | References | Official documentation used |
 
 ## Requirements
