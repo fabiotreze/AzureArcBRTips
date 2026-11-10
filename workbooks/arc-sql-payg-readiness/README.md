@@ -4,7 +4,7 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 > **Personal, unofficial project.** It is not a Microsoft product and not an official licensing tool. Core numbers are estimates, not meters. Confirm entitlement with your licensing process and charges in Cost Management. See [DISCLAIMER](../../DISCLAIMER.md).
 
-**Version:** 2.4.6 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
+**Version:** 2.4.7 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
