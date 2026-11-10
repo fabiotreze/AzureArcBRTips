@@ -35,6 +35,7 @@ param(
   [string[]]$WorkbookPath,
   [string]$HybridComputeVersion = '2026-09-01',
   [string[]]$ArcDataVersions = @('2026-01-01', '2026-03-01-preview'),
+  [string]$SqlVirtualMachineVersion = '2023-10-01',
   [string]$CacheDir = (Join-Path ([IO.Path]::GetTempPath()) 'arc-contract-cache'),
   [switch]$Live,
   [string[]]$Subscriptions,
@@ -46,6 +47,7 @@ $ErrorActionPreference = 'Stop'
 $script:SpecRoot = @{
   hybridcompute = 'specification/hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute'
   azurearcdata  = 'specification/azurearcdata/resource-manager/Microsoft.AzureArcData/AzureArcData'
+  sqlvirtualmachine = 'specification/sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine'
 }
 $script:ArgDocUrl = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/governance/resource-graph/reference/supported-tables-resources.md'
 
@@ -58,6 +60,7 @@ $script:TypeMap = @{
   'microsoft.azurearcdata/sqlserverinstances/availabilitygroups' = @('azurearcdata', 'SqlServerAvailabilityGroupResource')
   'microsoft.azurearcdata/sqlserverlicenses'                  = @('azurearcdata', 'SqlServerLicense')
   'microsoft.azurearcdata/sqlserveresulicenses'               = @('azurearcdata', 'SqlServerEsuLicense')
+  'microsoft.sqlvirtualmachine/sqlvirtualmachines'            = @('sqlvirtualmachine', 'SqlVirtualMachine')
 }
 
 # ---------- download with cache ----------
@@ -277,6 +280,8 @@ function Get-AllSpecs {
   $specs['hybridcompute'] = @($hc)
   $specs['azurearcdata'] = @($ArcDataVersions | ForEach-Object { Get-SpecSet -Service azurearcdata -Version $_ } | Where-Object { $_ })
   if (-not $specs['azurearcdata']) { throw 'No Arc data spec found.' }
+  $sqlvm = Get-SpecSet -Service sqlvirtualmachine -Version $SqlVirtualMachineVersion
+  $specs['sqlvirtualmachine'] = @(@($sqlvm) | Where-Object { $_ })
   $specs
 }
 
@@ -447,7 +452,7 @@ if ($MyInvocation.InvocationName -ne '.') {
   if ($ReportPath) {
     $md = [Collections.Generic.List[string]]::new()
     $md.Add('# Contract report'); $md.Add('')
-    $md.Add("Run date: $(Get-Date -Format 'yyyy-MM-dd'). Specs: HybridCompute $HybridComputeVersion; AzureArcData $($ArcDataVersions -join ', '); ARG tables: Learn supported-tables-resources."); $md.Add('')
+    $md.Add("Run date: $(Get-Date -Format 'yyyy-MM-dd'). Specs: HybridCompute $HybridComputeVersion; AzureArcData $($ArcDataVersions -join ', '); SqlVirtualMachine $SqlVirtualMachineVersion; ARG tables: Learn supported-tables-resources."); $md.Add('')
     $md.Add('| Layer | Status | Count |'); $md.Add('| --- | --- | --- |')
     foreach ($g in ($findings | Group-Object Layer, Status | Sort-Object Name)) { $l, $s = $g.Name -split ', '; $md.Add("| $l | $s | $($g.Count) |") }
     $md.Add(''); $md.Add('| Status | Layer | Workbook | Item | Detail |'); $md.Add('| --- | --- | --- | --- | --- |')
