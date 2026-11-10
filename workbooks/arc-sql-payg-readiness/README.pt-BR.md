@@ -4,7 +4,7 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.4.0 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
+**Versão:** 2.4.1 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 

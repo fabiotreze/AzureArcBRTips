@@ -2,6 +2,11 @@
 
 Personal, independent project; see [DISCLAIMER](../../DISCLAIMER.md). Projeto pessoal e independente; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal).
 
+## 1.2.7 - 2026-11-10
+
+- The `finding` text and the `rpValidation` value (`Pending`) in the exception queries now follow the *Language* parameter; they were always English (category codes are unchanged). Portal rendering not verified.
+- **Português:** os textos de `finding` e o valor de `rpValidation` (`Pendente`) das consultas de exceção agora seguem o parâmetro *Language*; antes eram sempre em inglês (códigos de categoria inalterados). Renderização no portal não verificada.
+
 ## 1.2.6 - 2026-11-10
 
 - License exceptions query: removed `properties.provisioningState` and `properties.state`, which are not in the Microsoft.AzureArcData `SqlServerLicense` / `SqlServerEsuLicense` API specs (checked with `scripts/Test-ArcWorkbookContract.ps1`). ESU licenses are now flagged when `activationState` is not Active (documented values: Inactive, Active, Terminated). The `status` and `provisioningState` columns were removed. Portal rendering not verified.

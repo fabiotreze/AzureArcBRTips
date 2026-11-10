@@ -1,5 +1,9 @@
 # Changelog – SQL Server enabled by Azure Arc – PAYG Readiness Workbook
 
+## 2.4.1 – 2026-11-10
+- **Text only (PAYG review tab):** the note now gives a reading order for the three tables, the priority rule applied by the query (High, Medium, OK), a column legend, and notes on hosts without an Arc machine and on free/test editions (the script does not filter by edition). No query changed. Portal rendering not verified.
+- **Português:** somente texto (aba Revisão PAYG): ordem de leitura das três tabelas, regra de prioridade da consulta (Alta, Média, OK), legenda das colunas e notas sobre hosts sem máquina Arc e edições gratuitas/teste (o script não filtra por edição). Nenhuma consulta alterada. Renderização no portal não verificada.
+
 ## 2.4.0 – 2026-11-10
 - **New tab "SQL on Azure VMs":** license type summary (PAYG, AHUB, DR) by edition and a review list for paid editions of `Microsoft.SqlVirtualMachine`, joined to the compute VM by `virtualMachineResourceId`. Free editions (Developer, Express) are listed separately; DR is treated as the free HA/DR replica, not as "AHB off". Property names and enum values checked with `scripts/Test-ArcWorkbookContract.ps1` against the 2023-10-01 spec. Software Assurance and vCores are not visible. Not run against live SQL VMs; portal rendering not verified.
 - **Português:** nova aba "SQL em VMs Azure": resumo por tipo de licença (PAYG, AHUB, DR) e edição, e lista de revisão das edições pagas de `Microsoft.SqlVirtualMachine`. Developer e Express separadas; DR é a réplica HA/DR gratuita. Propriedades conferidas com o script de contrato (spec 2023-10-01). Software Assurance e vCores não visíveis. Não executado em SQL VMs reais; renderização no portal não verificada.
