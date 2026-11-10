@@ -1,5 +1,9 @@
 # Changelog – SQL Server enabled by Azure Arc – PAYG Readiness Workbook
 
+## 2.4.3 – 2026-11-11
+- **Summary:** the *Arc not connected* tile counted hosts whose Arc machine is absent from Azure Resource Graph (empty status is "not Connected"), which inflated it (61 in the lab). It now counts only hosts with an Arc machine whose status is not Connected. New tile *No Arc machine in ARG*; *Arc SQL hosts* renamed *Hosts with SQL instances* (it always included hosts without a visible machine). The Inventory note now describes rows without an Arc machine and where to validate them. The lab split after the change is not verified; portal rendering not verified.
+- **Português:** Resumo: o bloco *Arc desconectado* contava hosts sem máquina Arc no ARG (status vazio é "não Connected"), inflando o número (61 no lab). Agora conta só hosts com máquina Arc cujo status não é Connected. Novo bloco *Sem máquina Arc no ARG*; *Hosts Arc SQL* renomeado para *Hosts com instância SQL*. A nota do Inventário descreve as linhas sem máquina Arc e onde validá-las. A divisão no lab após a mudança não foi verificada; renderização no portal não verificada.
+
 ## 2.4.2 – 2026-11-10
 - **SQL on Azure VMs tab:** the values `NotSet` (license type) and `Unknown` (edition), returned by the API in the lab tenant but not listed in the 2023-10-01 spec enum, are now shown as "Not reported" in the summary and review list; the tab note says so. Verified live: 28 SQL VMs returned in the lab, 4 of them with `NotSet`/`Unknown`. Portal rendering of the change not verified.
 - **Português:** aba SQL em VMs Azure: `NotSet` (licença) e `Unknown` (edição), retornados pela API no lab mas fora do enum do spec 2023-10-01, agora aparecem como "Not reported" no resumo e na lista; a nota informa isso. Verificado ao vivo: 28 SQL VMs no lab, 4 com `NotSet`/`Unknown`. Renderização no portal da mudança não verificada.
