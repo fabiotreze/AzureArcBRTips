@@ -221,6 +221,9 @@ function Invoke-SnapshotMain {
   Write-Host "Hosts with SQL instances: $($records.Count)"
   $records | Group-Object Scenario | Sort-Object Name | ForEach-Object { Write-Host ("  {0,-20} {1}" -f $_.Name, $_.Count) }
   Write-Host "Check ATTENTION: $(@($records | Where-Object Check -eq 'ATTENTION').Count)  (cores are estimates, not billing)"
+  $responding = @(@($data.Instances) + @($data.Machines) | ForEach-Object { ([string]$_.HostId -split '/')[2] } | Where-Object { $_ } | Sort-Object -Unique).Count
+  Write-Host "Subscriptions with Arc data: $responding of $($subs.Count) in scope"
+  if ($responding -lt $subs.Count) { Write-Warning 'Some subscriptions returned no Arc data: they may have none, or your token may not reach them (MFA or another tenant). Run Connect-AzAccount -TenantId <tenant> and use -Subscriptions to confirm coverage.' }
   $file
 }
 
