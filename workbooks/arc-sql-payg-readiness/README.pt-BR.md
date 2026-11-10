@@ -4,7 +4,7 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.4.4 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
+**Versão:** 2.4.5 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -20,20 +20,22 @@ Para publicar, siga o [fluxo de registro de revisões](CHANGELOG.md#azure-revisi
 
 Os limites Standard descrevem a [capacidade computacional do mecanismo](https://learn.microsoft.com/sql/sql-server/compute-capacity-limits-by-edition-of-sql-server), não um teto universal de cobrança. Hosts mistos usam o limite das suas instâncias Standard, não a versão de uma instância Developer. Reconcilie o licenciamento de hosts físicos e VMs separadamente com o [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing) e o Cost Management. Verificado em 2026-11-06.
 
-## Caminho rápido
-1. **Resumo**: panorama, mix de licenças, versões, situação de suporte.
-2. **Revisão PAYG**: comece pelos hosts 🔴; veja o que o script converteria.
-3. **Validações**: ESU, consentimento CSP, conectividade, pCore.
-4. Rode o script oficial com `-ReportOnly` e reconcilie.
-5. Pilote um conjunto pequeno aprovado com `-WaitForCompletion`.
-6. Confirme no Cost Management e defina a tag de implantação automática.
+## Caminho guiado (8 passos)
+1. **Escopo**: selecione as assinaturas.
+2. **Linha de base** (Resumo): hosts com instância SQL x hosts com máquina Arc no ARG, Arc desconectado, mix de licenças, hosts 🔴.
+3. **Corrigir a base** (Inventário, Validações): hosts sem máquina Arc, agentes desconectados, extensão ausente.
+4. **Triagem** (Revisão PAYG): 🔴 e depois 🟠; decida quais hosts excluir.
+5. **Núcleos** (Arquitetura): VM x físico, estimativa de núcleos, pCore.
+6. **Pré-requisitos** (Validações): ESU, consentimento CSP, tags, SQLServerLicense, pCore.
+7. **Simulação**: script oficial com `-ReportOnly`, comparado com *Script selecionaria (ARG)*.
+8. **Piloto e confirmação**: `-WaitForCompletion` em um conjunto pequeno, Cost Management, tag de auto-deploy.
 
-A aba *Como usar* tem botões que levam direto a cada aba e links para o script, o README e as páginas do Microsoft Learn.
+A aba *Como usar* explica cada passo (onde olhar, o que fazer, quando está pronto) e tem botões que levam a cada aba e links para o script e as páginas do Microsoft Learn.
 
 ## Abas
 | Aba | Uso |
 |---|---|
-| Como usar | Objetivo, caminho rápido com links diretos, limites |
+| Como usar | Objetivo, caminho guiado de 8 passos com links diretos, limites |
 | Resumo | Tiles (hosts com instância SQL, hosts com máquina Arc no ARG, instâncias sem máquina Arc (possivelmente residuais), Arc desconectado, mix de licenças), versões, situação de suporte |
 | Revisão PAYG / exportações | Prioridade por host, o que o script converteria, próxima ação, pendências |
 | Inventário completo / exportação | Evidências completas, exportáveis (grades até 10.000 linhas, com busca) |
@@ -70,7 +72,7 @@ Se omitido, o padrão `newGuid()` cria outro workbook; veja o [comportamento ARM
 
 O validador usa metadados REST de paginação do ARG; resultados **INCOMPLETE** reprovam a validação, inclusive em Burst. Consultas de inventário/revisão por host preservam `id` para tokens de continuação. Configurar a grade para 10.000 linhas não garante que a fonte retornou todos os registros. Veja [paginação ARG](https://learn.microsoft.com/azure/governance/resource-graph/concepts/work-with-data) e [limites de workbooks](https://learn.microsoft.com/azure/azure-monitor/visualize/workbooks-limits) (verificado em 2026-11-06).
 
-Execute `-DryRun`, modo normal e `-Burst` nos dois idiomas, com escopo explícito em `-Subscriptions <subscription-id>`. Teste também todas as abas e botões do caminho rápido no portal; testes de API não verificam renderização nem navegação.
+Execute `-DryRun`, modo normal e `-Burst` nos dois idiomas, com escopo explícito em `-Subscriptions <subscription-id>`. Teste também todas as abas e botões do caminho guiado no portal; testes de API não verificam renderização nem navegação.
 
 ## Documentação oficial
 - [Gerenciar licença e cobrança do SQL Server](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing)
