@@ -32,6 +32,24 @@ Os limites Standard descrevem a [capacidade computacional do mecanismo](https://
 
 A aba *Como usar* explica cada passo (onde olhar, o que fazer, quando está pronto) e tem botões que levam a cada aba e links para o script e as páginas do Microsoft Learn.
 
+## Scripts de snapshot antes/depois (opcional, fora do workbook)
+
+O workbook mostra apenas o estado atual e não guarda histórico. Dois scripts PowerShell 7 somente leitura (módulo `Az.Accounts`, apenas leituras no ARG) registram o estado antes e depois de uma mudança para PAYG e os comparam. Servem para qualquer caminho: PAYG direto ou PAYG com licença de núcleos físicos (virtualização ilimitada).
+
+```powershell
+Connect-AzAccount
+.\scripts\Export-ArcSqlPaygSnapshot.ps1 -Label Before      # CSV em .\arc-payg-snapshots
+# ... aplique a mudança (por exemplo o script oficial, com -WaitForCompletion) ...
+.\scripts\Export-ArcSqlPaygSnapshot.ps1 -Label After
+.\scripts\Compare-ArcSqlPaygSnapshot.ps1 -Before <before.csv> -After <after.csv> [-PlannedHostsCsv planned.csv]
+```
+
+- Uma linha por host. `Scenario`: `DirectPAYG` (LicenseType PAYG), `PhysicalCoreLicense` (UsePhysicalCoreLicense aplicado), `NotPAYG`, `Unknown` (sem máquina Arc ou sem extensão).
+- `Check` é `OK`, `INFO` ou `ATTENTION`. Achados incluem NO_MACHINE, ARC_NOT_CONNECTED, EXT_MISSING, EXT_NOT_SUCCEEDED, ESU_MISSING, PCORE_NO_LICENSE_VISIBLE e PCORE_PLAN_MISMATCH.
+- O Compare lista transições de cenário, campos alterados por host e, com `-PlannedHostsCsv` (coluna `MachineName` ou `HostId`), se cada host planejado está `CONVERTED`, `CONVERTED_WITH_ATTENTION`, `NOT_CONVERTED` ou `NOT_FOUND_AFTER`.
+- Núcleos são estimativas, não cobrança. O tempo que o ARG leva para refletir uma mudança não foi verificado; faça o snapshot After depois que a mudança propagar. Os CSV contêm IDs de assinatura e nomes de host: estão no .gitignore, mantenha-os privados.
+- Testes offline: `scripts\Test-ArcSqlPaygSnapshot.Tests.ps1`.
+
 ## Abas
 | Aba | Uso |
 |---|---|

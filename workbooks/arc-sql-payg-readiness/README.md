@@ -32,6 +32,24 @@ The Standard limits describe [engine compute capacity](https://learn.microsoft.c
 
 The *How to use* tab explains each step (where to look, what to do, when it is done) and has buttons that jump to each tab and links to the script and Microsoft Learn pages.
 
+## Before/after snapshot scripts (optional, outside the workbook)
+
+The workbook shows only the current state and keeps no history. Two read-only PowerShell 7 scripts (module `Az.Accounts`, ARG reads only) let you record the state before and after a PAYG change and compare them. They work for any path: direct PAYG or PAYG with physical core license (unlimited virtualization).
+
+```powershell
+Connect-AzAccount
+.\scripts\Export-ArcSqlPaygSnapshot.ps1 -Label Before      # CSV in .\arc-payg-snapshots
+# ... apply the change (for example the official script, with -WaitForCompletion) ...
+.\scripts\Export-ArcSqlPaygSnapshot.ps1 -Label After
+.\scripts\Compare-ArcSqlPaygSnapshot.ps1 -Before <before.csv> -After <after.csv> [-PlannedHostsCsv planned.csv]
+```
+
+- One row per host. `Scenario`: `DirectPAYG` (LicenseType PAYG), `PhysicalCoreLicense` (UsePhysicalCoreLicense applied), `NotPAYG`, `Unknown` (no Arc machine or no extension).
+- `Check` is `OK`, `INFO` or `ATTENTION`. Findings include NO_MACHINE, ARC_NOT_CONNECTED, EXT_MISSING, EXT_NOT_SUCCEEDED, ESU_MISSING, PCORE_NO_LICENSE_VISIBLE and PCORE_PLAN_MISMATCH.
+- Compare lists scenario transitions, changed fields per host, and, with `-PlannedHostsCsv` (column `MachineName` or `HostId`), whether each planned host is `CONVERTED`, `CONVERTED_WITH_ATTENTION`, `NOT_CONVERTED` or `NOT_FOUND_AFTER`.
+- Cores are estimates, not billing. How long ARG takes to reflect a change is not verified; take the After snapshot once the change has propagated. The CSVs contain subscription IDs and host names: they are git-ignored, keep them private.
+- Offline tests: `scripts\Test-ArcSqlPaygSnapshot.Tests.ps1`.
+
 ## Tabs
 | Tab | Use it for |
 |---|---|
