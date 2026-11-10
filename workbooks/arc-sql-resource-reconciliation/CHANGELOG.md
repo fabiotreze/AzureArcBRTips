@@ -2,6 +2,21 @@
 
 Personal, independent project; see [DISCLAIMER](../../DISCLAIMER.md). Projeto pessoal e independente; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal).
 
+## 1.2.6 - 2026-11-10
+
+- License exceptions query: removed `properties.provisioningState` and `properties.state`, which are not in the Microsoft.AzureArcData `SqlServerLicense` / `SqlServerEsuLicense` API specs (checked with `scripts/Test-ArcWorkbookContract.ps1`). ESU licenses are now flagged when `activationState` is not Active (documented values: Inactive, Active, Terminated). The `status` and `provisioningState` columns were removed. Portal rendering not verified.
+- **Português:** Consulta de exceções de licença: removidas `properties.provisioningState` e `properties.state`, que não constam nos specs de `SqlServerLicense` / `SqlServerEsuLicense` (verificado com `scripts/Test-ArcWorkbookContract.ps1`). Licenças ESU passam a ser sinalizadas quando `activationState` não é Active (valores documentados: Inactive, Active, Terminated). Colunas `status` e `provisioningState` removidas. Renderização no portal não verificada.
+
+## 1.2.5 - 2026-11-10
+
+- No query changed. The Language parameter now opens in English, like the other workbooks (Português stays available). The in-workbook banner showed 1.2.3; it now shows the real version. Portal rendering not verified.
+- **Português:** Nenhuma query alterada. O parâmetro Language agora abre em English, como os outros workbooks (Português continua disponível). O banner dentro do workbook mostrava 1.2.3; agora mostra a versão real. Renderização no portal não verificada.
+
+## 1.2.4 - 2026-11-10
+
+- No query changed. All grids now offer Export to Excel and show a status icon in the severity column. Portal rendering not verified.
+- **Português:** Nenhuma query alterada. Todas as grades oferecem exportação para Excel e ícone de status na coluna severity. Renderização no portal não verificada.
+
 ## 1.2.3 - 2026-11-06
 
 - Connectivity: extension health no longer flags plugin or component statuses ("status":"Error...") inside a message that is otherwise Healthy with upload OK; in a real run this flagged hosts that were healthy overall. Provisioning, non-Healthy status and upload failures are still reported.

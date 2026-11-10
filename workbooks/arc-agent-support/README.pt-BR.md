@@ -2,7 +2,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é uma ferramenta oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal) do repositório. O status de suporte é uma **estimativa** (as APIs do Azure não expõem datas de release) – valide nas [release notes do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). O uso é de sua responsabilidade.
 
-**Versão atual: 4.7.1** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
+**Versão atual: 4.9.0** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 
@@ -30,7 +30,7 @@ O suporte é estimado por número de releases sequenciais, não por datas verifi
 
 | # | Seção | O que mostra |
 |---|---|---|
-| 1 | Visão geral | Aviso quando há servidores desconectados / expirados; tiles de *Situação da frota* e *Versão e upgrade* (Latest / Supported / Out of support / **Abaixo do piso de segurança** / upgrade automático); **Servidores que precisam de ação** com o motivo |
+| 1 | Visão geral | Aviso quando há servidores desconectados / expirados; tiles de *Situação da frota* e *Versão e upgrade* (Latest / Supported / Out of support / **Abaixo do piso de segurança** / upgrade automático); **Servidores que precisam de ação** com o motivo (desconectado/expirado, abaixo do piso de segurança, fora de suporte, upgrade com falha/atrasado, upgrade manual necessário). Servidores que só têm upgrade automático desativado mas elegíveis aparecem como recomendação no bloco *Elegível, não ativado* e não entram em *Precisam de ação* |
 | 2 | Distribuição | Versões, status de conexão, saúde do upgrade automático (gráficos opcionais: *Mostrar gráficos de distribuição*, desligado por padrão) |
 | 3 | Azure Advisor | Bloqueios (expirados / desconectados) e recomendações do agent, com link para os recursos afetados no Advisor e verificação de atualidade |
 | 4 | Inventário | Uma linha por servidor (até 1000), abaixo do piso e fora de suporte primeiro |
@@ -47,17 +47,35 @@ Os catálogos de extensões usam o array raiz combinado retornado por [ARM GETAR
 
 Reader nas assinaturas / management group selecionados é necessário para consultar os dados. Implantar o template ARM ou salvar o workbook exige permissões adicionais para implantar/criar ou atualizar o recurso de workbook. Para validar as consultas, use PowerShell 7+ e Az.Accounts.
 
+### Filtros e controles (parâmetros visíveis)
+
+| Parâmetro | Padrão | Significado |
+|---|---|---|
+| Subscriptions | Todas | Assinaturas consultadas (Azure Resource Graph) |
+| Language | EN | Seletor único EN / PT para todos os textos do workbook |
+| OsFilter (OS) | Todos | Sistemas operacionais encontrados nas assinaturas selecionadas |
+| StatusFilter (Connection Status) | Todos | Status de conexão encontrados nas assinaturas selecionadas |
+| SupportFilter (Estimated support status) | Todos | Latest / Supported / Out of support / Unknown (heurística, veja Regras) |
+| AutoUpgradeFilter (Auto Upgrade) | Todos | Enabled / Disabled / N/A |
+| ShowInfo (Mostrar guia) | Não | Legenda, metodologia e fontes oficiais |
+| ShowCharts (Mostrar gráficos de distribuição) | Não | Gráficos opcionais em Distribuição; abrir a aba executa 6 queries a mais |
+| ShowChangelog (Exibir histórico) | Não | Histórico editorial (apenas modo Edit) |
+
+Os demais parâmetros são ocultos: as *Regras* abaixo, as versões de API do Azure (`ApiVersion`, `ExtApiVersion`) e valores resolvidos pelo Azure (`ReleasedWindows`, `ReleasedLinux`, `LatestSummary`, `AnyOsTarget`, `SelectedTab`). Na aba Extensões, selecionar uma linha da primeira grade exporta `ExtPublisher`, `ExtType` e `ExtLocation` para as grades de comparação.
+
+A consulta ao catálogo de extensões usa o caminho em nível de tenant, sem `/subscriptions/{id}`. Em 2026-11-10 ela retornou HTTP 200 com a mesma lista de versões do caminho documentado com a assinatura, para um publisher/tipo/região ([referência da API](https://learn.microsoft.com/rest/api/hybridcompute/extension-metadata-v-2/list)); outras regiões e publishers não foram testados.
+
 ### Regras (editáveis no modo Edit)
 
 | Parâmetro | Padrão | Significado |
 |---|---|---|
-| SupportWindow | 12 releases | Apenas heurística: aproxima a política oficial dos últimos 12 meses pelo número sequencial de releases; confirme as datas nas notas de versão do agent |
+| SupportWindow | 12 releases | Apenas heurística: aproxima a política oficial dos últimos 12 meses pelo número sequencial de releases; confirme as datas nas notas de versão do agent (as [notas de versão](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes) indicam suporte apenas a versões lançadas no último ano; verificado em 2026-11-10) |
 | AutoUpgradeTolerance | 1 | Heurística, não uma garantia documentada (a Microsoft libera os upgrades automáticos em lotes e repete as falhas); *On track* também exige conectividade e ausência de falha na última tentativa |
-| MinAutoUpgradeVersion | 1.67 | O upgrade automático exige agent 1.67 ou superior (Windows: execution policy do PowerShell RemoteSigned; Linux: serviço cron) |
-| **SecurityFloorVersion** | **1.61** | Mínimo configurável baseado em registros públicos de CVE (CVE-2026-26117 afeta agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 e CVE-2025-55316 como no Arc Posture Review); aplicado a todos os SOs; estar acima dele **não** atesta segurança. Revise regularmente novas correções e esse limite |
-| LatestOverride | 1.69 | Referência manual das notas de versão do agent. Quando preenchido, tem prioridade sobre todas as outras fontes (não é um máximo), mesmo que o Azure reporte uma versão maior: atualize ou limpe a cada release |
+| MinAutoUpgradeVersion | 1.67 | O upgrade automático exige agent 1.67 ou superior (Windows: execution policy do PowerShell RemoteSigned; Linux: serviço cron) — [Learn](https://learn.microsoft.com/azure/azure-arc/servers/automatic-agent-upgrade), verificado em 2026-11-10 |
+| **SecurityFloorVersion** | **1.61** | Mínimo configurável baseado em registros públicos de CVE (CVE-2026-26117 afeta agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 e CVE-2025-55316 como no Arc Posture Review); aplicado a todos os SOs; estar acima dele **não** atesta segurança. Revise regularmente novas correções e esse limite. Registro do CVE-2026-26117 (afeta < 1.61) conferido em 2026-11-10; as notas da 1.70 listam correções de segurança sem faixa de versões afetadas, então o piso não foi elevado |
+| LatestOverride | vazio | Referência manual opcional das notas de versão do agent. Quando preenchido, tem prioridade sobre todas as outras fontes (não é um máximo), mesmo que o Azure reporte uma versão maior: atualize ou limpe a cada release |
 
-Sem override, *Latest* é a maior versão que o Azure reporta e pode ficar atrás da release mais recente.
+Sem override, a *Latest* é a maior entre a versão que o Azure reporta (`osType/agentVersions/latest`) e o alvo do upgrade automático visto na frota, e pode ficar atrás da release mais recente. Verificado em 2026-11-10: as notas de versão e o host de download já listavam a 1.70 (`Last-Modified` do host em 2026-11-09), enquanto a API ainda retornava a 1.69. Nenhuma fonte do Azure Resource Graph ou ARM informa a release mais recente de imediato, então não dá para remover a versão fixa sem aceitar esse atraso; preencha o *LatestOverride* temporariamente se precisar que a release mais nova seja considerada. O seletor de download pré-seleciona a versão confirmada pela API, então um override mais novo não gera 404.
 
 ## Importação
 
@@ -93,6 +111,8 @@ Repita os testes em **EN e PT**. `Subsets` cobre as opções enumeradas disponí
 
 Os valores de `-SetParam` são aplicados antes da resolução dos parâmetros dependentes. Falhas de consulta, tokens não resolvidos, falhas de parâmetro e resultados **INCOMPLETE** produzem código de saída **1**; sucesso produz **0**. A ausência de token de continuação não comprova completude. Exatamente 10.000 linhas só são completas se os metadados confirmarem que não há mais resultados. As falhas de parâmetro aparecem no CSV e no resumo final em vermelho. Execute os testes de regressão offline com mocks usando `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1`.
 
+**Verificação de contrato com metadados (não testa resultados).** `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookContract.ps1` compara cada caminho `properties.*`, tipo de recurso, tabela do Resource Graph e caminho ARM usados pelos workbooks com as fontes públicas: as especificações da API REST do Azure (`Azure/azure-rest-api-specs`) e a lista do Learn de tabelas suportadas do Resource Graph. `-Live` (somente leitura) também conta quantos recursos do seu tenant preenchem cada propriedade. Comprova que o workbook lê campos documentados; não comprova que as heurísticas (suportado, on track, precisa de ação) seguem a política da Microsoft. Propriedades de Advisor, política e assinatura aparecem como UNVERIFIED porque não há especificação comparada. Testes offline: `Test-ArcWorkbookContract.Tests.ps1`.
+
 Na execução normal, parâmetros que aguardam apenas valores exportados pela seleção de linha de uma consulta aparecem como **Skipped (aguarda seleção)** no CSV e no resumo, sem reprovar a execução. Os nomes exportados são descobertos pelos metadados das consultas. `-ExtensionDrill` fornece valores de seleção e valida as consultas dos parâmetros; uma falha real ou um token não resolvido que não venha da seleção continua produzindo código de saída **1**.
 
 > Os relatórios de teste contêm dados do ambiente – trate como confidenciais e nunca anexe em issues ou commits.
@@ -108,9 +128,7 @@ As referências do agent usam consultas exatas a `latest`, e os downloads usam a
 
 ## Manutenção
 
-[`agent-releases.json`](agent-releases.json) é um calendário de referência gerado por [`Update-AgentReleases.ps1`](../../scripts/Update-AgentReleases.ps1). Nenhum workbook atual lê esse arquivo; atualizá-lo não muda as regras de conformidade, as versões de referência ou os workbooks implantados.
-
-O [workflow Update agent release calendar](../../.github/workflows/update-agent-releases.yml) é executado manualmente por `workflow_dispatch`, não por agendamento. Ele grava o calendário e, quando há mudança, faz commit e push desse arquivo na branch selecionada para a execução, sujeito às permissões do repositório e proteções de branch. Não executa os testes de consultas dos workbooks. Revise o diff resultante e o resultado do workflow; isso é separado da validação e publicação do workbook.
+Após cada release do Connected Machine agent, consulte as [notas de versão do agent](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes) e atualize ou limpe o `LatestOverride` (veja Regras). Nenhum arquivo deste repositório acompanha datas de release.
 
 ## Projetos relacionados
 

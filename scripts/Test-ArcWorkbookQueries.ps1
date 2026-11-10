@@ -310,6 +310,16 @@ function Invoke-OneItem {
   $unresolved = [regex]::Matches($q, '\{([A-Za-z][A-Za-z0-9_]*)\}') | ForEach-Object { $_.Value } | Select-Object -Unique
   $rec = [ordered]@{ Scenario = $Scenario; Tab = $Tab; Item = $name; Kind = $(if ($isArm) { 'ARM' } else { 'ARG' }); QueryChars = $q.Length
                      Status = 'Skipped'; Rows = $null; Truncated = $false; DurationMs = 0; N429 = 0; CacheHit = $false; Unresolved = ($unresolved -join ' '); Error = '' }
+  if (-not $isArm) {
+    # ARG allows 3 join and 3 mv-expand operators per query by default (Microsoft Learn: Resource Graph query language limits).
+    $bare = [regex]::Replace($q, "'[^']*'", "''")
+    $joins = ([regex]::Matches($bare, '\|\s*join\b')).Count
+    $expands = ([regex]::Matches($bare, '\|\s*mv-expand\b')).Count
+    if ($joins -gt 3 -or $expands -gt 3) {
+      $rec.Status = 'FAILED'; $rec.Error = "ARG operator limit exceeded: join=$joins, mv-expand=$expands (max 3 each)."
+      $results.Add([pscustomobject]$rec); return
+    }
+  }
   if ($DryRun -or $unresolved) { $rec.Status = $(if ($unresolved) { 'UnresolvedTokens' } else { 'DryRunOK' }); $results.Add([pscustomobject]$rec); return }
   $key = "$isArm|$($Subs -join ',')|$q"
   if ($CacheQueries -and $queryCache.ContainsKey($key)) { $res = $queryCache[$key]; $rec.CacheHit = $true }

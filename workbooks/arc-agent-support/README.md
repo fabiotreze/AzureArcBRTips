@@ -2,7 +2,7 @@
 
 > ⚠️ **Personal, independent project – not an official Microsoft tool.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Support status is an **estimate** (Azure APIs do not expose release dates) – validate against the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes). You are responsible for how you use it.
 
-**Current version: 4.7.1** · **Languages:** English / Português · **Mode:** read-only queries; deploying or saving creates or updates a workbook resource, without upgrading agents or changing the inventoried servers.
+**Current version: 4.9.0** · **Languages:** English / Português · **Mode:** read-only queries; deploying or saving creates or updates a workbook resource, without upgrading agents or changing the inventoried servers.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 
@@ -30,7 +30,7 @@ Support is estimated from sequential release numbers, not verified release dates
 
 | # | Section | What it shows |
 |---|---|---|
-| 1 | Overview | Banner when servers are disconnected / expired; *Fleet status* and *Version & upgrade* tiles (Latest / Supported / Out of support / **Below security floor** / auto-upgrade); **Servers that need action** with the reason |
+| 1 | Overview | Banner when servers are disconnected / expired; *Fleet status* and *Version & upgrade* tiles (Latest / Supported / Out of support / **Below security floor** / auto-upgrade); **Servers that need action** with the reason (disconnected/expired, below security floor, out of support, failing/lagging upgrade, manual upgrade needed). Servers that only have automatic upgrade disabled while eligible are a separate *Eligible, not enabled* recommendation tile, not counted as *Needs action* |
 | 2 | Distribution | Versions, connection status, auto-upgrade health (charts are optional: *Show distribution charts*, off by default) |
 | 3 | Azure Advisor | Blockers (expired / disconnected) and agent recommendations, with a link to the impacted resources in Advisor and a freshness check |
 | 4 | Server inventory | One row per server (up to 1000), below-floor and out-of-support first |
@@ -47,17 +47,35 @@ Extension catalogs use the merged root array returned by [ARM GETARRAY](https://
 
 Reader on the selected subscriptions / management group is required to query data. Deploying the ARM template or saving the workbook requires additional permissions to deploy/create or update the workbook resource. For query validation, use PowerShell 7+ and Az.Accounts.
 
+### Filters and controls (visible parameters)
+
+| Parameter | Default | Meaning |
+|---|---|---|
+| Subscriptions | All | Subscriptions queried (Azure Resource Graph) |
+| Language | EN | Single EN / PT switch for every text in the workbook |
+| OsFilter (OS) | All | Operating systems found in the selected subscriptions |
+| StatusFilter (Connection Status) | All | Connection statuses found in the selected subscriptions |
+| SupportFilter (Estimated support status) | All | Latest / Supported / Out of support / Unknown (heuristic, see Rules) |
+| AutoUpgradeFilter (Auto Upgrade) | All | Enabled / Disabled / N/A |
+| ShowInfo (Show guide) | No | Legend, methodology and official sources |
+| ShowCharts (Show distribution charts) | No | Optional charts on Distribution; opening the tab runs 6 extra queries |
+| ShowChangelog | No | Editorial history (Edit mode only) |
+
+The remaining parameters are hidden: the *Rules* below, the Azure API versions (`ApiVersion`, `ExtApiVersion`) and values resolved from Azure (`ReleasedWindows`, `ReleasedLinux`, `LatestSummary`, `AnyOsTarget`, `SelectedTab`). On the Extensions tab, selecting a row of the first grid exports `ExtPublisher`, `ExtType` and `ExtLocation` to the comparison grids.
+
+The extension catalog request uses the tenant-level path without `/subscriptions/{id}`. On 2026-11-10 it returned HTTP 200 with the same version list as the documented subscription path for one publisher/type/region ([API reference](https://learn.microsoft.com/rest/api/hybridcompute/extension-metadata-v-2/list)); other regions and publishers were not tested.
+
 ### Rules (editable in Edit mode)
 
 | Parameter | Default | Meaning |
 |---|---|---|
-| SupportWindow | 12 releases | Heuristic only: approximates the official last-12-months policy using sequential release numbers; verify release dates in the agent release notes |
+| SupportWindow | 12 releases | Heuristic only: approximates the official last-12-months policy using sequential release numbers; verify release dates in the agent release notes (the [release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes) say only versions released within the last year are supported; checked 2026-11-10) |
 | AutoUpgradeTolerance | 1 | Heuristic, not a documented guarantee (Microsoft rolls automatic upgrades out in batches and retries failures); *On track* also requires connectivity and no failed last attempt |
-| MinAutoUpgradeVersion | 1.67 | Automatic agent upgrade requires agent 1.67 or later (Windows: PowerShell execution policy RemoteSigned; Linux: cron service) |
-| **SecurityFloorVersion** | **1.61** | Configurable minimum based on public CVE records (CVE-2026-26117 affects agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 and CVE-2025-55316 as in Arc Posture Review); applied to every OS; being at/above it does **not** certify security. Review new security fixes and this threshold regularly |
-| LatestOverride | 1.69 | Manual reference taken from the agent release notes. When filled it takes priority over every other source (it is not a maximum), even if Azure reports a higher version: update or clear it after each release |
+| MinAutoUpgradeVersion | 1.67 | Automatic agent upgrade requires agent 1.67 or later (Windows: PowerShell execution policy RemoteSigned; Linux: cron service); [Learn](https://learn.microsoft.com/azure/azure-arc/servers/automatic-agent-upgrade), verified 2026-11-10 |
+| **SecurityFloorVersion** | **1.61** | Configurable minimum based on public CVE records (CVE-2026-26117 affects agents < 1.61, CVE-2025-49692 < 1.49; CVE-2025-26627 and CVE-2025-55316 as in Arc Posture Review); applied to every OS; being at/above it does **not** certify security. Review new security fixes and this threshold regularly. CVE-2026-26117 record (affected < 1.61) checked 2026-11-10; the 1.70 release notes list security fixes without affected-version ranges, so the floor was not raised |
+| LatestOverride | empty | Optional manual reference taken from the agent release notes. When filled it takes priority over every other source (it is not a maximum), even if Azure reports a higher version: update or clear it after each release |
 
-Without an override, *Latest* is the highest version Azure reports and can lag the newest release.
+Without an override, *Latest* is the highest of the version Azure reports (`osType/agentVersions/latest`) and the auto-upgrade target seen in the fleet, and it can lag the newest release. Verified on 2026-11-10: the release notes and the download host already listed 1.70 (host `Last-Modified` 2026-11-09) while the API still returned 1.69. No Azure Resource Graph or ARM source tells the newest release immediately, so a fixed version cannot be removed without accepting that lag; set *LatestOverride* temporarily if you need the newest release counted. The download selector pre-selects the version confirmed by the API, so a newer override does not produce a 404.
 
 ## Import
 
@@ -93,6 +111,8 @@ Repeat the tests in **both EN and PT**. `Subsets` covers the enumerated filter o
 
 `-SetParam` values take effect before dependent parameters are resolved. Query failures, unresolved tokens, parameter failures and **INCOMPLETE** results produce exit code **1**; success produces **0**. Missing continuation tokens do not prove completeness. Exactly 10,000 rows are complete only when response metadata confirms there are no more. Parameter failures appear in the CSV and the red final summary. Run the offline mock regression tests with `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookQueries.Tests.ps1`.
 
+**Metadata contract check (not a result test).** `pwsh -NoProfile -File .\scripts\Test-ArcWorkbookContract.ps1` compares every `properties.*` path, resource type, Resource Graph table and ARM path used by the workbooks with the public sources: the Azure REST API specs (`Azure/azure-rest-api-specs`) and the Learn list of Resource Graph supported tables. `-Live` (read-only) also counts how many resources in your tenant populate each property. It proves the workbook reads documented fields; it does not prove that the heuristics (supported, on track, needs action) match Microsoft policy. Advisor, policy and subscription properties are reported as UNVERIFIED because no spec is compared for them. Offline tests: `Test-ArcWorkbookContract.Tests.ps1`.
+
 During normal execution, parameters awaiting only values exported by query row selection are reported as **Skipped (aguarda seleção)** in the CSV and summary, without failing the run. Export names are discovered from query metadata. `-ExtensionDrill` supplies selection values and validates the parameter queries; a real failure or an unresolved non-selection token still produces exit code **1**.
 
 > Test reports contain environment data – treat them as confidential and never attach them to issues or commits.
@@ -108,9 +128,7 @@ Agent references use exact `latest` lookups, and agent downloads use an exact `m
 
 ## Maintenance
 
-[`agent-releases.json`](agent-releases.json) is a reference calendar generated by [`Update-AgentReleases.ps1`](../../scripts/Update-AgentReleases.ps1). No current workbook reads it; refreshing it does not change compliance rules, reference versions or deployed workbooks.
-
-The [Update agent release calendar workflow](../../.github/workflows/update-agent-releases.yml) runs manually through `workflow_dispatch`, not on a schedule. It writes the calendar and, when changed, commits and pushes that file to the branch selected for the run, subject to repository permissions and branch protections. It does not run the workbook query tests. Review the resulting diff and workflow outcome; this is separate from workbook validation and publication.
+After each Connected Machine agent release, check the [agent release notes](https://learn.microsoft.com/azure/azure-arc/servers/agent-release-notes) and update or clear `LatestOverride` (see Rules). No file in this repository tracks release dates.
 
 ## Related projects
 

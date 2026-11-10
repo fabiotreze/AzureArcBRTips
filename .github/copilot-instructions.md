@@ -11,7 +11,7 @@ workbooks/<project>/README.md                # English guide
 workbooks/<project>/README.pt-BR.md          # Portuguese (Brazil) guide
 workbooks/<project>/CHANGELOG.md             # per-project versions (independent of the repo)
 templates/<project>-azuredeploy.json         # ARM template embedding the workbook ("Deploy to Azure" button)
-scripts/                                      # shared tooling (Test-ArcWorkbookQueries.ps1 and its offline mock tests Test-ArcWorkbookQueries.Tests.ps1, which must pass after any change to the harness)
+scripts/                                      # shared tooling (Test-ArcWorkbookQueries.ps1 and its offline mock tests Test-ArcWorkbookQueries.Tests.ps1, which must pass after any change to the harness; Test-ArcWorkbookContract.ps1 checks queries against public Microsoft metadata, with offline tests Test-ArcWorkbookContract.Tests.ps1)
 README.md / README.pt-BR.md                  # root: "Project catalog" table, one row per project
 ```
 Current projects: `arc-agent-support` (Connected Machine agent compliance), `arc-sql-payg-readiness` (SQL Server enabled by Azure Arc – PAYG readiness) and `arc-sql-resource-reconciliation` (SQL resource relationship and metadata exceptions).

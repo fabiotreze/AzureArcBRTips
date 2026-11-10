@@ -2,7 +2,7 @@
 
 > Projeto pessoal e independente, não é ferramenta oficial da Microsoft. Veja [DISCLAIMER](../../DISCLAIMER.md#aviso-legal). Achados são candidatos para investigação, não órfãos confirmados ou irregularidades de licenciamento.
 
-**Versão atual: 1.2.3** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
+**Versão atual: 1.2.6** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [JSON do workbook](../arc-sql-resource-reconciliation-workbook.json)
 
@@ -184,6 +184,6 @@ Verificada em 2026-11-06:
 - ARG tem consistência eventual. Um 404 é inconclusivo até conferir ID, versão da API, acesso e escopo. Dois GETs bem-sucedidos comprovam existência, não validade da relação.
 - A classificação FCI consolidado/nó usa arrays de metadados observados; o formato esperado no ambiente-alvo está **não verificado**. Hostnames diferentes não comprovam órfãos. Coletas em momentos diferentes podem produzir divergências transitórias.
 - Correlação AG não comprova descoberta de todas as réplicas. Não há limite arbitrário de idade do inventário ou quantidade esperada de réplicas.
-- Metadados de licença SQL ausentes são sinal de revisão; provisioningState opcional ausente, sozinho, não é erro. Direitos ESU, intenção de ativação e cobrança não são inferidos. Recursos ESU sem exceções explícitas de provisionamento podem não gerar achados mesmo quando exigem revisão de licenciamento; use o [guia de prontidão PAYG](../arc-sql-payg-readiness/README.pt-BR.md).
+- Metadados de licença SQL ausentes são sinal de revisão. Licenças ESU só são sinalizadas quando `activationState` não é Active (valores documentados: Inactive, Active, Terminated); o estado de provisionamento não é usado porque não consta nos specs da API de licenças (verificado em 2026-11-10 com `scripts/Test-ArcWorkbookContract.ps1`). Direitos ESU, intenção de ativação e cobrança não são inferidos. Uma linha ESU ativa pode não gerar achados mesmo quando exige revisão de licenciamento; use o [guia de prontidão PAYG](../arc-sql-payg-readiness/README.pt-BR.md).
 - Cada grade tem limite de 1.000 linhas. Resumos e referências expandidas podem não oferecer tokens de continuação ARG; portal sem erro não comprova exportação exaustiva.
 - Não há comandos de exclusão/alteração, botões de correção ou inventário saudável completo.

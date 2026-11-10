@@ -1,5 +1,17 @@
 # Changelog – SQL Server enabled by Azure Arc – PAYG Readiness Workbook
 
+## 2.3.3 – 2026-11-10
+- **SQLServerLicense validation:** removed the `Scope` column (`properties.scope`), which is not in the `SqlServerLicense` API spec; the documented fields are `scopeType` and `tenantId` (checked with `scripts/Test-ArcWorkbookContract.ps1`). Portal rendering not verified.
+- **Português:** validação de SQLServerLicense: coluna `Scope` removida (`properties.scope` não consta no spec; os campos documentados são `scopeType` e `tenantId`). Renderização no portal não verificada.
+
+## 2.3.2 – 2026-11-10
+- **Language parameter:** removed the non-standard `defaultValue` and the per-item `selected` flags; they appear to make the portal offer a *Default items* choice that sets a value outside EN/PT (red parameter). The initial value is now English, same as the agent-support workbook (options: English and Português). Not reproduced outside the portal; portal rendering not verified.
+- **Português:** parâmetro Language sem `defaultValue` e sem `selected`, que parecem gerar a opção *Default items* com valor fora de EN/PT. Idioma inicial agora English (como no agent-support). Renderização no portal não verificada.
+
+## 2.3.1 – 2026-11-10
+- indexof in extension-to-host joins is now case-insensitive (indexof(tolower(id), '/extensions')) in 11 queries, matching the reconciliation workbook. The ESU hint in su_gap no longer hard-codes a date; dates moved to the guide with a Microsoft Learn source. Status icons (ArcStatus) and bars (Instances) added to grids. Portal rendering not verified.
+- **Português:** indexof sem distinção de maiúsculas em 11 queries; dica de ESU sem data fixa (datas no guia, com fonte); ícones de status e barras nas grades. Renderização no portal não verificada.
+
 ## 2.3.0 – 2026-11-06
 - **Core-capacity approximation:** Standard uses 24 cores through SQL Server 2022 and 32 for SQL Server 2025, based on the machine's Standard instances. Unknown editions/core counts are not reported as zero. Capacity is explicitly not a licensing requirement or billing meter.
 - Per-host architecture recommendations no longer describe Standard capacity as a PAYG billing cap; VM and physical-host guidance is consistent with the estimate methodology in EN/PT.

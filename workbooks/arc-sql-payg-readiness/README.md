@@ -4,7 +4,7 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 > **Personal, unofficial project.** It is not a Microsoft product and not an official licensing tool. Core numbers are estimates, not meters. Confirm entitlement with your licensing process and charges in Cost Management. See [DISCLAIMER](../../DISCLAIMER.md).
 
-**Version:** 2.3.0 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
+**Version:** 2.3.3 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -82,3 +82,5 @@ Run `-DryRun`, normal mode and `-Burst` in both languages with an explicit `-Sub
 ## Known limits
 - The "would the script convert?" column is an approximation of a pinned version of the script (commit `e1163bf`). Re-read the script before running it.
 - The workbook cannot see entitlement (Software Assurance), billing or CSP agreements.
+- ESU hints in the grid carry no dates. Per the Microsoft Learn lifecycle pages (verified on 2026-11-10), extended support ended for [SQL Server 2014](https://learn.microsoft.com/lifecycle/products/sql-server-2014) on 2024-07-09 and for [SQL Server 2016](https://learn.microsoft.com/lifecycle/products/sql-server-2016) on 2026-07-14; ESU year boundaries were not verified here.
+- The extension `settings` keys `enableExtendedSecurityUpdates`, `UsePhysicalCoreLicense.IsApplied` and `ConsentToRecurringPAYG.Consented`/`ConsentTimestamp` are free-form in the ARM spec, so the contract check cannot validate them. Their names and casing match the [official `modify-arc-sql-license-type.ps1`](https://github.com/microsoft/sql-server-samples/blob/master/samples/manage/azure-arc-enabled-sql-server/modify-license-type/modify-arc-sql-license-type.ps1) (verified on 2026-11-10). In the author's lab none of the three was populated, so the columns show "not reported" there and were not observed with real values.- Azure Resource Graph returns at most 1,000 records per call by default ([Learn](https://learn.microsoft.com/azure/governance/resource-graph/concepts/work-with-data)); whether the Workbooks grid pages beyond that with the 10,000-row limit is not verified. Confirm in large estates.

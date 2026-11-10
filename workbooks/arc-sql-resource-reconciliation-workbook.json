@@ -37,7 +37,7 @@
           {
             "isRequired": true,
             "name": "Language",
-            "value": "PT",
+            "value": "EN",
             "id": "reconciliation-language",
             "type": 2,
             "jsonData": "[{\"value\":\"EN\",\"label\":\"English\"},{\"value\":\"PT\",\"label\":\"Português\"}]"
@@ -68,7 +68,7 @@
       "type": 1,
       "name": "intro-EN",
       "content": {
-        "json": "# Azure Arc SQL - Resource Reconciliation\n**Version 1.2.3.** Personal, independent project; not an official Microsoft tool. See [disclaimer](https://github.com/fabiotreze/AzureArcBRTips/blob/main/DISCLAIMER.md). Queries only read ARG; deploying/saving changes a workbook resource. This view lists technical exceptions and unresolved evidence, not confirmed orphan resources or licensing noncompliance."
+        "json": "# Azure Arc SQL - Resource Reconciliation\n**Version 1.2.6.** Personal, independent project; not an official Microsoft tool. See [disclaimer](https://github.com/fabiotreze/AzureArcBRTips/blob/main/DISCLAIMER.md). Queries only read ARG; deploying/saving changes a workbook resource. This view lists technical exceptions and unresolved evidence, not confirmed orphan resources or licensing noncompliance."
       },
       "conditionalVisibility": {
         "comparison": "isEqualTo",
@@ -80,7 +80,7 @@
       "type": 1,
       "name": "intro-PT",
       "content": {
-        "json": "# Azure Arc SQL - Reconciliação de recursos\n**Versão 1.2.3.** Projeto pessoal e independente; não é ferramenta oficial da Microsoft. Veja o [aviso legal](https://github.com/fabiotreze/AzureArcBRTips/blob/main/DISCLAIMER.md). As consultas apenas leem ARG; implantar/salvar altera um recurso de workbook. A visão lista exceções técnicas e evidências inconclusivas, não órfãos confirmados ou irregularidades de licenciamento."
+        "json": "# Azure Arc SQL - Reconciliação de recursos\n**Versão 1.2.6.** Projeto pessoal e independente; não é ferramenta oficial da Microsoft. Veja o [aviso legal](https://github.com/fabiotreze/AzureArcBRTips/blob/main/DISCLAIMER.md). As consultas apenas leem ARG; implantar/salvar altera um recurso de workbook. A visão lista exceções técnicas e evidências inconclusivas, não órfãos confirmados ou irregularidades de licenciamento."
       },
       "conditionalVisibility": {
         "comparison": "isEqualTo",
@@ -184,11 +184,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "16dba18b-f65f-4a8e-9f24-981a25751969"
           },
@@ -208,11 +238,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "e334d31a-5cfc-4007-b1b1-99446ea82cef"
           },
@@ -232,11 +292,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "7c1d6e52-3b1a-4f0e-9a43-5d2b8e6f0a11"
           },
@@ -256,11 +346,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "a9fc509f-e2ee-40a9-a099-588f17703c0a"
           }
@@ -319,11 +439,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "b3a7e9d0-5c21-4e68-8f14-2a9d6c0b7e35"
           },
@@ -343,11 +493,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "d41f8a62-9e07-4b53-a6c8-1f3e5b7d9c20"
           },
@@ -367,11 +547,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "a1d4b8c6-7f02-4e39-9b5a-6c2e8f0d1a77"
           }
@@ -430,11 +640,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "3b4f2ecb-004b-4ef0-a417-5a2e298ad050"
           },
@@ -454,11 +694,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "17c3d428-8287-4120-9ec4-ac3d6000501c"
           },
@@ -478,11 +748,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "7425b7f5-08d5-409b-9658-a6762e50ffb5"
           },
@@ -502,11 +802,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "73e58111-1301-42d2-9b1f-3e2d36a9bc65"
           },
@@ -526,11 +856,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "e8c2a7f1-6b34-4d90-b5a1-3c7e9d2f4a60"
           },
@@ -550,11 +910,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "f5a9c3d8-2e71-4b06-8c4d-7a1b0e6f9d33"
           }
@@ -613,11 +1003,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "e5b62541-4899-4d84-99a6-c4bee6825d79"
           }
@@ -664,7 +1084,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Resources\n| where type in~ ('microsoft.azurearcdata/sqlserverlicenses','microsoft.azurearcdata/sqlserveresulicenses')\n| extend licenseResourceType=case(type =~ 'microsoft.azurearcdata/sqlserverlicenses','SQL Server License / pCore',type =~ 'microsoft.azurearcdata/sqlserveresulicenses','SQL Server ESU License','Other')\n| extend billingPlan=tostring(properties.billingPlan),activationState=tostring(properties.activationState),licenseCategory=tostring(properties.licenseCategory),physicalCores=toint(properties.physicalCores),scopeType=tostring(properties.scopeType)\n| extend finding=case(isnotempty(tostring(properties.provisioningState)) and tostring(properties.provisioningState) !~ 'Succeeded','Provisioning not succeeded',type =~ 'microsoft.azurearcdata/sqlserverlicenses' and (isempty(billingPlan) or isempty(activationState) or isempty(scopeType) or isnull(physicalCores)),'SQL license metadata incomplete','')\n| where isnotempty(finding)\n| project finding,rpValidation='Pending',validationType='Licensing / billing review',severity='Review',licenseResourceType,resourceName=name,billingPlan,activationState,licenseCategory,physicalCores,scopeType,status=tostring(properties.state),provisioningState=tostring(properties.provisioningState),resourceGroup,subscriptionId,resourceId=id,resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),recommendedValidation=case(type =~ 'microsoft.azurearcdata/sqlserverlicenses','Validate billing plan, activation state, physical cores, scope and intended SQL estate coverage','Validate ESU scope, eligible SQL versions, core counts, entitlement and billing')\n| order by licenseResourceType asc,billingPlan asc,resourceGroup asc,resourceName asc",
+              "query": "Resources\n| where type in~ ('microsoft.azurearcdata/sqlserverlicenses','microsoft.azurearcdata/sqlserveresulicenses')\n| extend licenseResourceType=case(type =~ 'microsoft.azurearcdata/sqlserverlicenses','SQL Server License / pCore',type =~ 'microsoft.azurearcdata/sqlserveresulicenses','SQL Server ESU License','Other')\n| extend billingPlan=tostring(properties.billingPlan),activationState=tostring(properties.activationState),licenseCategory=tostring(properties.licenseCategory),physicalCores=toint(properties.physicalCores),scopeType=tostring(properties.scopeType)\n| extend finding=case(type =~ 'microsoft.azurearcdata/sqlserveresulicenses' and activationState !~ 'Active','ESU license not active',type =~ 'microsoft.azurearcdata/sqlserverlicenses' and (isempty(billingPlan) or isempty(activationState) or isempty(scopeType) or isnull(physicalCores)),'SQL license metadata incomplete','')\n| where isnotempty(finding)\n| project finding,rpValidation='Pending',validationType='Licensing / billing review',severity='Review',licenseResourceType,resourceName=name,billingPlan,activationState,licenseCategory,physicalCores,scopeType,resourceGroup,subscriptionId,resourceId=id,resourcePortalUrl=strcat('https://portal.azure.com/#resource',id),recommendedValidation=case(type =~ 'microsoft.azurearcdata/sqlserverlicenses','Validate billing plan, activation state, physical cores, scope and intended SQL estate coverage','Validate ESU scope, eligible SQL versions, core counts, entitlement and billing')\n| order by licenseResourceType asc,billingPlan asc,resourceGroup asc,resourceName asc",
               "size": 0,
               "title": "License metadata exceptions / Exceções de metadados de licenças",
               "timeContext": {
@@ -676,11 +1096,41 @@
                 "filter": true,
                 "sortBy": [],
                 "rowLimit": 1000,
-                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta."
+                "noDataMessage": "No findings returned; check scope, permissions and query completion. / Nenhum achado retornado; confira escopo, permissões e conclusão da consulta.",
+                "formatters": [
+                  {
+                    "columnMatch": "severity",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Warning",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Review",
+                          "representation": "warning",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "unknown",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  }
+                ]
               },
               "crossComponentResources": [
                 "{Subscription}"
-              ]
+              ],
+              "showExportToExcel": true
             },
             "name": "ab248443-fa5d-4773-ba4b-297abb76a4f6"
           }
@@ -736,7 +1186,7 @@
     },
     {
       "content": {
-        "json": "## Changelog / Histórico\n\n| Version / Versão | Date / Data | Change / Alteração |\n| --- | --- | --- |\n| 1.2.3 | 2026-11-06 | Extension health no longer flags plugin or component statuses inside an otherwise Healthy message (noise on healthy hosts). Saúde da extensão não sinaliza mais status de plugin/componente em mensagem Healthy. Portal validation pending / Validação no portal pendente. |\n| 1.2.2 | 2026-11-06 | Removed the stale-inventory check and its threshold parameter (false positives on healthy hosts); instance status check kept. Removida a verificação de inventário antigo e seu parâmetro de limite (falsos positivos em hosts saudáveis). Portal validation pending / Validação no portal pendente. |\n| 1.2.1 | 2026-11-06 | Added FCI declared host without node projection, node projection not declared by the cluster, and instance whose host has no SQL extension. Hosts FCI sem projeção de nó, nó não declarado pelo cluster e instância cujo host não tem extensão SQL. Portal validation pending / Validação no portal pendente. |\n| 1.2.0 | 2026-11-06 | Orphan detection now includes databases and AGs of instances whose Arc machine is gone; Linux SQL extension; new Connectivity tab (instance status, stale inventory, extension health/upload). Detecção de órfãos inclui bancos e AGs de instâncias sem máquina Arc; extensão SQL Linux; nova aba Conectividade. Portal validation pending / Validação no portal pendente. |\n| 1.1.0 | 2026-11-06 | Added databases on disconnected host or without active SQL extension (grouped per SQL instance). Databases em host desconectado ou sem extensão SQL ativa (agrupado por instância SQL). Portal validation pending / Validação no portal pendente. |\n| 1.0.0 | 2026-11-06 | Initial repository integration, Arc scope, exception-only queries and bilingual navigation. Integração inicial, escopo Arc, consultas de exceções e navegação bilíngue. Portal validation pending / Validação no portal pendente. |"
+        "json": "## Changelog / Histórico\n\n| Version / Versão | Date / Data | Change / Alteração |\n| --- | --- | --- |\n| 1.2.6 | 2026-11-10 | License exceptions query: removed `properties.provisioningState` and `properties.state`, which are not in the Microsoft.AzureArcData SqlServerLicense/SqlServerEsuLicense API specs (checked with scripts/Test-ArcWorkbookContract.ps1). ESU licenses are now flagged when `activationState` is not Active (documented values: Inactive, Active, Terminated). Columns status and provisioningState removed. Consulta de licencas: removidas propriedades fora do spec; ESU sinalizada quando activationState nao e Active. Portal validation pending / Validação no portal pendente. |\n| 1.2.5 | 2026-11-10 | No query changed. Language now defaults to English (same as the other workbooks); the in-workbook banner shows the real version (it still said 1.2.3). Idioma agora abre em English; o banner mostra a versão real (ainda dizia 1.2.3). Portal validation pending / Validação no portal pendente. |\n| 1.2.4 | 2026-11-10 | No query changed. Grids now offer Export to Excel and show an icon for the severity column. Nenhuma query alterada. Grades com exportação para Excel e ícone na coluna severity. Portal validation pending / Validação no portal pendente. |\n| 1.2.3 | 2026-11-06 | Extension health no longer flags plugin or component statuses inside an otherwise Healthy message (noise on healthy hosts). Saúde da extensão não sinaliza mais status de plugin/componente em mensagem Healthy. Portal validation pending / Validação no portal pendente. |\n| 1.2.2 | 2026-11-06 | Removed the stale-inventory check and its threshold parameter (false positives on healthy hosts); instance status check kept. Removida a verificação de inventário antigo e seu parâmetro de limite (falsos positivos em hosts saudáveis). Portal validation pending / Validação no portal pendente. |\n| 1.2.1 | 2026-11-06 | Added FCI declared host without node projection, node projection not declared by the cluster, and instance whose host has no SQL extension. Hosts FCI sem projeção de nó, nó não declarado pelo cluster e instância cujo host não tem extensão SQL. Portal validation pending / Validação no portal pendente. |\n| 1.2.0 | 2026-11-06 | Orphan detection now includes databases and AGs of instances whose Arc machine is gone; Linux SQL extension; new Connectivity tab (instance status, stale inventory, extension health/upload). Detecção de órfãos inclui bancos e AGs de instâncias sem máquina Arc; extensão SQL Linux; nova aba Conectividade. Portal validation pending / Validação no portal pendente. |\n| 1.1.0 | 2026-11-06 | Added databases on disconnected host or without active SQL extension (grouped per SQL instance). Databases em host desconectado ou sem extensão SQL ativa (agrupado por instância SQL). Portal validation pending / Validação no portal pendente. |\n| 1.0.0 | 2026-11-06 | Initial repository integration, Arc scope, exception-only queries and bilingual navigation. Integração inicial, escopo Arc, consultas de exceções e navegação bilíngue. Portal validation pending / Validação no portal pendente. |"
       },
       "conditionalVisibility": {
         "comparison": "isEqualTo",

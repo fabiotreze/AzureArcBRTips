@@ -164,6 +164,8 @@ if ($Worker) {
     'failed-query-whitespace' { $items = @(New-Query 'fail-whitespace') }
     'unresolved-dry' { $items = @(New-Query '{Missing}'); $arguments.DryRun = $true }
     'unresolved-live' { $items = @(New-Query '{Missing}') }
+    'operator-limit-dry' { $items = @(New-Query ('T | join (A) on k | join (B) on k | join (C) on k | join (D) on k')); $arguments.DryRun = $true }
+    'operator-limit-ok' { $items = @(New-Query ("T | where x == '| join | join | join | join' | join (A) on k | mv-expand y")); $arguments.DryRun = $true }
     'unresolved-burst' { $items = @(New-Query '{Missing}'); $arguments.Burst = $true }
     'override-dependent' {
       $parameters = @(
@@ -316,6 +318,8 @@ $cases = @(
   @{ Name = 'failed-query-whitespace'; Exit = 1; Status = 'FAILED' },
   @{ Name = 'unresolved-dry'; Exit = 1; Status = 'UnresolvedTokens' },
   @{ Name = 'unresolved-live'; Exit = 1; Status = 'UnresolvedTokens' },
+  @{ Name = 'operator-limit-dry'; Exit = 1; Status = 'FAILED' },
+  @{ Name = 'operator-limit-ok'; Exit = 0; Status = 'DryRunOK' },
   @{ Name = 'unresolved-burst'; Exit = 1; Status = 'UnresolvedTokens' },
   @{ Name = 'override-dependent'; Exit = 0; Observed = '1.70' },
   @{ Name = 'scalar-arg'; Exit = 0; Observed = '1.69' },
@@ -447,6 +451,36 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness','arc-sql-resou
     if ($link.linkTarget -eq 'parameter' -and $link.cellValue -eq 'SelectedTab' -and $link.subTarget -notin $tabs) {
       throw "Broken tab target in ${project}: $($link.subTarget)"
     }
+  }
+  $version = $template.contentVersion -replace '\.0$',''
+  $projectDir = Join-Path $PSScriptRoot "..\workbooks\$project"
+  foreach ($readme in 'README.md','README.pt-BR.md') {
+    $head = (Get-Content -LiteralPath (Join-Path $projectDir $readme) -Encoding utf8 -TotalCount 12) -join "`n"
+    $m = [regex]::Match($head, '\*\*(?:Current version|Version|Vers\u00e3o atual|Vers\u00e3o):?\*{0,2}\s*(\d+\.\d+\.\d+)')
+    if (-not $m.Success -or $m.Groups[1].Value -ne $version) { throw "Version mismatch in ${project}/${readme}: expected $version" }
+  }
+  $changelogHead = (Get-Content -LiteralPath (Join-Path $projectDir 'CHANGELOG.md') -Encoding utf8 -TotalCount 8) -join "`n"
+  if ($changelogHead -notmatch "(?m)^(\|v|## )$([regex]::Escape($version))\b") { throw "CHANGELOG.md top entry is not $version in $project" }
+  $versionRow = "(?m)^\|[^\r\n]{0,40}\bv?$([regex]::Escape($version))\b"
+  if (-not ($items | Where-Object { $_.type -eq 1 -and $_.content.json -match $versionRow })) {
+    throw "In-workbook changelog has no row for $version in $project"
+  }
+  function Get-QueryCount($Group) {
+    $count = 0
+    foreach ($item in $Group) {
+      if ($item.type -eq 3 -and $item.content.query) { $count++ }
+      elseif ($item.type -eq 12) { $count += Get-QueryCount $item.content.items }
+    }
+    $count
+  }
+  foreach ($group in $workbook.items | Where-Object { $_.type -eq 12 -and $_.conditionalVisibility.parameterName -eq 'SelectedTab' }) {
+    $queryCount = Get-QueryCount $group.content.items
+    if ($queryCount -gt 10) { throw "Tab '$($group.conditionalVisibility.value)' in $project has $queryCount queries (limit 10, Resource Graph throttling)." }
+  }
+  foreach ($query in $items | Where-Object { $_.type -eq 3 -and $_.content.query }) {
+    $length = $query.content.query.Length
+    if ($length -gt 15000) { throw "Query '$($query.name)' in $project has $length characters (failed in the portal at 15-17k)." }
+    if ($length -gt 12000) { Write-Host "WARN query over ~12,000 characters in ${project}: $($query.name) ($length)" }
   }
   if ($project -eq 'arc-agent-support') {
     $catalog = ($parameters | Where-Object name -eq 'ExtAvailable').query | ConvertFrom-Json -Depth 50

@@ -4,7 +4,7 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.3.0 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
+**Versão:** 2.3.3 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -82,3 +82,5 @@ Execute `-DryRun`, modo normal e `-Burst` nos dois idiomas, com escopo explícit
 ## Limites conhecidos
 - A coluna "O script converteria?" é uma aproximação de uma versão fixa do script (commit `e1163bf`). Releia o script antes de executá-lo.
 - O workbook não enxerga direitos (Software Assurance), cobrança nem contratos CSP.
+- As dicas de ESU na grade não trazem datas. Segundo as páginas de ciclo de vida do Microsoft Learn (verificado em 10/11/2026), o suporte estendido terminou para o [SQL Server 2014](https://learn.microsoft.com/lifecycle/products/sql-server-2014) em 09/07/2024 e para o [SQL Server 2016](https://learn.microsoft.com/lifecycle/products/sql-server-2016) em 14/07/2026; os limites dos anos de ESU não foram verificados aqui.
+- As chaves de `settings` da extensão `enableExtendedSecurityUpdates`, `UsePhysicalCoreLicense.IsApplied` e `ConsentToRecurringPAYG.Consented`/`ConsentTimestamp` são livres no spec do ARM, então a checagem de contrato não consegue validá-las. Nomes e caixa conferem com o [`modify-arc-sql-license-type.ps1` oficial](https://github.com/microsoft/sql-server-samples/blob/master/samples/manage/azure-arc-enabled-sql-server/modify-license-type/modify-arc-sql-license-type.ps1) (verificado em 10/11/2026). No laboratório do autor nenhuma das três estava preenchida, então as colunas mostram "não reportado" e não foram observadas com valores reais.- O Azure Resource Graph retorna no máximo 1.000 registros por chamada por padrão ([Learn](https://learn.microsoft.com/azure/governance/resource-graph/concepts/work-with-data)); não foi verificado se a grade do Workbooks pagina além disso com o limite de 10.000 linhas. Confirme em ambientes grandes.

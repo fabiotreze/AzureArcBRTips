@@ -2,7 +2,7 @@
 
 > Personal, independent project, not an official Microsoft tool. See [DISCLAIMER](../../DISCLAIMER.md). Findings are candidates for investigation, not confirmed orphan resources or licensing noncompliance.
 
-**Current version: 1.2.3** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
+**Current version: 1.2.6** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [Workbook JSON](../arc-sql-resource-reconciliation-workbook.json)
 
@@ -184,6 +184,6 @@ Verified on 2026-11-06:
 - ARG is eventually consistent. A 404 is inconclusive until resource ID, API version, access and scope are verified. Two successful GETs establish existence, not relationship validity.
 - FCI consolidated/node classification uses observed metadata arrays; the expected shape in the target environment is **not verified**. Hostname differences do not prove orphaning. Collection-time differences can produce transient discrepancies.
 - AG correlation does not establish replica completeness. No arbitrary inventory-age threshold or expected replica count is imposed.
-- Missing SQL license metadata is a review signal; absence of optional provisioningState alone is not an error. ESU entitlement, intended activation and billing are not inferred. ESU rows without explicit provisioning exceptions may return no findings even when further licensing review is needed; use the [PAYG readiness guide](../arc-sql-payg-readiness/README.md).
+- Missing SQL license metadata is a review signal. ESU licenses are flagged only when `activationState` is not Active (documented values: Inactive, Active, Terminated); provisioning state is not used because it is not in the license API specs (verified on 2026-11-10 with `scripts/Test-ArcWorkbookContract.ps1`). ESU entitlement, intended activation and billing are not inferred. An active ESU row may return no findings even when further licensing review is needed; use the [PAYG readiness guide](../arc-sql-payg-readiness/README.md).
 - Each grid is limited to 1,000 rows. Summaries and expanded references may not support ARG continuation tokens; a successful portal view is not proof of exhaustive export.
 - No delete/update commands, remediation buttons or full healthy inventory are included.
