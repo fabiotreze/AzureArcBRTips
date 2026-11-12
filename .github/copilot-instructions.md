@@ -36,6 +36,14 @@ Current projects: `arc-agent-support` (Connected Machine agent compliance), `arc
 - One bilingual tab bar ("EN / PT" labels) driven by a single parameter. Two tab bars break navigation.
 - Grids: set `rowLimit` explicitly (default 250); `tiles` stack vertically, so prefer compact tables for KPIs.
 - Use ARG-supported KQL only (no `let`, limited `join`/`union`); every query must run in both languages.
+- ARG limits (Microsoft Learn, "Understand the query language", checked 2026-11-12): at most 3 `join`/`union` in total (only one may be a cross-table join, unless all cross-table joins are Resources↔ResourceContainers); at most 3 `mv-expand`; `union` only inside one table or between Resources and ResourceContainers; a table cannot be the right side more than once (`DisallowedMaxNumberOfRemoteTables`). `policyresources` and `resourcechanges` cannot be combined with each other in a `union` (portal error `UnsupportedRemoteTableScenario`): use one query each.
+
+## Lessons learned (evidence discipline)
+- Never assume a table, property or value. Confirm it on Microsoft Learn, the REST spec, the SDK reference or Azure Policy aliases (`Get-AzPolicyAlias`) and record the source and date. If it cannot be confirmed, keep it UNVERIFIED and defer to Microsoft support; do not state it as fact.
+- Third-party scripts and community sites (for example AzAdvertizer) are leads, not sources; label them as such.
+- Inspect workbook queries by parsing the JSON per query name, not with raw-text regex: `resources | where` also matches inside `advisorresources | where`.
+- Mock tests do not prove KQL semantics or ARG limits; real tenant runs and portal clicks do. Say what remains unverified.
+- Do not retract or assert a claim based on one tenant: say how many scopes and records were observed.
 
 ## Definition of done for any workbook change
 1. JSON parses; no undefined `{Parameter}` references.
