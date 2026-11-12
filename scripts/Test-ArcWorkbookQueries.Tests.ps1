@@ -490,7 +490,7 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness','arc-sql-resou
       throw 'Extension GETARRAY transformers must read the root array.'
     }
     $detailQuery = ($items | Where-Object name -eq 'ext-detail').content.query
-    if ($detailQuery -notmatch "case\(availCount == 0, 'Unknown" -or $detailQuery.Contains('Auto-upgrade will move it')) {
+    if (-not $detailQuery.Contains("availCount == 0, 'Unknown") -or $detailQuery.Contains('Auto-upgrade will move it')) {
       throw 'Extension upgrade outlook must preserve catalog uncertainty and avoid upgrade guarantees.'
     }
     if (@($parameters | Where-Object name -match '^Released(Windows|Linux)[234]$').Count) { throw 'Unstable agent list samples returned.' }
@@ -504,6 +504,48 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness','arc-sql-resou
     }
     if (-not ($items | Where-Object name -eq 'extensions').content.query.Contains('by Publisher, ExtensionType, location')) {
       throw 'Extension grouping lost its region.'
+    }
+    $inventoryQuery = ($items | Where-Object name -eq 'inventory').content.query
+    foreach ($required in 'OSName = osName','OSSku = osSku','OSVersion = osVersion','p.detectedProperties.architecture',"'Ahead of reference'","'Outside configured window'") {
+      if (-not $inventoryQuery.Contains($required)) { throw "Missing agent inventory evidence: $required" }
+    }
+    foreach ($item in $items | Where-Object { $_.type -eq 3 -and $_.content.query.Contains('| extend versionComparison =') }) {
+      if ($item.content.query.Contains("'Supported'") -or $item.content.query.Contains("'Out of support'") -or
+          -not $item.content.query.Contains("agentRank < minAutoRank, 'Below minimum (manual upgrade)'") -or
+          -not $item.content.query.Contains("autoUpgradeLabel == 'N/A', 'Unknown enablement'")) {
+        throw "Version comparison or automatic-upgrade evidence regression: $($item.name)"
+      }
+    }
+    $availableQuery = ($items | Where-Object name -eq 'ext-available').content.query
+    foreach ($filter in 'OsFilter','StatusFilter','AutoUpgradeFilter') {
+      if (-not $availableQuery.Contains("{$filter}")) { throw "Missing extension count filter: $filter" }
+    }
+    foreach ($name in 'ext-detail','ext-issues') {
+      $query = ($items | Where-Object name -eq $name).content.query
+      foreach ($required in '_payload.SystemErrors','_payload.InstancesStatus',"'Not assessed'","'Diagnostic review'") {
+        if (-not $query.Contains($required)) { throw "Missing extension diagnostic handling in ${name}: $required" }
+      }
+      if ($query.Contains("'OK'") -or $query.Contains('No longer offered by Azure')) {
+        throw "Unsupported extension conclusion in $name"
+      }
+    }
+    $pathQuery = ($items | Where-Object name -eq 'upgrade-paths').content.query
+    if ($pathQuery.Contains('Auto-upgrade will handle it') -or -not $pathQuery.Contains('FailedAttempts = countif')) {
+      throw 'Agent upgrade paths must inspect blockers without guaranteeing rollout.'
+    }
+    $versionFormatter = ($items | Where-Object name -eq 'inventory').content.gridSettings.formatters |
+      Where-Object columnMatch -eq 'VersionComparison' | ConvertTo-Json -Depth 50 -Compress
+    if (-not $versionFormatter.Contains('"thresholdValue":"At reference"') -or
+        -not $versionFormatter.Contains('"thresholdValue":"Ahead of reference"')) {
+      throw 'Inventory color rules must bind the operational version-comparison labels.'
+    }
+    foreach ($name in 'ext-detail','ext-issues') {
+      $diagnosticFormatter = ($items | Where-Object name -eq $name).content.gridSettings.formatters |
+        Where-Object columnMatch -eq 'IssueCategory' | ConvertTo-Json -Depth 50 -Compress
+      if (-not $diagnosticFormatter.Contains('"thresholdValue":"Diagnostic review","representation":"warning"') -or
+          $diagnosticFormatter.Contains('"thresholdValue":"OK"')) {
+        throw "Diagnostic color rules must not present unassessed health as success: $name"
+      }
     }
   } elseif ($project -eq 'arc-sql-payg-readiness') {
     $estimators = @($items | Where-Object { $_.type -eq 3 -and $_.content.query.Contains('| extend CoreEstimate = case(') })

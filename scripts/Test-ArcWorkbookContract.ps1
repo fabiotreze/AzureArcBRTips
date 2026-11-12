@@ -51,6 +51,40 @@ $script:SpecRoot = @{
 }
 $script:ArgDocUrl = 'https://raw.githubusercontent.com/MicrosoftDocs/azure-docs/main/articles/governance/resource-graph/reference/supported-tables-resources.md'
 
+$script:DefensiveLiterals = @(
+  'properties.sqlImageSku=Unknown'
+  'properties.sqlServerLicenseType=NotSet'
+  'properties.activationState=Active'
+)
+
+# Properties outside the compared REST specs whose existence is documented by Microsoft (verified 2026-11-12). Reported as DOCUMENTED, never as OK.
+$script:DocumentedSources = @(
+  @{ Type = 'microsoft.advisor/'; Source = 'Learn Resource Graph samples (Advisor, FinOps) and Advisor REST spec 2025-01-01'
+     Paths = @('properties.category', 'properties.impact', 'properties.impactedField', 'properties.lastUpdated', 'properties.recommendationTypeId', 'properties.resourceMetadata.resourceId', 'properties.shortDescription.problem', 'properties.shortDescription.solution') }
+  @{ Type = 'microsoft.policyinsights/'; Source = 'Learn Resource Graph samples (Policy)'
+     Paths = @('properties.complianceState', 'properties.policyAssignmentName', 'properties.policyDefinitionId', 'properties.policyDefinitionReferenceId', 'properties.resourceId', 'properties.resourceType') }
+  @{ Type = 'microsoft.resources/subscriptions'; Source = 'Subscriptions REST spec 2022-12-01 (SubscriptionPolicies.quotaId)'
+     Paths = @('properties.subscriptionPolicies.quotaId') }
+  @{ Type = 'resourcechanges'; Source = 'Learn "Get resource changes" (Resource Graph change history)'
+     Paths = @('properties.targetResourceId', 'properties.targetResourceType', 'properties.changeType', 'properties.changes', 'properties.changeAttributes.changedBy', 'properties.changeAttributes.clientType', 'properties.changeAttributes.timestamp') }
+)
+
+# Free-form extension settings: no REST spec. Observations come from read-only ARG counts (2026-11-12, 1310 SQL extensions in 2 scopes) and a third-party public script; they never become OK.
+$script:ObservedNotes = @{
+  'properties.settings.LicenseType'                          = 'free-form setting; observed in 1081 of 1310 SQL extensions (values Paid or absent); the third-party script lists Paid, PAYG, LicenseOnly'
+  'properties.settings.UsePhysicalCoreLicense.IsApplied'     = 'free-form setting; observed in 2 of 1310 SQL extensions as {IsApplied:false, LastUpdatedTimestamp}'
+  'properties.settings.enableExtendedSecurityUpdates'        = 'free-form setting; 0 of 1310 SQL extensions populate it; path read by a third-party public script, not by a Microsoft source'
+  'properties.settings.ConsentToRecurringPAYG.Consented'     = 'free-form setting; 0 of 1310 SQL extensions populate it; path read and written by a third-party public script, not by a Microsoft source'
+  'properties.hardwareProfile.vmSize'                        = 'HardwareProfile.vmSize is in the Compute REST spec 2026-04-01; the full path through the VM resource was not compared'
+}
+
+function Get-SourceNote {
+  param([string]$PathText, [string[]]$Types)
+  foreach ($e in $script:DocumentedSources) {
+    if (@($Types | Where-Object { $_ -like "$($e.Type)*" }) -and $e.Paths -contains $PathText) { return $e.Source }
+  }
+}
+
 # ARG type -> (service, resource definition name in the spec)
 $script:TypeMap = @{
   'microsoft.hybridcompute/machines'                          = @('hybridcompute', 'Machine')
@@ -207,8 +241,19 @@ function Get-WorkbookQueries {
   [pscustomobject]@{ Queries = $queries; Params = $params }
 }
 
+function Expand-QueryPropertyAliases {
+  param([string]$Query)
+  $aliases = @([regex]::Matches($Query, "(?<![\w.])([A-Za-z_]\w*)\s*=\s*properties\b(?![.\[])") |
+    ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+  foreach ($alias in $aliases) {
+    $Query = [regex]::Replace($Query, "(?<![\w.])$([regex]::Escape($alias))(?=\.|\[')", 'properties')
+  }
+  $Query
+}
+
 function Get-QueryPropertyPaths {
   param([string]$Query)
+  $Query = Expand-QueryPropertyAliases $Query
   $paths = [Collections.Generic.List[object]]::new()
   foreach ($m in [regex]::Matches($Query, "(?<![\w])properties((?:\.[A-Za-z_]\w*|\['[^']+'\])+)")) {
     $segs = @('properties') + @([regex]::Matches($m.Groups[1].Value, "\.([A-Za-z_]\w*)|\['([^']+)'\]") | ForEach-Object { if ($_.Groups[1].Success) { $_.Groups[1].Value } else { $_.Groups[2].Value } })
@@ -225,6 +270,7 @@ function Get-QueryTypes {
 function Get-QueryEnumChecks {
   # Heuristic: literals compared directly with a property (or with an alias assigned from it).
   param([string]$Query)
+  $Query = Expand-QueryPropertyAliases $Query
   $checks = [Collections.Generic.List[object]]::new()
   $keys = @{}
   foreach ($m in [regex]::Matches($Query, "(?<![\w])properties(?:\.[A-Za-z_]\w*)+")) { $keys[$m.Value] = $m.Value }
@@ -335,6 +381,23 @@ function Invoke-ContractCheck {
         continue
       }
       $types = Get-QueryTypes $text
+      if ($table -eq 'resourcechanges') {
+        # Type literals are the changed (target) resource types, and properties.* is the change record, not the target resource schema.
+        foreach ($t in $types) {
+          $listed = @($argTables.Keys | Where-Object { $argTables[$_].Contains($t) })
+          if ($listed) { & $add 'ARG-type' $wbName "$($q.Name): $t" 'OK' "target type, listed under: $($listed -join ', ')" }
+          else { & $add 'ARG-type' $wbName "$($q.Name): $t" 'FAIL' 'target type is not listed under any Learn table' }
+        }
+        foreach ($pth in (Get-QueryPropertyPaths $text | Sort-Object Text -Unique)) {
+          $src = Get-SourceNote -PathText $pth.Text -Types @('resourcechanges')
+          if ($src) { & $add 'Property' $wbName "$($q.Name): $($pth.Text)" 'DOCUMENTED' $src }
+          else {
+            $obs = $script:ObservedNotes[$pth.Text]
+            & $add 'Property' $wbName "$($q.Name): $($pth.Text)" 'UNVERIFIED' ("not in the REST specs or Learn change-record fields" + $(if ($obs) { "; $obs" } else { '' }))
+          }
+        }
+        continue
+      }
       $mentioned = @($argTables.Keys | Where-Object { $text -match "(?i)(?<![\w.])$_(?![\w.])" })
       foreach ($t in $types) {
         $listed = @($mentioned | Where-Object { $argTables[$_].Contains($t) })
@@ -366,7 +429,12 @@ function Invoke-ContractCheck {
           if ($onlyPreview) { $note += 'only in preview spec; ' }
           & $add 'Property' $wbName "$($q.Name): $($pth.Text)" $st ($note + (($foundIn | Select-Object -Unique) -join ', '))
         } elseif ($uncovered -or $other -or -not $covered) {
-          & $add 'Property' $wbName "$($q.Name): $($pth.Text)" 'UNVERIFIED' "type(s) not covered by the specs: $((@($uncovered) + @($other)) -join ', ')"
+          $src = Get-SourceNote -PathText $pth.Text -Types $types
+          if ($src) { & $add 'Property' $wbName "$($q.Name): $($pth.Text)" 'DOCUMENTED' $src }
+          else {
+            $obs = $script:ObservedNotes[$pth.Text]
+            & $add 'Property' $wbName "$($q.Name): $($pth.Text)" 'UNVERIFIED' ("type(s) not covered by the specs: $((@($uncovered) + @($other)) -join ', ')" + $(if ($obs) { "; $obs" } else { '' }))
+          }
         } else {
           & $add 'Property' $wbName "$($q.Name): $($pth.Text)" 'FAIL' "not found in spec for $($covered -join ', ')"
         }
@@ -386,7 +454,12 @@ function Invoke-ContractCheck {
         }
         $enum = @($enum | Select-Object -Unique)
         if ($enum.Count -and $chk.Literal -notin $enum) {
-          & $add 'Value' $wbName "$($q.Name): $($chk.Path) = '$($chk.Literal)'" 'WARN' "not in spec enum (open enum or derived label): $($enum -join ', ')"
+          # Sentinels the workbook maps to "Not reported" or tolerates defensively; the spec does not list them, so they are never reported as OK.
+          if ("$($chk.Path)=$($chk.Literal)" -in $script:DefensiveLiterals) {
+            & $add 'Value' $wbName "$($q.Name): $($chk.Path) = '$($chk.Literal)'" 'UNVERIFIED' "defensive literal, not in spec enum: $($enum -join ', ')"
+          } else {
+            & $add 'Value' $wbName "$($q.Name): $($chk.Path) = '$($chk.Literal)'" 'WARN' "not in spec enum (open enum or derived label): $($enum -join ', ')"
+          }
         }
       }
     }
@@ -462,6 +535,6 @@ if ($MyInvocation.InvocationName -ne '.') {
     Write-Host "Report: $ReportPath"
   }
   $fails = @($findings | Where-Object Status -eq 'FAIL').Count
-  Write-Host ("Contract check: {0} FAIL, {1} WARN, {2} UNVERIFIED, {3} OK/FREEFORM" -f $fails, @($findings | Where-Object Status -eq 'WARN').Count, @($findings | Where-Object Status -eq 'UNVERIFIED').Count, @($findings | Where-Object { $_.Status -in 'OK', 'FREEFORM' }).Count)
+  Write-Host ("Contract check: {0} FAIL, {1} WARN, {2} UNVERIFIED, {3} DOCUMENTED, {4} OK/FREEFORM" -f $fails, @($findings | Where-Object Status -eq 'WARN').Count, @($findings | Where-Object Status -eq 'UNVERIFIED').Count, @($findings | Where-Object Status -eq 'DOCUMENTED').Count, @($findings | Where-Object { $_.Status -in 'OK', 'FREEFORM' }).Count)
   if ($fails) { exit 1 }
 }

@@ -44,9 +44,19 @@ $q = "resources`n| where type =~ 'microsoft.hybridcompute/machines'`n| extend s=
 Assert-Equal ((Get-QueryPropertyPaths $q | ForEach-Object Text | Sort-Object -Unique) -join ',') 'properties.agentVersion,properties.status' 'property paths incl. bracket syntax'
 Assert-Equal ((Get-QueryEnumChecks $q | ForEach-Object Literal | Sort-Object -Unique) -join ',') 'Connected,Expired,Healthy' 'enum literals incl. alias'
 Assert-Equal (Get-QueryTypes $q) 'microsoft.hybridcompute/machines' 'type literal'
+$aliasQuery = "resources | extend p = properties | extend s=tostring(p.status), a=p['agentVersion'], c=p.settings.architecture | where s == 'Expired'"
+Assert-Equal ((Get-QueryPropertyPaths $aliasQuery | ForEach-Object Text | Sort-Object -Unique) -join ',') 'properties.agentVersion,properties.settings.architecture,properties.status' 'root property alias paths'
+Assert-Equal ((Get-QueryEnumChecks $aliasQuery | ForEach-Object Literal) -join ',') 'Expired' 'enum through root property alias'
+Assert-Equal (@(Get-QueryPropertyPaths "resources | extend p=properties | project x=other.p.status, y=somep.status").Count) 0 'alias does not match suffixes or nested fields'
 Assert-Equal (Get-QueryTable 'resources') 'resources' 'table of a single-line query'
 Assert-Equal (Get-QueryTable "// c`nAdvisorResources | take 1") 'advisorresources' 'table after comment, case-insensitive'
+Assert-Equal (Get-QueryTable "// c`nresourcechanges | where properties.targetResourceType =~ 'microsoft.azurearcdata/sqlserverlicenses'") 'resourcechanges' 'table of a change-history query'
+Assert-Equal ($script:DefensiveLiterals -contains 'properties.activationState=Active') $true 'defensive literals list'
 Assert-Equal (Test-ArmPathInSpec -ArmPath '/providers/Microsoft.HybridCompute/osType/linux/agentVersions/latest' -Spec ([pscustomobject]@{ Files = @{ 'p.json' = @{ paths = @{ '/providers/Microsoft.HybridCompute/osType/{osType}/agentVersions/{version}' = @{ get = @{} } } } } })) '/providers/Microsoft.HybridCompute/osType/{osType}/agentVersions/{version}' 'ARM path template match'
+Assert-Equal (Get-SourceNote -PathText 'properties.impactedField' -Types @('microsoft.resources/subscriptions', 'microsoft.advisor/recommendations')) 'Learn Resource Graph samples (Advisor, FinOps) and Advisor REST spec 2025-01-01' 'documented source, Advisor field'
+Assert-Equal ([bool](Get-SourceNote -PathText 'properties.impactedField' -Types @('microsoft.policyinsights/policystates'))) $false 'source is scoped by resource type'
+Assert-Equal ([bool](Get-SourceNote -PathText 'properties.settings.enableExtendedSecurityUpdates' -Types @('resourcechanges'))) $false 'free-form settings are never DOCUMENTED'
+Assert-Equal ($script:ObservedNotes.ContainsKey('properties.settings.ConsentToRecurringPAYG.Consented')) $true 'observed note for consent setting'
 
 if ($script:fail) { Write-Host "$script:fail contract test(s) failed"; exit 1 }
 Write-Host 'All contract tests passed'
