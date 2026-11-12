@@ -79,6 +79,12 @@ $script:ObservedNotes = @{
   'properties.settings.ConsentToRecurringPAYG.Consented'     = 'free-form setting; 0 of 1310 SQL extensions populate it; path read and written by a third-party public script, not by a Microsoft source'
 }
 
+$script:ObservedLiteralNotes = @{
+  'properties.sqlImageSku=Unknown'          = 'not observed in 18 SQL virtual machines in 2 scopes (2026-11-12; values seen: Developer, Enterprise)'
+  'properties.sqlServerLicenseType=NotSet'  = 'not observed in 18 SQL virtual machines in 2 scopes (2026-11-12; values seen: PAYG, AHUB)'
+  'properties.activationState=Active'       = 'not observed; the only license seen in 2 scopes was Deactivated (2026-11-12); the spec value is Activated'
+}
+
 function Get-SourceNote {
   param([string]$PathText, [string[]]$Types)
   foreach ($e in $script:DocumentedSources) {
@@ -457,7 +463,9 @@ function Invoke-ContractCheck {
         if ($enum.Count -and $chk.Literal -notin $enum) {
           # Sentinels the workbook maps to "Not reported" or tolerates defensively; the spec does not list them, so they are never reported as OK.
           if ("$($chk.Path)=$($chk.Literal)" -in $script:DefensiveLiterals) {
-            & $add 'Value' $wbName "$($q.Name): $($chk.Path) = '$($chk.Literal)'" 'UNVERIFIED' "defensive literal, not in spec enum: $($enum -join ', ')"
+            $lit = "$($chk.Path)=$($chk.Literal)"
+            $obsLit = $script:ObservedLiteralNotes[$lit]
+            & $add 'Value' $wbName "$($q.Name): $($chk.Path) = '$($chk.Literal)'" 'UNVERIFIED' ("defensive literal, not in spec enum: $($enum -join ', ')" + $(if ($obsLit) { "; $obsLit" } else { '' }))
           } else {
             & $add 'Value' $wbName "$($q.Name): $($chk.Path) = '$($chk.Literal)'" 'WARN' "not in spec enum (open enum or derived label): $($enum -join ', ')"
           }
