@@ -45,6 +45,31 @@ Controls: *Show guide* adds the legend, methodology and official sources. *Show 
 
 Extension catalogs use the merged root array returned by [ARM GETARRAY](https://learn.microsoft.com/azure/azure-monitor/visualize/workbooks-data-sources#azure-resource-manager) (verified on 2026-11-06). If no versions are returned, comparison and upgrade outlook remain unknown; installed-only does not prove a version was withdrawn. Enabled automatic upgrade is not a guarantee of rollout.
 
+### Data model: entities and relationships
+
+Read-only view of what the workbook reads and how the tables are related (derived from the queries in v5.0.0, checked 2026-11-12). Every relationship is a `join` written inside each query; Azure Resource Graph has no stored foreign keys. Property names are validated by the shared contract validator (see Validation).
+
+```mermaid
+erDiagram
+    SUBSCRIPTION ||--o{ MACHINE : "subscriptionId"
+    MACHINE ||--o{ EXTENSION : "id prefix before /extensions/"
+    MACHINE ||--o{ ADVISOR_RECOMMENDATION : "properties.resourceMetadata.resourceId = id"
+    MACHINE ||--o{ POLICY_STATE : "properties.resourceId = id"
+    POLICY_STATE }o--|| POLICY_DEFINITION : "properties.policyDefinitionId"
+    MACHINE }o--|| FLEET_REFERENCE : "osType (aggregate over the same table)"
+```
+
+| Entity | ARG table and type | Key | Joined to | Used by (query) |
+|---|---|---|---|---|
+| Machine | `resources`, `microsoft.hybridcompute/machines` | `tolower(id)` | all others | all |
+| Subscription | `resourcecontainers`, `microsoft.resources/subscriptions` | `subscriptionId` | Machine, left join, only to show the name | `inventory`, `au-detail` |
+| Extension | `resources`, `microsoft.hybridcompute/machines/extensions` | machine id = text of `id` before `/extensions/` | Machine, inner join | `extensions`, `ext-available`, `ext-issues` |
+| Advisor recommendation | `advisorresources`, `microsoft.advisor/recommendations` | `properties.resourceMetadata.resourceId` | Machine, inner join | `adv-summary`, `adv-detail` |
+| Policy state | `policyresources`, `microsoft.policyinsights/policystates` | `properties.resourceId` | Machine, inner join | `policy` |
+| Policy definition | `policyresources`, `microsoft.authorization/policydefinitions` | `tolower(id)` = `policyDefinitionId` | Policy state, left join, only for the display name | `policy` |
+| Fleet reference | `resources` (machines again) | `osType` | Machine, left join | most Machine queries (self-join that computes the highest installed, desired and last-attempt version per OS) |
+
+Notes: the portal's own Arc lists read `resources` with a type filter and no join; this workbook adds joins to correlate Advisor, Policy and extensions. Whether the self-join is slower than the portal pattern has **not been measured**. Learn limits (checked 2026-11-12): at most 3 `join`/`union` per query, and only one cross-table join unless all are Resources with ResourceContainers; see [Resource Graph query language](https://learn.microsoft.com/azure/governance/resource-graph/concepts/query-language).
 ## Requirements
 
 Reader on the selected subscriptions / management group is required to query data. Deploying the ARM template or saving the workbook requires additional permissions to deploy/create or update the workbook resource. For query validation, use PowerShell 7+ and Az.Accounts.

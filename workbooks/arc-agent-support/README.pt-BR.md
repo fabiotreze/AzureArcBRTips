@@ -45,6 +45,31 @@ Controles: *Mostrar guia* exibe a legenda, a metodologia e as fontes oficiais. *
 
 Os catálogos de extensões usam o array raiz combinado retornado por [ARM GETARRAY](https://learn.microsoft.com/azure/azure-monitor/visualize/workbooks-data-sources#azure-resource-manager) (verificado em 2026-11-06). Sem versões retornadas, a comparação e a previsão de upgrade permanecem desconhecidas; installed-only não prova que uma versão foi retirada. Upgrade automático habilitado não garante rollout.
 
+### Modelo de dados: entidades e relacionamentos
+
+Visão somente leitura do que o workbook lê e de como as tabelas se relacionam (derivada das queries da v5.0.0, conferida em 12/11/2026). Cada relacionamento é um `join` escrito dentro de cada query; o Azure Resource Graph não tem chaves estrangeiras armazenadas. Os nomes das propriedades são validados pelo validador de contrato compartilhado (ver Validação).
+
+```mermaid
+erDiagram
+    SUBSCRICAO ||--o{ MAQUINA : "subscriptionId"
+    MAQUINA ||--o{ EXTENSAO : "prefixo do id antes de /extensions/"
+    MAQUINA ||--o{ RECOMENDACAO_ADVISOR : "properties.resourceMetadata.resourceId = id"
+    MAQUINA ||--o{ ESTADO_POLICY : "properties.resourceId = id"
+    ESTADO_POLICY }o--|| DEFINICAO_POLICY : "properties.policyDefinitionId"
+    MAQUINA }o--|| REFERENCIA_FROTA : "osType (agregado sobre a mesma tabela)"
+```
+
+| Entidade | Tabela e tipo no ARG | Chave | Ligada a | Usada por (query) |
+|---|---|---|---|---|
+| Máquina | `resources`, `microsoft.hybridcompute/machines` | `tolower(id)` | todas as outras | todas |
+| Subscrição | `resourcecontainers`, `microsoft.resources/subscriptions` | `subscriptionId` | Máquina, left join, só para exibir o nome | `inventory`, `au-detail` |
+| Extensão | `resources`, `microsoft.hybridcompute/machines/extensions` | id da máquina = texto do `id` antes de `/extensions/` | Máquina, inner join | `extensions`, `ext-available`, `ext-issues` |
+| Recomendação do Advisor | `advisorresources`, `microsoft.advisor/recommendations` | `properties.resourceMetadata.resourceId` | Máquina, inner join | `adv-summary`, `adv-detail` |
+| Estado de Policy | `policyresources`, `microsoft.policyinsights/policystates` | `properties.resourceId` | Máquina, inner join | `policy` |
+| Definição de Policy | `policyresources`, `microsoft.authorization/policydefinitions` | `tolower(id)` = `policyDefinitionId` | Estado de Policy, left join, só para o nome de exibição | `policy` |
+| Referência da frota | `resources` (máquinas de novo) | `osType` | Máquina, left join | a maioria das queries de Máquina (self-join que calcula a maior versão instalada, desejada e da última tentativa por SO) |
+
+Observações: as listas Arc do próprio portal leem `resources` com filtro de tipo e sem join; este workbook adiciona joins para correlacionar Advisor, Policy e extensões. Se o self-join é mais lento que o padrão do portal **não foi medido**. Limites do Learn (conferidos em 12/11/2026): no máximo 3 `join`/`union` por query, e só um join entre tabelas diferentes, salvo se todos forem Resources com ResourceContainers; ver [linguagem de consulta do Resource Graph](https://learn.microsoft.com/azure/governance/resource-graph/concepts/query-language).
 ## Requisitos
 
 Reader nas assinaturas / management group selecionados é necessário para consultar os dados. Implantar o template ARM ou salvar o workbook exige permissões adicionais para implantar/criar ou atualizar o recurso de workbook. Para validar as consultas, use PowerShell 7+ e Az.Accounts.
