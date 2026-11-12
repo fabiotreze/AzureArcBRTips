@@ -65,6 +65,8 @@ $script:DocumentedSources = @(
      Paths = @('properties.complianceState', 'properties.policyAssignmentName', 'properties.policyDefinitionId', 'properties.policyDefinitionReferenceId', 'properties.resourceId', 'properties.resourceType') }
   @{ Type = 'microsoft.resources/subscriptions'; Source = 'Subscriptions REST spec 2022-12-01 (SubscriptionPolicies.quotaId)'
      Paths = @('properties.subscriptionPolicies.quotaId') }
+  @{ Type = 'microsoft.compute/virtualmachines'; Source = 'Azure Policy alias Microsoft.Compute/virtualMachines/hardwareProfile.vmSize (Get-AzPolicyAlias, 2026-11-12)'
+     Paths = @('properties.hardwareProfile.vmSize') }
   @{ Type = 'resourcechanges'; Source = 'Learn "Get resource changes" (Resource Graph change history)'
      Paths = @('properties.targetResourceId', 'properties.targetResourceType', 'properties.changeType', 'properties.changes', 'properties.changeAttributes.changedBy', 'properties.changeAttributes.clientType', 'properties.changeAttributes.timestamp') }
 )
@@ -75,7 +77,6 @@ $script:ObservedNotes = @{
   'properties.settings.UsePhysicalCoreLicense.IsApplied'     = 'free-form setting; observed in 2 of 1310 SQL extensions as {IsApplied:false, LastUpdatedTimestamp}'
   'properties.settings.enableExtendedSecurityUpdates'        = 'free-form setting; 0 of 1310 SQL extensions populate it; path read by a third-party public script, not by a Microsoft source'
   'properties.settings.ConsentToRecurringPAYG.Consented'     = 'free-form setting; 0 of 1310 SQL extensions populate it; path read and written by a third-party public script, not by a Microsoft source'
-  'properties.hardwareProfile.vmSize'                        = 'HardwareProfile.vmSize is in the Compute REST spec 2026-04-01; the full path through the VM resource was not compared'
 }
 
 function Get-SourceNote {

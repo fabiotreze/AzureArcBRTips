@@ -56,6 +56,7 @@ Assert-Equal (Test-ArmPathInSpec -ArmPath '/providers/Microsoft.HybridCompute/os
 Assert-Equal (Get-SourceNote -PathText 'properties.impactedField' -Types @('microsoft.resources/subscriptions', 'microsoft.advisor/recommendations')) 'Learn Resource Graph samples (Advisor, FinOps) and Advisor REST spec 2025-01-01' 'documented source, Advisor field'
 Assert-Equal ([bool](Get-SourceNote -PathText 'properties.impactedField' -Types @('microsoft.policyinsights/policystates'))) $false 'source is scoped by resource type'
 Assert-Equal ([bool](Get-SourceNote -PathText 'properties.settings.enableExtendedSecurityUpdates' -Types @('resourcechanges'))) $false 'free-form settings are never DOCUMENTED'
+Assert-Equal ([bool](Get-SourceNote -PathText 'properties.hardwareProfile.vmSize' -Types @('microsoft.compute/virtualmachines'))) $true 'vmSize documented by Azure Policy alias'
 Assert-Equal ($script:ObservedNotes.ContainsKey('properties.settings.ConsentToRecurringPAYG.Consented')) $true 'observed note for consent setting'
 
 if ($script:fail) { Write-Host "$script:fail contract test(s) failed"; exit 1 }
