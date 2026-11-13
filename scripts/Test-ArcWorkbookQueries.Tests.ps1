@@ -505,6 +505,10 @@ foreach ($project in 'arc-agent-support','arc-sql-payg-readiness','arc-sql-resou
     if (-not ($items | Where-Object name -eq 'extensions').content.query.Contains('by Publisher, ExtensionType, location')) {
       throw 'Extension grouping lost its region.'
     }
+    $tabBars = @($items | Where-Object { $_.type -eq 11 -and $_.content.style -eq 'tabs' })
+    if ($tabBars.Count -ne 1 -or $tabBars[0].conditionalVisibility) {
+      throw 'The workbook must have exactly one always-visible bilingual tab bar (two tab bars did not navigate in the portal).'
+    }
     $inventoryQuery = ($items | Where-Object name -eq 'inventory').content.query
     foreach ($required in 'OSName = osName','OSSku = osSku','OSVersion = osVersion','p.detectedProperties.architecture',"'Ahead of reference'","'Outside configured window'") {
       if (-not $inventoryQuery.Contains($required)) { throw "Missing agent inventory evidence: $required" }
