@@ -33,7 +33,7 @@ Current projects: `arc-agent-support` (Connected Machine agent compliance), `arc
 ## Workbook design limits (learned in testing)
 - Azure Resource Graph throttles at about **15 queries per 5 seconds per user**. Keep **≤ 8–10 ARG queries visible per tab**; hide inactive tabs with conditional visibility (hidden items do not run).
 - Keep each query **≤ ~12,000 characters**; 15–17k character queries failed in the portal.
-- One bilingual tab bar ("EN / PT" labels) driven by a single parameter. Two tab bars break navigation.
+- One bilingual tab bar ("EN / PT" labels) driven by a single parameter. Two tab bars break navigation. `linkLabel` does not resolve `{parameters}` in the portal (the braces are shown literally), so labels cannot follow `Language`; tested 2026-11-13 and reverted.
 - Grids: set `rowLimit` explicitly (default 250); `tiles` stack vertically, so prefer compact tables for KPIs.
 - Use ARG-supported KQL only (no `let`, limited `join`/`union`); every query must run in both languages.
 - ARG limits (Microsoft Learn, "Understand the query language", checked 2026-11-12): at most 3 `join`/`union` in total (only one may be a cross-table join, unless all cross-table joins are Resources↔ResourceContainers); at most 3 `mv-expand`; `union` only inside one table or between Resources and ResourceContainers; a table cannot be the right side more than once (`DisallowedMaxNumberOfRemoteTables`). `policyresources` and `resourcechanges` cannot be combined with each other in a `union` (portal error `UnsupportedRemoteTableScenario`): use one query each.
