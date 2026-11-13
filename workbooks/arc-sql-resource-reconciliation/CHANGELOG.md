@@ -2,6 +2,11 @@
 
 Personal, independent project; see [DISCLAIMER](../../DISCLAIMER.md). Projeto pessoal e independente; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal).
 
+## 1.2.8 - 2026-11-13
+
+- **SQL extension health (`SQLExtensionHealth`)** now follows the Microsoft definition in [Troubleshoot Azure extension for SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/troubleshoot-extension) (verified on 2026-11-13): status message without `SQL Server Extension Agent: Healthy`, `uploadStatus : OK` missing, last `timestampUTC` outside the last 3 days (the default of the Microsoft query) or absent, or provisioning not Succeeded. The machine status check of that article stays in the Connectivity tab. A `Healthy` message that carries a plugin failure is still not judged. Portal not verified.
+- **Português:** a **saúde da extensão SQL (`SQLExtensionHealth`)** passa a seguir a definição da Microsoft em [Troubleshoot Azure extension for SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/troubleshoot-extension) (verificado em 2026-11-13): mensagem de status sem `SQL Server Extension Agent: Healthy`, `uploadStatus : OK` ausente, `timestampUTC` fora dos últimos 3 dias (padrão da query da Microsoft) ou ausente, ou provisionamento diferente de Succeeded. A checagem de status da máquina desse artigo permanece na aba Conectividade. Mensagem `Healthy` com falha de plugin continua não julgada. Portal não verificado.
+
 ## 1.2.7 - 2026-11-10
 
 - The `finding` text and the `rpValidation` value (`Pending`) in the exception queries now follow the *Language* parameter; they were always English (category codes are unchanged). Portal rendering not verified.

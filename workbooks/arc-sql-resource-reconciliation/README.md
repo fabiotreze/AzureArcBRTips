@@ -2,7 +2,7 @@
 
 > Personal, independent project, not an official Microsoft tool. See [DISCLAIMER](../../DISCLAIMER.md). Findings are candidates for investigation, not confirmed orphan resources or licensing noncompliance.
 
-**Current version: 1.2.7** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
+**Current version: 1.2.8** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [Workbook JSON](../arc-sql-resource-reconciliation-workbook.json)
 
@@ -86,7 +86,7 @@ Only the Arc machine plus SQL extension scope is modeled: SQL managed instance, 
 | Database host | Host not Connected or SQL extension absent/not Succeeded | Relationships |
 | Instance status | Status other than Connected on an existing Arc machine (inventory timestamp shown for context only) | Connectivity |
 | Instance without extension | Instance remains but its existing Arc machine has no SQL extension | Connectivity |
-| Extension health | Provisioning not Succeeded, status not Healthy, upload not OK (plugin-level statuses inside a Healthy message are not judged) | Connectivity |
+| Extension health | Provisioning not Succeeded, no `SQL Server Extension Agent: Healthy`, no `uploadStatus : OK`, or last `timestampUTC` outside the last 3 days or absent (plugin-level statuses inside a Healthy message are not judged) | Connectivity |
 | FCI projections | Incomplete or inconsistent metadata (heuristic) | FCI |
 | FCI declared host | Host listed by the consolidated projection without a node projection | FCI |
 | FCI node projection | Node projection whose container is not among the declared hosts | FCI |
@@ -129,7 +129,7 @@ Status as of 2026-11-06. "Executed" means the query ran without error against a 
 | Several instances on one machine | One row per instance; not an exception by itself | Not tested |
 | Instance not Connected | Connectivity tab; documented status example is `Registered`, full list of values not verified. A stale-inventory check was removed in 1.2.2: in a real run, Connected instances on healthy hosts showed old inventory timestamps (cause not verified) | Executed |
 | Host disconnected/expired | Database host query | Observed in lab |
-| Extension health or upload errors | Matches the observed message format (`Healthy`, `uploadStatus : OK`); format not documented by Microsoft, treat as heuristic | Observed in lab |
+| Extension health or upload errors | Follows the Microsoft definition in [Troubleshoot Azure extension for SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/troubleshoot-extension) (verified on 2026-11-13); the 3-day window is the default of that query | Microsoft Learn |
 | Extension removed, instance remains | Instance without extension | Executed; no positive case observed |
 | FCI (consolidated and per-node) | Heuristic projection checks | A declared host without node projection was observed in the lab; other topologies not verified |
 | AG: WSFC, distributed, contained, clusterless | AG health query; `isDistributed`, `isContained` and `clusterTypeDescription` exist in the [AG API](https://learn.microsoft.com/rest/api/arcdata/sql-server-availability-groups/get) but are not judged as exceptions | Only the basic WSFC case observed |

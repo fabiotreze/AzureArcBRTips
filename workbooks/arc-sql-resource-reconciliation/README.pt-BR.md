@@ -2,7 +2,7 @@
 
 > Projeto pessoal e independente, não é ferramenta oficial da Microsoft. Veja [DISCLAIMER](../../DISCLAIMER.md#aviso-legal). Achados são candidatos para investigação, não órfãos confirmados ou irregularidades de licenciamento.
 
-**Versão atual: 1.2.7** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
+**Versão atual: 1.2.8** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [JSON do workbook](../arc-sql-resource-reconciliation-workbook.json)
 
@@ -86,7 +86,7 @@ Só o escopo servidor Arc mais extensão SQL é modelado: instância gerenciada 
 | Host dos bancos | Host fora de Connected ou extensão SQL ausente/não Succeeded | Relacionamentos |
 | Status da instância | Status diferente de Connected em máquina Arc existente (horário do inventário só como contexto) | Conectividade |
 | Instância sem extensão | A instância permanece, mas a máquina Arc existente não tem extensão SQL | Conectividade |
-| Saúde da extensão | Provisionamento diferente de Succeeded, status não Healthy, upload não OK (status de plugin dentro de mensagem Healthy não é julgado) | Conectividade |
+| Saúde da extensão | Provisionamento diferente de Succeeded, sem `SQL Server Extension Agent: Healthy`, sem `uploadStatus : OK`, ou `timestampUTC` fora dos últimos 3 dias ou ausente (status de plugin dentro de mensagem Healthy não é julgado) | Conectividade |
 | Projeções FCI | Metadados incompletos ou inconsistentes (heurística) | FCI |
 | Host declarado da FCI | Host listado pela projeção consolidada sem projeção de nó | FCI |
 | Projeção de nó da FCI | Projeção de nó cujo contêiner não está entre os hosts declarados | FCI |
@@ -129,7 +129,7 @@ Situação em 2026-11-06. "Executado" significa que a consulta rodou sem erro em
 | Várias instâncias na mesma máquina | Uma linha por instância; não é exceção por si só | Não testado |
 | Instância fora de Connected | Aba Conectividade; o exemplo documentado de status é `Registered`, lista completa de valores não verificada | Executado. A verificação de inventário antigo foi removida na 1.2.2: em execução real, instâncias Connected em hosts saudáveis mostraram horário de inventário antigo (causa não verificada) |
 | Host desconectado/expirado | Consulta de host dos bancos | Observado no laboratório |
-| Erros de saúde ou upload da extensão | Usa o formato de mensagem observado (`Healthy`, `uploadStatus : OK`); formato não documentado pela Microsoft, tratar como heurística | Observado no laboratório |
+| Erros de saúde ou upload da extensão | Segue a definição da Microsoft em [Troubleshoot Azure extension for SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/troubleshoot-extension) (verificado em 2026-11-13); a janela de 3 dias é o padrão dessa query | Microsoft Learn |
 | Extensão removida, instância permanece | Instância sem extensão | Executado; nenhum caso positivo observado |
 | FCI (consolidada e por nó) | Verificações heurísticas de projeção | Host declarado sem projeção de nó observado no laboratório; outras topologias não verificadas |
 | AG: WSFC, distribuído, contained, clusterless | Consulta de saúde do AG; `isDistributed`, `isContained` e `clusterTypeDescription` existem na [API de AG](https://learn.microsoft.com/rest/api/arcdata/sql-server-availability-groups/get), mas não são julgados como exceção | Somente o caso WSFC básico observado |
