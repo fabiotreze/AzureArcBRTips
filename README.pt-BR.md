@@ -13,7 +13,7 @@ Uma coleção de **projetos, workbooks, scripts, templates de implantação e or
 
 | Projeto | Versão atual | Finalidade | Documentação |
 |---|---|---|---|
-| Arc Agent Support Workbook | 5.2.1 | Conformidade de versões do agent, saúde do upgrade automático, Advisor, Policy e extensões | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
+| Arc Agent Support Workbook | 5.3.0 | Conformidade de versões do agent, saúde do upgrade automático, Advisor, Policy e extensões | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
 | Workbook de prontidão PAYG – SQL Server habilitado pelo Azure Arc | 2.4.8 | Prontidão para PAYG, tipo de licença, ESU, consentimento CSP e conectividade do SQL Server habilitado pelo Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
 | Workbook de reconciliação de recursos SQL no Azure Arc | 1.2.9 | Exceções técnicas de relacionamentos SQL, conectividade Arc e saúde da extensão SQL, projeções FCI/AG e metadados de licenças; candidatos exigem validação direta no provedor | [English](workbooks/arc-sql-resource-reconciliation/README.md) · [Português](workbooks/arc-sql-resource-reconciliation/README.pt-BR.md) · [Changelog](workbooks/arc-sql-resource-reconciliation/CHANGELOG.md) |
 

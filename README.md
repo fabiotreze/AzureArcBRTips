@@ -13,7 +13,7 @@ A collection of **projects, workbooks, scripts, deployment templates and practic
 
 | Project | Current version | Purpose | Documentation |
 |---|---|---|---|
-| Arc Agent Support Workbook | 5.2.1 | Agent version compliance, automatic upgrade health, Advisor, Policy and extensions | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
+| Arc Agent Support Workbook | 5.3.0 | Agent version compliance, automatic upgrade health, Advisor, Policy and extensions | [English](workbooks/arc-agent-support/README.md) · [Português](workbooks/arc-agent-support/README.pt-BR.md) · [Changelog](workbooks/arc-agent-support/CHANGELOG.md) |
 | SQL Server enabled by Azure Arc PAYG Readiness Workbook | 2.4.8 | PAYG readiness, license type, ESU, CSP consent and connectivity review for SQL Server enabled by Azure Arc | [English](workbooks/arc-sql-payg-readiness/README.md) · [Português](workbooks/arc-sql-payg-readiness/README.pt-BR.md) · [Changelog](workbooks/arc-sql-payg-readiness/CHANGELOG.md) |
 | Azure Arc SQL Resource Reconciliation Workbook | 1.2.9 | Technical exceptions in SQL resource relationships, Arc connectivity and SQL extension health, FCI/AG projections and license metadata; candidates require direct provider validation | [English](workbooks/arc-sql-resource-reconciliation/README.md) · [Português](workbooks/arc-sql-resource-reconciliation/README.pt-BR.md) · [Changelog](workbooks/arc-sql-resource-reconciliation/CHANGELOG.md) |
 

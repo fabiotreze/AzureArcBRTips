@@ -2,7 +2,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é produto nem documentação oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal). Comparação de versão **não** determina suporte. Valide datas, SO e arquitetura nas fontes oficiais. O uso é de sua responsabilidade.
 
-**Versão atual: 5.2.1** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
+**Versão atual: 5.3.0** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 
