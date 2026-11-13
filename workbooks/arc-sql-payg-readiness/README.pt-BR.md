@@ -4,7 +4,7 @@ Azure Workbook que mostra, em um só lugar, o quão prontas estão as suas **ins
 
 > **Projeto pessoal e não oficial.** Não é um produto da Microsoft nem uma ferramenta oficial de licenciamento. Os números de núcleos são estimativas, não medidores. Confirme os direitos pelo seu processo de licenciamento e os valores no Cost Management. Veja o [DISCLAIMER](../../DISCLAIMER.md).
 
-**Versão:** 2.4.8 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
+**Versão:** 2.5.0 · **Idiomas:** English / Português (troque no parâmetro *Language*) · **Modo:** consultas somente leitura (Azure Resource Graph); implantar ou salvar cria ou atualiza um recurso de workbook, sem alterar os servidores inventariados ou seu licenciamento.
 
 [English](README.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -16,9 +16,9 @@ Para publicar, siga o [fluxo de registro de revisões](CHANGELOG.md#azure-revisi
 - Quais instâncias SQL Server com Arc já são PAYG, quais não são e quais tipos de licença estão em uso (LicenseOnly, Paid, PAYG).
 - O que o script oficial `manage-payg-transition.ps1` **converteria** e quais hosts precisam de atenção primeiro (prioridade 🔴 🟠 🟢).
 - O que falta para uma transição segura: extensão SQL, lacuna de ESU (SQL Server 2014/2016), **consentimento CSP para cobrança PAYG recorrente**, conectividade (check-in com mais de 30 dias), alinhamento pCore x plano de cobrança, tags de implantação automática.
-- Aproximação de capacidade de núcleos por host (mínimo 4; Standard 24 até SQL Server 2022 e 32 para 2025; edições gratuitas 0), preservando valores desconhecidos, e sinais de VM x físico. Não representa requisito de licenciamento nem medidor de cobrança.
+- Aproximação de capacidade de núcleos por host (mínimo 4; Standard 24 até SQL Server 2022 e 32 para 2025 em VMs e formato desconhecido, todos os núcleos físicos em máquinas físicas; edições gratuitas 0), preservando valores desconhecidos, e sinais de VM x físico. Não representa requisito de licenciamento nem medidor de cobrança.
 
-Os limites Standard descrevem a [capacidade computacional do mecanismo](https://learn.microsoft.com/sql/sql-server/compute-capacity-limits-by-edition-of-sql-server), não um teto universal de cobrança. Hosts mistos usam o limite das suas instâncias Standard, não a versão de uma instância Developer. Reconcilie o licenciamento de hosts físicos e VMs separadamente com o [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing) e o Cost Management. Verificado em 2026-11-06.
+Os limites Standard descrevem a [capacidade computacional do mecanismo](https://learn.microsoft.com/sql/sql-server/compute-capacity-limits-by-edition-of-sql-server), não um teto universal de cobrança. Hosts mistos usam o limite das suas instâncias Standard, não a versão de uma instância Developer. Reconcilie o licenciamento de hosts físicos e VMs separadamente com o [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing) e o Cost Management. Em máquinas físicas o teto não é aplicado: a Learn diz que um host físico sem VMs é cobrado por todos os núcleos físicos com base na maior edição instalada (verificado em 2026-11-13). Sockets não são avaliados. Verificado em 2026-11-06.
 
 ## Caminho guiado (8 passos)
 1. **Escopo**: selecione as assinaturas.

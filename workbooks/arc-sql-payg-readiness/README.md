@@ -4,7 +4,7 @@ Azure Workbook that shows, in one place, how ready your **SQL Server instances e
 
 > **Personal, unofficial project.** It is not a Microsoft product and not an official licensing tool. Core numbers are estimates, not meters. Confirm entitlement with your licensing process and charges in Cost Management. See [DISCLAIMER](../../DISCLAIMER.md).
 
-**Version:** 2.4.8 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
+**Version:** 2.5.0 · **Languages:** English / Português (switch with the *Language* parameter) · **Mode:** read-only queries (Azure Resource Graph); deploying or saving creates or updates a workbook resource, without changing the inventoried servers or their licensing.
 
 [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-sql-payg-readiness-workbook.json`](../arc-sql-payg-readiness-workbook.json)
 
@@ -16,9 +16,9 @@ For publication, follow the [revision tracking workflow](CHANGELOG.md#azure-revi
 - Which Arc-enabled SQL Server instances are already PAYG, which are not, and which license types are in use (LicenseOnly, Paid, PAYG).
 - What the official `manage-payg-transition.ps1` script **would** convert, and which hosts need attention first (🔴 🟠 🟢 priority).
 - What is missing before a safe transition: SQL extension, ESU gap (SQL Server 2014/2016), **CSP consent for recurring PAYG billing**, connectivity (check-in older than 30 days), pCore versus billing plan alignment, auto-deploy tags.
-- A per-host core-capacity approximation (minimum 4; Standard 24 through SQL Server 2022 and 32 for 2025; free editions 0), with unknown values preserved, and VM versus physical signals. This is not a licensing requirement or billing meter.
+- A per-host core-capacity approximation (minimum 4; Standard 24 through SQL Server 2022 and 32 for 2025 on VMs and unknown form factors, all physical cores on physical machines; free editions 0), with unknown values preserved, and VM versus physical signals. This is not a licensing requirement or billing meter.
 
-The Standard limits describe [engine compute capacity](https://learn.microsoft.com/sql/sql-server/compute-capacity-limits-by-edition-of-sql-server), not a universal billing cap. Mixed hosts use the limit of their Standard instances, not a Developer instance's version. Reconcile physical-host and VM licensing separately using [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing) and Cost Management. Verified on 2026-11-06.
+The Standard limits describe [engine compute capacity](https://learn.microsoft.com/sql/sql-server/compute-capacity-limits-by-edition-of-sql-server), not a universal billing cap. Mixed hosts use the limit of their Standard instances, not a Developer instance's version. Reconcile physical-host and VM licensing separately using [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/manage-license-billing) and Cost Management. On physical machines the cap is not applied: Learn says a physical host without VMs is billed for all its physical cores based on the highest edition installed (verified on 2026-11-13). Sockets are not evaluated. Verified on 2026-11-06.
 
 ## Guided path (8 steps)
 1. **Scope**: select the subscriptions.
