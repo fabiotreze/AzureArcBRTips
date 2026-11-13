@@ -2,7 +2,7 @@
 
 > Personal, independent project, not an official Microsoft tool. See [DISCLAIMER](../../DISCLAIMER.md). Findings are candidates for investigation, not confirmed orphan resources or licensing noncompliance.
 
-**Current version: 1.2.8** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
+**Current version: 1.2.9** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [Workbook JSON](../arc-sql-resource-reconciliation-workbook.json)
 

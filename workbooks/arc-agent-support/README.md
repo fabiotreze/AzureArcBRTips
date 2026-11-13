@@ -2,7 +2,7 @@
 
 > ⚠️ **Personal, independent project – not an official Microsoft product or documentation.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Version comparison does **not** determine support. Validate release dates, OS and architecture against the official sources. You are responsible for how you use it.
 
-**Current version: 5.2.0** · **Languages:** English / Português · **Mode:** read-only queries; deploying or saving creates or updates a workbook resource, without upgrading agents or changing the inventoried servers.
+**Current version: 5.2.1** · **Languages:** English / Português · **Mode:** read-only queries; deploying or saving creates or updates a workbook resource, without upgrading agents or changing the inventoried servers.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 

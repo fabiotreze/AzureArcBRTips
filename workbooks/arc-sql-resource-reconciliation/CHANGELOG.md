@@ -2,6 +2,11 @@
 
 Personal, independent project; see [DISCLAIMER](../../DISCLAIMER.md). Projeto pessoal e independente; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal).
 
+## 1.2.9 - 2026-11-13
+
+- **Text:** Portuguese accents restored in labels, descriptions and editorial history (for example *Versão exata*, *Referência*). No query or logic change.
+- **Português:** acentuação do português restaurada em rótulos, descrições e histórico editorial (por exemplo *Versão exata*, *Referência*). Sem mudança de query ou lógica.
+
 ## 1.2.8 - 2026-11-13
 
 - **SQL extension health (`SQLExtensionHealth`)** now follows the Microsoft definition in [Troubleshoot Azure extension for SQL Server](https://learn.microsoft.com/en-us/sql/sql-server/azure-arc/troubleshoot-extension) (verified on 2026-11-13): status message without `SQL Server Extension Agent: Healthy`, `uploadStatus : OK` missing, last `timestampUTC` outside the last 3 days (the default of the Microsoft query) or absent, or provisioning not Succeeded. The machine status check of that article stays in the Connectivity tab. A `Healthy` message that carries a plugin failure is still not judged. Portal not verified.

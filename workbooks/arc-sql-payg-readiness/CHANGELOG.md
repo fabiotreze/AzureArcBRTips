@@ -1,5 +1,9 @@
 # Changelog – SQL Server enabled by Azure Arc – PAYG Readiness Workbook
 
+## 2.4.8 – 2026-11-13
+- **Text:** Portuguese accents restored in labels, descriptions and editorial history (for example *Versão exata*, *Referência*). No query or logic change.
+- **Português:** acentuação do português restaurada em rótulos, descrições e histórico editorial (por exemplo *Versão exata*, *Referência*). Sem mudança de query ou lógica.
+
 ## 2.4.7 – 2026-11-11
 - **Validation:** the *PAYG change history* table now also lists property changes of the `SQLServerLicense` resource (physical core license scenario, for example `billingPlan` Paid to PAYG), with a *Kind* column (SQL extension or SQLServerLicense); the create/delete table is limited to Create and Delete records. No new query (Validation tab stays at 10). Which license property names appear in `resourcechanges` is not verified; portal rendering not verified.
 - **Português:** Validações: a tabela *Histórico de mudanças PAYG* agora também lista mudanças de propriedades do recurso `SQLServerLicense` (cenário de licença de núcleos físicos, por exemplo `billingPlan` de Paid para PAYG), com coluna *Kind* (Extensão SQL ou SQLServerLicense); a tabela de criação/exclusão ficou limitada a registros Create e Delete. Nenhuma consulta nova (a aba Validações continua com 10). Quais nomes de propriedade da licença aparecem no `resourcechanges` não foi verificado; renderização no portal não verificada.

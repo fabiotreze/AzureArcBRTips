@@ -2,7 +2,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é produto nem documentação oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal). Comparação de versão **não** determina suporte. Valide datas, SO e arquitetura nas fontes oficiais. O uso é de sua responsabilidade.
 
-**Versão atual: 5.2.0** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
+**Versão atual: 5.2.1** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 
@@ -141,18 +141,18 @@ O validador de contrato compartilhado antes apontava 15 FAIL e 5 WARN no SQL PAY
 [`scripts/Test-ArcWorkbookQueries.ps1`](../../scripts/Test-ArcWorkbookQueries.ps1) resolve os tipos de parâmetros suportados pelo validador e executa as consultas visíveis de todas as abas no seu tenant (somente leitura). Avalia a visibilidade herdada dos grupos e informa status, linhas, duração, HTTP 429 e resultados incompletos. Usa a resposta REST do ARG para conferir metadados de paginação. Não substitui os testes de cliques no portal. Execute a partir da raiz do repositório:
 
 ```powershell
-# Use contexto Az.Accounts autenticado existente; os testes nao iniciam login interativo.
+# Use contexto Az.Accounts autenticado existente; os testes não iniciam login interativo.
 # lint offline (sem chamada ao Azure)
 ./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -DryRun
 # cada valor de filtro isoladamente + os 3 primeiros detalhamentos de extensão
 ./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Language PT -FilterCombos OneFactor -ExtensionDrill 3
 # abre cada aba como o portal (todas as queries ao mesmo tempo) com os gráficos opcionais ligados – reproduz HTTP 429
 ./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Burst -SetParam @{ ShowCharts = 'Yes' }
-# todos os subconjuntos nao vazios dos filtros e a selecao explicita All; consultas identicas executam uma vez por chamada
+# todos os subconjuntos não vazios dos filtros e a seleção explicita All; consultas idênticas executam uma vez por chamada
 ./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Subscriptions <subscription-id> -Language EN -FilterCombos Subsets -CacheQueries -SetParam @{ ShowCharts = 'Yes' }
-# cada linha de extensao/regiao e cada versao publicada oferecida na tabela de comparacao
+# cada linha de extensao/regiao e cada versão publicada oferecida na tabela de comparação
 ./scripts/Test-ArcWorkbookQueries.ps1 -WorkbookPath ./workbooks/arc-agent-support-workbook.json -Subscriptions <subscription-id> -Language PT -ExtensionDrill 10000 -AllExtensionTargets -CacheQueries
-# regressoes semanticas anonimas extraidas das queries reais (contexto existente)
+# regressões semânticas anonimas extraídas das queries reais (contexto existente)
 ./scripts/Test-ArcAgentSemantics.ps1
 ```
 

@@ -2,7 +2,7 @@
 
 > Projeto pessoal e independente, não é ferramenta oficial da Microsoft. Veja [DISCLAIMER](../../DISCLAIMER.md#aviso-legal). Achados são candidatos para investigação, não órfãos confirmados ou irregularidades de licenciamento.
 
-**Versão atual: 1.2.8** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
+**Versão atual: 1.2.9** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [JSON do workbook](../arc-sql-resource-reconciliation-workbook.json)
 
