@@ -44,6 +44,9 @@ Current projects: `arc-agent-support` (Connected Machine agent compliance), `arc
 - Inspect workbook queries by parsing the JSON per query name, not with raw-text regex: `resources | where` also matches inside `advisorresources | where`.
 - Mock tests do not prove KQL semantics or ARG limits; real tenant runs and portal clicks do. Say what remains unverified.
 - Do not retract or assert a claim based on one tenant: say how many scopes and records were observed.
+- Extension health: never trust the first token of a status message (a SQL agent `Healthy` can carry a failed plugin). Classify from the whole message, test the rules on real captured text, and state that the rules come from observed messages, not a Microsoft catalog.
+- `instanceView.status` of Arc extensions has only `level`, `code` and `message`: there is no date in Azure Resource Graph. Show a date only when the extension writes it in its message, and say it is the last report, not the start of the problem.
+- Harness: `-FilterCombos` takes `None|OneFactor|Full|Subsets` (`Full` ran for over 25 minutes without finishing; use `OneFactor`), and `-Subscriptions` is required or global parameters stay unresolved.
 
 ## Definition of done for any workbook change
 1. JSON parses; no undefined `{Parameter}` references.
