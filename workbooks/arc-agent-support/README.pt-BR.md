@@ -2,7 +2,7 @@
 
 > ⚠️ **Projeto pessoal e independente – não é produto nem documentação oficial da Microsoft.** Fornecido no estado em que se encontra, sem garantia; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal). Comparação de versão **não** determina suporte. Valide datas, SO e arquitetura nas fontes oficiais. O uso é de sua responsabilidade.
 
-**Versão atual: 5.1.4** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
+**Versão atual: 5.1.5** · **Idiomas:** English / Português · **Modo:** consultas somente leitura; implantar ou salvar cria ou atualiza um recurso de workbook, sem atualizar agents ou alterar os servidores inventariados.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Arquivo do workbook: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 
@@ -125,6 +125,8 @@ Para publicar, siga o [fluxo de registro de revisões](CHANGELOG.md#azure-revisi
 **v5.1.2, 2026-11-13 (Abas).** A barra de abas voltou a ser a barra única bilíngue da v5.1.0 (rótulos como "1-2 Overview / Visão geral"). Dois itens de links com visibilidade condicional em Language não respondiam aos cliques no portal (relatado pelo dono; causa não investigada além disso). Uma invariante offline agora falha se o workbook tiver algo diferente de exatamente uma barra de abas sempre visível. As regras de problemas de extensão da v5.1.1 não mudaram. Cliques em PT e EN nesta versão ainda precisam ser confirmados no portal.
 
 **v5.1.3, verificado em 2026-11-13 (Problemas de extensão).** Uma captura do portal mostrou mensagens da extensão SQL Server que começam com Healthy mas trazem falhas de plugin no mesmo texto (plugin Azure AD com status failed, timeout do Purview, exceção do Purview). A regra da v5.1.1 as classificaria como `Not assessed`; agora são Health warning e *Issue* mostra o detalhe do plugin. Mensagens sem esses marcadores continuam `Not assessed`. Conferido no texto da captura com as mesmas expressões regulares; itens como `AutomaticBackups: Suspended` continuam sem classificação porque o significado não está verificado. Portal não verificado.
+
+**v5.1.5, verificado em 2026-11-13 (Problemas de extensão).** Nova coluna *Last reported by extension (UTC)*: o timestamp mais recente que a própria extensão grava na mensagem de status (`timestampUTC` do agente SQL, `TimestampUTC` do Defender for SQL). Nas amostras do ARG verificadas (`instanceView.status` tem só `level`, `code` e `message`), as demais extensões não trazem data e mostram *Not reported by extension*. O valor é quando a extensão reportou pela última vez, não quando o problema começou. Conferido em mensagens reais em um escopo de 141 assinaturas. Portal não verificado.
 
 **v5.1.4, verificado em 2026-11-13 (Problemas de extensão).** Para extensões que reportam `InstancesStatus` (por exemplo Defender for SQL), *Issue* agora lista só as instâncias com problema como `instância: status - erros` (por exemplo `MSSQLSERVER: Inactive - Failed to initiated all workers`) em vez do primeiro Status e Errors encontrados, que podia mostrar o status de uma instância diferente da do erro. Conferido em mensagens reais de extensão em um escopo de 612 máquinas. Portal não verificado.
 

@@ -2,7 +2,7 @@
 
 > ⚠️ **Personal, independent project – not an official Microsoft product or documentation.** Provided *as is*, without warranty; see the repository [disclaimer](../../DISCLAIMER.md). Version comparison does **not** determine support. Validate release dates, OS and architecture against the official sources. You are responsible for how you use it.
 
-**Current version: 5.1.4** · **Languages:** English / Português · **Mode:** read-only queries; deploying or saving creates or updates a workbook resource, without upgrading agents or changing the inventoried servers.
+**Current version: 5.1.5** · **Languages:** English / Português · **Mode:** read-only queries; deploying or saving creates or updates a workbook resource, without upgrading agents or changing the inventoried servers.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · Workbook file: [`arc-agent-support-workbook.json`](../arc-agent-support-workbook.json)
 
@@ -125,6 +125,8 @@ For publication, follow the [revision tracking workflow](CHANGELOG.md#azure-revi
 **v5.1.2, 2026-11-13 (Tabs).** The tab bar is again the single bilingual bar of v5.1.0 (labels such as "1-2 Overview / Visão geral"). Two link items with conditional visibility on Language did not respond to clicks in the portal (reported by the owner; cause not investigated further). An offline invariant now fails if the workbook has anything other than exactly one always-visible tab bar. The v5.1.1 extension-issue rules are unchanged. Portal clicks in PT and EN on this version remain to be confirmed.
 
 **v5.1.3, verified on 2026-11-13 (Extension issues).** A portal capture showed SQL Server extension messages that start with Healthy but contain plugin failures in the same text (an Azure AD plugin entry with status failed, a Purview timeout, a Purview exception). The v5.1.1 rule would have classified them as `Not assessed`; they are now a Health warning, and *Issue* shows the plugin detail. Messages with none of these markers stay `Not assessed`. Checked on the capture text with the same regular expressions; settings such as `AutomaticBackups: Suspended` remain unclassified because their meaning is not verified. Portal not verified.
+
+**v5.1.5, verified on 2026-11-13 (Extension issues).** New column *Last reported by extension (UTC)*: the newest timestamp the extension wrote in its own status message (SQL agent `timestampUTC`, Defender for SQL `TimestampUTC`). In the ARG samples checked (`instanceView.status` has only `level`, `code` and `message`), other extensions carry no date, so they show *Not reported by extension*. The value is when the extension last reported, not when the problem started. Checked on real messages in a 141-subscription scope. Portal not verified.
 
 **v5.1.4, verified on 2026-11-13 (Extension issues).** For extensions that report `InstancesStatus` (for example Defender for SQL), *Issue* now lists only the instances with a problem as `instance: status - errors` (for example `MSSQLSERVER: Inactive - Failed to initiated all workers`) instead of the first Status and Errors found, which could show a status from a different instance than the error. Checked on real extension messages in a 612-machine scope. Portal not verified.
 
