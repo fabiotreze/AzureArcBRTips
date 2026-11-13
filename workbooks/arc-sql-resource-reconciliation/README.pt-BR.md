@@ -2,7 +2,7 @@
 
 > Projeto pessoal e independente, não é ferramenta oficial da Microsoft. Veja [DISCLAIMER](../../DISCLAIMER.md#aviso-legal). Achados são candidatos para investigação, não órfãos confirmados ou irregularidades de licenciamento.
 
-**Versão atual: 1.2.9** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
+**Versão atual: 1.2.10** · **Idiomas:** English / Português · **Modo:** consultas somente leitura. Implantar ou salvar cria ou atualiza um recurso de workbook; não altera servidores SQL ou licenças.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [JSON do workbook](../arc-sql-resource-reconciliation-workbook.json)
 
@@ -125,7 +125,7 @@ Situação em 2026-11-06. "Executado" significa que a consulta rodou sem erro em
 | Cenário | Tratamento | Situação |
 |---|---|---|
 | Instância cuja máquina Arc foi excluída (órfã) | Instância para contêiner; bancos/AGs sinalizados como dependentes | Caso da instância visto em resultado fornecido por testador; dependentes ainda não observados |
-| Extensão SQL Windows e Linux | Os dois tipos são reconhecidos (nomes conforme o [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/delete-from-azure-arc), verificado em 2026-11-06) | Executado; nenhum host Linux observado |
+| Extensão SQL Windows e Linux | Os dois tipos são reconhecidos (nomes conforme o [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/delete-from-azure-arc), verificado em 2026-11-13) | Executado; nenhum host Linux observado |
 | Várias instâncias na mesma máquina | Uma linha por instância; não é exceção por si só | Não testado |
 | Instância fora de Connected | Aba Conectividade; o exemplo documentado de status é `Registered`, lista completa de valores não verificada | Executado. A verificação de inventário antigo foi removida na 1.2.2: em execução real, instâncias Connected em hosts saudáveis mostraram horário de inventário antigo (causa não verificada) |
 | Host desconectado/expirado | Consulta de host dos bancos | Observado no laboratório |
@@ -171,7 +171,7 @@ Checklist de aceitação no portal:
 
 ## Documentação oficial
 
-Verificada em 2026-11-06:
+Verificada em 2026-11-06 (estratégia ARG, API de instância SQL, linguagem ARG) e 2026-11-13 (FCI, API de licença SQL):
 
 - [Estratégia ARG e validação direta no provedor](https://learn.microsoft.com/azure/governance/resource-graph/choose-query-strategy)
 - [Inventário FCI no SQL Arc e limitações](https://learn.microsoft.com/sql/sql-server/azure-arc/support-for-fci)

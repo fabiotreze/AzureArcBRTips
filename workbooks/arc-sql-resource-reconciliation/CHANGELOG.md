@@ -2,6 +2,11 @@
 
 Personal, independent project; see [DISCLAIMER](../../DISCLAIMER.md). Projeto pessoal e independente; veja o [aviso legal](../../DISCLAIMER.md#aviso-legal).
 
+## 1.2.10 - 2026-11-13
+
+- **Text:** documentation sources re-verified on 2026-11-13 (disconnect SQL Server from Azure Arc, FCI view, SQL license API); the FCI tab now notes the documented instance naming (network name) as a possible reason for not-matched declared hosts. No query or logic change; the ARG strategy source keeps its 2026-11-06 date.
+- **Português:** fontes de documentação reverificadas em 2026-11-13 (desconectar o SQL Server do Azure Arc, visão FCI, API de licenças SQL); a aba FCI agora registra a nomenclatura documentada da instância (nome de rede) como possível motivo de hosts declarados sem correspondência. Sem mudança de query ou lógica; a fonte de estratégia ARG mantém a data de 2026-11-06.
+
 ## 1.2.9 - 2026-11-13
 
 - **Text:** Portuguese accents restored in labels, descriptions and editorial history (for example *Versão exata*, *Referência*). No query or logic change.

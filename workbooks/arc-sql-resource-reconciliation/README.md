@@ -2,7 +2,7 @@
 
 > Personal, independent project, not an official Microsoft tool. See [DISCLAIMER](../../DISCLAIMER.md). Findings are candidates for investigation, not confirmed orphan resources or licensing noncompliance.
 
-**Current version: 1.2.9** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
+**Current version: 1.2.10** · **Languages:** English / Português · **Mode:** read-only queries. Deploying or saving creates or updates a workbook resource; it does not modify SQL servers or licenses.
 
 [English](README.md) · [Português](README.pt-BR.md) · [Changelog](CHANGELOG.md) · [Workbook JSON](../arc-sql-resource-reconciliation-workbook.json)
 
@@ -125,7 +125,7 @@ Status as of 2026-11-06. "Executed" means the query ran without error against a 
 | Scenario | Handling | Status |
 |---|---|---|
 | Instance whose Arc machine was deleted (orphan) | Instance to container; databases/AGs flagged as dependents | Instance case seen in a tester-provided result; dependents not yet observed |
-| Windows and Linux SQL extension | Both extension types are matched (names per [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/delete-from-azure-arc), verified 2026-11-06) | Executed; no Linux host observed |
+| Windows and Linux SQL extension | Both extension types are matched (names per [Microsoft Learn](https://learn.microsoft.com/sql/sql-server/azure-arc/delete-from-azure-arc), verified 2026-11-13) | Executed; no Linux host observed |
 | Several instances on one machine | One row per instance; not an exception by itself | Not tested |
 | Instance not Connected | Connectivity tab; documented status example is `Registered`, full list of values not verified. A stale-inventory check was removed in 1.2.2: in a real run, Connected instances on healthy hosts showed old inventory timestamps (cause not verified) | Executed |
 | Host disconnected/expired | Database host query | Observed in lab |
@@ -171,7 +171,7 @@ Portal acceptance checklist:
 
 ## Official documentation
 
-Verified on 2026-11-06:
+Verified on 2026-11-06 (ARG strategy, SQL instance API, ARG language) and 2026-11-13 (FCI, SQL license API):
 
 - [ARG query strategy and direct provider validation](https://learn.microsoft.com/azure/governance/resource-graph/choose-query-strategy)
 - [SQL Arc FCI inventory and limitations](https://learn.microsoft.com/sql/sql-server/azure-arc/support-for-fci)
